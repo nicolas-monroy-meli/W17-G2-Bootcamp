@@ -1,0 +1,42 @@
+package utils
+
+import "errors"
+
+var (
+
+	//Buyer
+	// ErrBuyerRepositoryNotFound is returned when the buyer is not found
+	ErrBuyerRepositoryNotFound = errors.New("repository: buyer not found")
+	// ErrBuyerRepositoryDuplicated is returned when the buyer already exists
+	ErrBuyerRepositoryDuplicated = errors.New("repository: buyer already exists")
+
+	//Employee
+	// ErrEmployeeRepositoryNotFound is returned when the employee is not found
+	ErrEmployeeRepositoryNotFound = errors.New("repository: employee not found")
+	// ErrEmployeeRepositoryDuplicated is returned when the employee already exists
+	ErrEmployeeRepositoryDuplicated = errors.New("repository: employee already exists")
+
+	//Product
+	// ErrProductRepositoryNotFound is returned when the product is not found
+	ErrProductRepositoryNotFound = errors.New("repository: product not found")
+	// ErrProductRepositoryDuplicated is returned when the product already exists
+	ErrProductRepositoryDuplicated = errors.New("repository: product already exists")
+
+	//Section
+	// ErrSectionRepositoryNotFound is returned when the section is not found
+	ErrSectionRepositoryNotFound = errors.New("repository: section not found")
+	// ErrSectionRepositoryDuplicated is returned when the section already exists
+	ErrSectionRepositoryDuplicated = errors.New("repository: section already exists")
+
+	//Seller
+	// ErrSellerRepositoryNotFound is returned when the seller is not found
+	ErrSellerRepositoryNotFound = errors.New("repository: seller not found")
+	// ErrSellerRepositoryDuplicated is returned when the seller already exists
+	ErrSellerRepositoryDuplicated = errors.New("repository: seller already exists")
+
+	//Warehouse
+	// ErrWarehouseRepositoryNotFound is returned when the warehouse is not found
+	ErrWarehouseRepositoryNotFound = errors.New("repository: warehouse not found")
+	// ErrWarehouseRepositoryDuplicated is returned when the warehouse already exists
+	ErrWarehouseRepositoryDuplicated = errors.New("repository: warehouse already exists")
+)

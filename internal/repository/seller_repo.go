@@ -1,0 +1,51 @@
+package repository
+
+import (
+	mod "github.com/nicolas-monroy-meli/W17-G2-Bootcamp/pkg/models"
+	"github.com/nicolas-monroy-meli/W17-G2-Bootcamp/pkg/utils"
+)
+
+// NewSellerRepo creates a new instance of the Seller repository
+func NewSellerRepo(sellers map[int]mod.Seller) *SellerDB {
+	return &SellerDB{
+		db: sellers,
+	}
+}
+
+// SellerDB is the implementation of the Seller database
+type SellerDB struct {
+	db map[int]mod.Seller
+}
+
+// FindAll returns all sellers from the database
+func (r *SellerDB) FindAll() (sellers map[int]mod.Seller, err error) {
+	result := r.db
+	if len(r.db) == 0 {
+		return nil, utils.ErrSellerRepositoryNotFound
+	}
+	return result, nil
+}
+
+// FindByID returns a seller from the database by its id
+func (r *SellerDB) FindByID(id int) (seller mod.Seller, err error) {
+
+	return
+}
+
+// Save saves a seller into the database
+func (r *SellerDB) Save(seller *mod.Seller) (err error) {
+
+	return
+}
+
+// Update updates a seller in the database
+func (r *SellerDB) Update(seller *mod.Seller) (err error) {
+
+	return
+}
+
+// Delete deletes a seller from the database
+func (r *SellerDB) Delete(id int) (err error) {
+
+	return
+}
