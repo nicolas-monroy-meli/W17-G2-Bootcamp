@@ -2,7 +2,7 @@ package internal
 
 import "errors"
 
-// Buyer is a struct that contains the buyer's information
+// Buyer is a struct that contains the buyer's informations
 type Buyer struct {
 	// ID is the unique identifier of the buyer
 	ID int
