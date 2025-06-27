@@ -3,7 +3,7 @@ package internal
 import (
 	"net/http"
 
-	mod "github.com/nicolas-monroy-meli/W17-G2-Bootcamp/pkg/models"
+	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 )
 
 // SellerRepository is an interface that contains the methods that the seller repository should support

@@ -1,4 +1,4 @@
-module github.com/nicolas-monroy-meli/W17-G2-Bootcamp
+module github.com/smartineztri_meli/W17-G2-Bootcamp
 
 go 1.21
 

@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	internal "github.com/nicolas-monroy-meli/W17-G2-Bootcamp/internal/interfaces"
+	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
 )
 
 // NewProductHandler creates a new instance of the product handler

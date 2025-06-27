@@ -3,7 +3,7 @@ package internal
 import (
 	"net/http"
 
-	mod "github.com/nicolas-monroy-meli/W17-G2-Bootcamp/pkg/models"
+	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 )
 
 // EmployeeRepository is an interface that contains the methods that the employee repository should support
@@ -47,4 +47,3 @@ type EmployeeHandler interface {
 	// Delete deletes the buyer with the given ID
 	Delete(id int) http.HandlerFunc
 }
-

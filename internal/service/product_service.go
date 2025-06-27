@@ -1,8 +1,8 @@
 package service
 
 import (
-	internal "github.com/nicolas-monroy-meli/W17-G2-Bootcamp/internal/interfaces"
-	mod "github.com/nicolas-monroy-meli/W17-G2-Bootcamp/pkg/models"
+	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
+	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 )
 
 // NewProductService creates a new instance of the product service
