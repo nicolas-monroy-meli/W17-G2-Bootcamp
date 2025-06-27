@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	server "github.com/nicolas-monroy-meli/W17-G2-Bootcamp/internal/application"
+	server "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/application"
 )
 
 func main() {

@@ -3,12 +3,12 @@ package server
 import (
 	"net/http"
 
-	"github.com/nicolas-monroy-meli/W17-G2-Bootcamp/docs"
-	cont "github.com/nicolas-monroy-meli/W17-G2-Bootcamp/internal/handler"
-	repo "github.com/nicolas-monroy-meli/W17-G2-Bootcamp/internal/repository"
-	srv "github.com/nicolas-monroy-meli/W17-G2-Bootcamp/internal/service"
-	mod "github.com/nicolas-monroy-meli/W17-G2-Bootcamp/pkg/models"
-	"github.com/nicolas-monroy-meli/W17-G2-Bootcamp/pkg/utils"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/docs"
+	cont "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/handler"
+	repo "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/repository"
+	srv "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/service"
+	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 
 	"github.com/go-chi/chi/v5"
 )

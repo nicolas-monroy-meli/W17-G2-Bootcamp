@@ -1,8 +1,8 @@
 package repository
 
 import (
-	mod "github.com/nicolas-monroy-meli/W17-G2-Bootcamp/pkg/models"
-	"github.com/nicolas-monroy-meli/W17-G2-Bootcamp/pkg/utils"
+	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 )
 
 // NewSellerRepo creates a new instance of the Seller repository
