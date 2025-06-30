@@ -2,6 +2,7 @@ package repository
 
 import (
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 )
 
 // NewSectionRepo creates a new instance of the Section repository
@@ -18,8 +19,10 @@ type SectionDB struct {
 
 // FindAll returns all sections from the database
 func (r *SectionDB) FindAll() (sections map[int]mod.Section, err error) {
-
-	return
+	if len(r.db) == 0 {
+		return nil, utils.ErrEmptySectionDB
+	}
+	return r.db, nil
 }
 
 // FindByID returns a section from the database by its id

@@ -23,6 +23,9 @@ var (
 	ErrProductRepositoryDuplicated = errors.New("repository: product already exists")
 
 	//Section
+
+	//ErrEmptySectionDB returned when there aren't any sections to show due db emptiness
+	ErrEmptySectionDB = errors.New("repository: empty DB")
 	// ErrSectionRepositoryNotFound is returned when the section is not found
 	ErrSectionRepositoryNotFound = errors.New("repository: section not found")
 	// ErrSectionRepositoryDuplicated is returned when the section already exists
