@@ -20,7 +20,7 @@ type SectionService struct {
 
 // FindAll returns all sections
 func (s *SectionService) FindAll() (sections map[int]mod.Section, err error) {
-	return
+	return s.rp.FindAll()
 }
 
 // FindByID returns a section

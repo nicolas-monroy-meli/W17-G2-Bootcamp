@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 	"net/http"
 
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
@@ -22,7 +23,12 @@ type SectionHandler struct {
 // GetAll returns all sections
 func (h *SectionHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
+		result, err := h.sv.FindAll()
+		if err != nil {
+			utils.BadResponse(w, http.StatusNotFound, err.Error())
+			return
+		}
+		utils.GoodResponse(w, http.StatusOK, "data retrieved successfully", result)
 	}
 }
 
