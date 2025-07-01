@@ -1,0 +1,13 @@
+[
+{"id":3,"product_code":"A1003","description":"Yogur natural 150g","height":8,"lenght":6,"width":6,"net_weight":0.15,"expiration_rate":0.1,"freezing_rate":0.01,"recommended_freezing_temperature":4,"product_type_id":1,"seller_id":103},
+{"id":4,"product_code":"A1004","description":"Mantequilla 200g","height":4,"lenght":10,"width":6,"net_weight":0.2,"expiration_rate":0.07,"freezing_rate":0.03,"recommended_freezing_temperature":5,"product_type_id":3,"seller_id":104},
+{"id":5,"product_code":"A1005","description":"Helado de vainilla 1L","height":15,"lenght":12,"width":12,"net_weight":1,"expiration_rate":0.02,"freezing_rate":0.2,"recommended_freezing_temperature":-18,"product_type_id":4,"seller_id":105},
+{"id":6,"product_code":"A1006","description":"Crema de leche 200ml","height":10,"lenght":5,"width":5,"net_weight":0.2,"expiration_rate":0.09,"freezing_rate":0.01,"recommended_freezing_temperature":4,"product_type_id":1,"seller_id":106},
+{"id":8,"product_code":"A1008","description":"Leche deslactosada 1L","height":25,"lenght":7,"width":7,"net_weight":1,"expiration_rate":0.06,"freezing_rate":0,"recommended_freezing_temperature":4,"product_type_id":1,"seller_id":108},
+{"id":1,"product_code":"A1001","description":"Leche entera 1L","height":25,"lenght":7,"width":7,"net_weight":1,"expiration_rate":0.05,"freezing_rate":0,"recommended_freezing_temperature":4,"product_type_id":1,"seller_id":101},
+{"id":2,"product_code":"A1002","description":"Queso fresco 500g","height":6,"lenght":12,"width":12,"net_weight":0.5,"expiration_rate":0.08,"freezing_rate":0.02,"recommended_freezing_temperature":2,"product_type_id":2,"seller_id":102},
+{"id":7,"product_code":"A1007","description":"Queso rallado 100g","height":2,"lenght":15,"width":10,"net_weight":0.1,"expiration_rate":0.12,"freezing_rate":0.04,"recommended_freezing_temperature":3,"product_type_id":2,"seller_id":107},
+{"id":9,"product_code":"A1009","description":"Yogur griego 120g","height":7,"lenght":6,"width":6,"net_weight":0.12,"expiration_rate":0.11,"freezing_rate":0.01,"recommended_freezing_temperature":4,"product_type_id":1,"seller_id":109},
+{"id":10,"product_code":"A1010","description":"Queso azul 250g","height":5,"lenght":10,"width":10,"net_weight":0.25,"expiration_rate":0.09,"freezing_rate":0.03,"recommended_freezing_temperature":3,"product_type_id":2,"seller_id":110},
+{"id":11,"product_code":"A1011","description":"Crema batida 250ml","height":12,"lenght":6,"width":6,"net_weight":0.25,"expiration_rate":0.07,"freezing_rate":0.01,"recommended_freezing_temperature":4,"product_type_id":1,"seller_id":111}
+]

@@ -20,17 +20,17 @@ type ProductService struct {
 
 // FindAll returns all products
 func (s *ProductService) FindAll() (products map[int]mod.Product, err error) {
-	return
+	return s.rp.FindAll()
 }
 
 // FindByID returns a product
 func (s *ProductService) FindByID(id int) (product mod.Product, err error) {
-	return
+	return s.rp.FindByID(id)
 }
 
 // Save creates a new product
 func (s *ProductService) Save(product *mod.Product) (err error) {
-	return
+	return s.rp.Save(product)
 }
 
 // Update updates a product
