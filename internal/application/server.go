@@ -110,6 +110,8 @@ func (a *ServerChi) Run() (err error) {
 	// - sections
 	rt.Route("/v1/sections", func(rt chi.Router) {
 		rt.Get("/", sechd.GetAll())
+		rt.Get("/{id}", sechd.GetByID())
+		rt.Delete("/{id}", sechd.Delete())
 	})
 
 	// - products
