@@ -41,7 +41,6 @@ func (h *SellerHandler) GetAll() http.HandlerFunc {
 // GetByID returns a seller
 func (h *SellerHandler) GetByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		req, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
 			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
@@ -68,7 +67,7 @@ func (h *SellerHandler) Create() http.HandlerFunc {
 
 		err = json.Unmarshal(body, &req)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestNoBody.Error())
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestWrongBody.Error())
 			return
 		}
 
@@ -92,6 +91,41 @@ func (h *SellerHandler) Create() http.HandlerFunc {
 // Update updates a seller
 func (h *SellerHandler) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		var req models.Seller
+		id, err := strconv.Atoi(chi.URLParam(r, "id"))
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			return
+		}
+
+		currentSeller, err := h.sv.FindByID(id)
+		if err != nil {
+			utils.BadResponse(w, 404, err.Error())
+			return
+		}
+
+		body, err := io.ReadAll(r.Body)
+		if err != nil || body == nil {
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestFailedBody.Error())
+			return
+		}
+
+		err = json.Unmarshal(body, &req)
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestWrongBody.Error())
+			return
+		}
+
+		seller := h.sv.PatchValidator(currentSeller, req)
+		var validate = validator.New(validator.WithRequiredStructEnabled())
+		errValidate := validate.Struct(seller)
+		if errValidate != nil {
+			utils.BadResponse(w, 422,
+				utils.ErrRequestWrongBody.Error()+"\n"+errValidate.Error())
+			return
+		}
+		h.sv.Update(&seller)
+		utils.GoodResponse(w, 200, "success", nil)
 
 	}
 }
@@ -99,6 +133,16 @@ func (h *SellerHandler) Update() http.HandlerFunc {
 // Delete deletes a seller
 func (h *SellerHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
+		req, err := strconv.Atoi(chi.URLParam(r, "id"))
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			return
+		}
+		err = h.sv.Delete(req)
+		if err != nil {
+			utils.BadResponse(w, 404, err.Error())
+			return
+		}
+		utils.GoodResponse(w, 204, "success", nil)
 	}
 }

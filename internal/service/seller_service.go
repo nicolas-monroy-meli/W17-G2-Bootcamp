@@ -35,10 +35,27 @@ func (s *SellerService) Save(seller *mod.Seller) (err error) {
 
 // Update updates a seller
 func (s *SellerService) Update(seller *mod.Seller) (err error) {
-	return
+	return s.rp.Update(seller)
 }
 
 // Delete deletes a seller
 func (s *SellerService) Delete(id int) (err error) {
-	return
+	return s.rp.Delete(id)
+}
+
+// Validates Patch Request
+func (s *SellerService) PatchValidator(seller, newSeller mod.Seller) mod.Seller {
+	if newSeller.Telephone != "" {
+		seller.Telephone = newSeller.Telephone
+	}
+	if newSeller.Address != "" {
+		seller.Address = newSeller.Address
+	}
+	if newSeller.CompanyName != "" {
+		seller.CompanyName = newSeller.CompanyName
+	}
+	if newSeller.CID != 0 {
+		seller.CID = newSeller.CID
+	}
+	return seller
 }

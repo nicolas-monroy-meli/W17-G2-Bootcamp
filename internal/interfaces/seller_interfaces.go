@@ -32,6 +32,8 @@ type SellerService interface {
 	Update(seller *mod.Seller) error
 	// Delete deletes the seller with the given ID
 	Delete(id int) error
+	//Valdiates Patch Request
+	PatchValidator(seller, newSeller mod.Seller) mod.Seller
 }
 
 // SellerService is an interface that contains the methods that the buyer service should support
@@ -46,4 +48,6 @@ type SellerHandler interface {
 	Update(buyer *mod.Seller) http.HandlerFunc
 	// Delete deletes the buyer with the given ID
 	Delete(id int) http.HandlerFunc
+	//Valdiates Patch Request
+	PatchValidator(seller, newSeller mod.Seller) mod.Seller
 }
