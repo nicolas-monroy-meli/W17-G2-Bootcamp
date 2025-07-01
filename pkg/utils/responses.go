@@ -7,6 +7,15 @@ import (
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 )
 
+var (
+	// EmptyParams string telling the parameters are empty
+	EmptyParams = "empty parameters"
+	// DataRetrievedSuccess string that tells the data was retrieved
+	DataRetrievedSuccess = "data retrieved successfully"
+	// SectionDeleted string that tells the section was deleted successfully
+	SectionDeleted = "section deleted successfully"
+)
+
 func BadResponse(w http.ResponseWriter, code int, message string) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(code)
