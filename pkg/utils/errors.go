@@ -3,12 +3,20 @@ package utils
 import "errors"
 
 var (
-
-	//Requests
 	ErrRequestIdMustBeInt = errors.New("handler: id must be an integer")
 	ErrRequestNoBody      = errors.New("handler: request must have a body")
 	ErrRequestWrongBody   = errors.New("handler: body does not meet requirements")
 	ErrRequestFailedBody  = errors.New("handler: failed to read body")
+
+	// EmptyParams string telling the parameters are empty
+	EmptyParams = "handler: empty parameters"
+	// DataRetrievedSuccess string that tells the data was retrieved
+	DataRetrievedSuccess = "handler: data retrieved successfully"
+	// SectionDeleted string that tells the section was deleted successfully
+	SectionDeleted = "handler: section deleted successfully"
+	// SectionCreated string to show a successful creation
+	SectionCreated = "handler: section successfully created"
+
 	//Buyer
 	// ErrBuyerRepositoryNotFound is returned when the buyer is not found
 	ErrBuyerRepositoryNotFound = errors.New("repository: buyer not found")

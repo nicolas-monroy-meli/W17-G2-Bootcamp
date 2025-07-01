@@ -1,14 +1,19 @@
 package handler
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-playground/validator/v10"
+	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 	"net/http"
 	"strconv"
-
-	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
 )
+
+var model models.Section
 
 // NewSectionHandler creates a new instance of the section handler
 func NewSectionHandler(sv internal.SectionService) *SectionHandler {
@@ -65,10 +70,68 @@ func (h *SectionHandler) GetByID() http.HandlerFunc {
 	}
 }
 
+// ValidateStruct returns a string map of formatted errors
+func ValidateStruct(s interface{}) map[string]string {
+	v := validator.New()
+	errorsList := make(map[string]string)
+
+	err := v.Struct(s)
+	if err == nil {
+		return nil
+	}
+	for _, err := range err.(validator.ValidationErrors) {
+		customMsg := "unexpected error"
+		field := err.Field()
+		switch err.Tag() {
+		case "required":
+			customMsg = fmt.Sprintf("%s is required", field)
+		case "gte":
+			customMsg = fmt.Sprintf("%s must be greater than or equal to %s", field, err.Param())
+		case "gt":
+			customMsg = fmt.Sprintf("%s must be greater than %s", field, err.Param())
+		case "gtefield":
+			customMsg = fmt.Sprintf("%s must be greater than or equal to %s", field, err.Param())
+		case "gtfield":
+			customMsg = fmt.Sprintf("%s must be greater than %s", field, err.Param())
+		case "lte":
+			customMsg = fmt.Sprintf("%s must be less than or equal to %s", field, err.Param())
+		case "lt":
+			customMsg = fmt.Sprintf("%s must be less than %s", field, err.Param())
+		case "ltefield":
+			customMsg = fmt.Sprintf("%s must be less than or equal to %s", field, err.Param())
+		case "ltfield":
+			customMsg = fmt.Sprintf("%s must be less than %s", field, err.Param())
+		default:
+			customMsg = fmt.Sprintf("%s failed on %s validation", field, err.Tag())
+		}
+		errorsList[field] = customMsg
+	}
+	return errorsList
+}
+
 // Create creates a new section
 func (h *SectionHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
+		err := json.NewDecoder(r.Body).Decode(&model)
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+		validationErrors := ValidateStruct(model)
+		if len(validationErrors) > 0 {
+			str := ""
+			for _, err := range validationErrors {
+				str += err + ", "
+			}
+			utils.BadResponse(w, http.StatusUnprocessableEntity, str)
+			return
+		}
+		err = h.sv.Save(&model)
+		if err != nil {
+			utils.BadResponse(w, http.StatusConflict, err.Error())
+			return
+		}
+		utils.GoodResponse(w, http.StatusCreated, utils.SectionCreated, model)
 	}
 }
 
