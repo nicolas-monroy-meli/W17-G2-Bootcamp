@@ -3,13 +3,13 @@ package models
 // Seller is a struct that contains the seller's information
 type Seller struct {
 	// ID is the unique identifier of the seller
-	ID int `json:"id"`
+	ID int
 	// CID is the unique identifier of the company
-	CID int `json:"cid" validate:"required,gte=0"`
+	CID int
 	// CompanyName is the name of the company
-	CompanyName string `json:"company_name" validate:"required"`
+	CompanyName string
 	// Address is the address of the company
-	Address string `json:"address" validate:"required"`
+	Address string
 	// Telephone is the telephone number of the company
-	Telephone string `json:"telephone" validate:"required"`
+	Telephone string
 }
