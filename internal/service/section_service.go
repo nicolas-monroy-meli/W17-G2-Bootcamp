@@ -20,25 +20,26 @@ type SectionService struct {
 
 // FindAll returns all sections
 func (s *SectionService) FindAll() (sections map[int]mod.Section, err error) {
-	return
+	return s.rp.FindAll()
 }
 
 // FindByID returns a section
 func (s *SectionService) FindByID(id int) (section mod.Section, err error) {
-	return
+
+	return s.rp.FindByID(id)
 }
 
 // Save creates a new section
 func (s *SectionService) Save(section *mod.Section) (err error) {
-	return
+	return s.rp.Save(section)
 }
 
 // Update updates a section
 func (s *SectionService) Update(section *mod.Section) (err error) {
-	return
+	return s.rp.Update(section)
 }
 
 // Delete deletes a section
 func (s *SectionService) Delete(id int) (err error) {
-	return
+	return s.rp.Delete(id)
 }

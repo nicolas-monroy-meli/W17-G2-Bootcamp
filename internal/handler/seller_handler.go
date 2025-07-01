@@ -1,9 +1,15 @@
 package handler
 
 import (
+	"encoding/json"
+	"io"
 	"net/http"
+	"strconv"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-playground/validator/v10"
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 )
 
@@ -25,7 +31,7 @@ func (h *SellerHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		result, err := h.sv.FindAll()
 		if err != nil {
-			utils.BadResponse(w, 400, "unable to get sellers")
+			utils.BadResponse(w, 400, err.Error())
 			return
 		}
 		utils.GoodResponse(w, 200, "succes", result)
@@ -36,13 +42,50 @@ func (h *SellerHandler) GetAll() http.HandlerFunc {
 func (h *SellerHandler) GetByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
+		req, err := strconv.Atoi(chi.URLParam(r, "id"))
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			return
+		}
+		result, err := h.sv.FindByID(req)
+		if err != nil {
+			utils.BadResponse(w, 404, err.Error())
+			return
+		}
+		utils.GoodResponse(w, 200, "success", result)
 	}
 }
 
 // Create creates a new seller
 func (h *SellerHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		var req models.Seller
+		body, err := io.ReadAll(r.Body)
+		if err != nil || body == nil {
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestFailedBody.Error())
+			return
+		}
 
+		err = json.Unmarshal(body, &req)
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestNoBody.Error())
+			return
+		}
+
+		var validate = validator.New(validator.WithRequiredStructEnabled())
+		errValidate := validate.Struct(req)
+		if errValidate != nil {
+			utils.BadResponse(w, 422,
+				utils.ErrRequestWrongBody.Error()+"\n"+errValidate.Error())
+			return
+		}
+
+		err = h.sv.Save(&req)
+		if err != nil {
+			utils.BadResponse(w, http.StatusConflict, err.Error())
+			return
+		}
+		utils.GoodResponse(w, 201, "success", nil)
 	}
 }
 

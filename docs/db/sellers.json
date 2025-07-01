@@ -1,12 +1,12 @@
 [
-  {"ID":1,"CID":1001,"CompanyName":"Alpha Traders Inc.","Address":"123 Alpha St, New York, NY","Telephone":"+1-212-555-0101"},
-  {"ID":2,"CID":1001,"CompanyName":"Alpha Traders Inc.","Address":"123 Alpha St, New York, NY","Telephone":"+1-212-555-0101"},
-  {"ID":3,"CID":1002,"CompanyName":"Beta Logistics Ltd.","Address":"456 Beta Blvd, Chicago, IL","Telephone":"+1-312-555-0102"},
-  {"ID":4,"CID":1002,"CompanyName":"Beta Logistics Ltd.","Address":"456 Beta Blvd, Chicago, IL","Telephone":"+1-312-555-0102"},
-  {"ID":5,"CID":1003,"CompanyName":"Gamma Exports","Address":"789 Gamma Ave, Houston, TX","Telephone":"+1-713-555-0103"},
-  {"ID":6,"CID":1004,"CompanyName":"Delta Wholesale","Address":"321 Delta Rd, Miami, FL","Telephone":"+1-305-555-0104"},
-  {"ID":7,"CID":1005,"CompanyName":"Epsilon Products","Address":"654 Epsilon Pkwy, Seattle, WA","Telephone":"+1-206-555-0105"},
-  {"ID":8,"CID":1006,"CompanyName":"Zeta Solutions","Address":"987 Zeta Ln, Denver, CO","Telephone":"+1-720-555-0106"},
-  {"ID":9,"CID":1005,"CompanyName":"Epsilon Products","Address":"654 Epsilon Pkwy, Seattle, WA","Telephone":"+1-206-555-0105"},
-  {"ID":10,"CID":1007,"CompanyName":"Theta Goods Co.","Address":"246 Theta Cir, Boston, MA","Telephone":"+1-617-555-0108"}
+  {"ID":1,"CID":1001,"Company_Name":"Alpha Traders Inc.","Address":"123 Alpha St, New York, NY","Telephone":"+1-212-555-0101"},
+  {"ID":2,"CID":1001,"Company_Name":"Alpha Traders Inc.","Address":"123 Alpha St, New York, NY","Telephone":"+1-212-555-0101"},
+  {"ID":3,"CID":1002,"Company_Name":"Beta Logistics Ltd.","Address":"456 Beta Blvd, Chicago, IL","Telephone":"+1-312-555-0102"},
+  {"ID":4,"CID":1002,"Company_Name":"Beta Logistics Ltd.","Address":"456 Beta Blvd, Chicago, IL","Telephone":"+1-312-555-0102"},
+  {"ID":5,"CID":1003,"Company_Name":"Gamma Exports","Address":"789 Gamma Ave, Houston, TX","Telephone":"+1-713-555-0103"},
+  {"ID":6,"CID":1004,"Company_Name":"Delta Wholesale","Address":"321 Delta Rd, Miami, FL","Telephone":"+1-305-555-0104"},
+  {"ID":7,"CID":1005,"Company_Name":"Epsilon Products","Address":"654 Epsilon Pkwy, Seattle, WA","Telephone":"+1-206-555-0105"},
+  {"ID":8,"CID":1006,"Company_Name":"Zeta Solutions","Address":"987 Zeta Ln, Denver, CO","Telephone":"+1-720-555-0106"},
+  {"ID":9,"CID":1005,"Company_Name":"Epsilon Products","Address":"654 Epsilon Pkwy, Seattle, WA","Telephone":"+1-206-555-0105"},
+  {"ID":10,"CID":1007,"Company_Name":"Theta Goods Co.","Address":"246 Theta Cir, Boston, MA","Telephone":"+1-617-555-0108"}
 ]
