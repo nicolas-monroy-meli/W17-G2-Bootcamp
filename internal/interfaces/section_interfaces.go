@@ -36,13 +36,13 @@ type SectionService interface {
 	Delete(id int) error
 }
 
-// SectionService is an interface that contains the methods that the buyer service should support
+// SectionHandler is an interface that contains the methods that the buyer service should support
 type SectionHandler interface {
-	// FindAll returns all the buyers
+	// GetAll returns all the buyers
 	GetAll() http.HandlerFunc
-	// FindByID returns the buyer with the given ID
+	// GetByID returns the buyer with the given ID
 	GetByID(id int) http.HandlerFunc
-	// Save saves the given buyer
+	// Create saves the given buyer
 	Create(buyer *mod.Section) http.HandlerFunc
 	// Update updates the given buyer
 	Update(buyer *mod.Section) http.HandlerFunc

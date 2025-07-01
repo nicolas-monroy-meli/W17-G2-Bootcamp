@@ -113,6 +113,7 @@ func (a *ServerChi) Run() (err error) {
 		rt.Get("/{id}", sechd.GetByID())
 		rt.Delete("/{id}", sechd.Delete())
 		rt.Post("/", sechd.Create())
+		rt.Patch("/{id}", sechd.Update())
 	})
 
 	// - products

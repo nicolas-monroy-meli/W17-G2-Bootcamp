@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/docs"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 )
@@ -41,7 +42,6 @@ func (r *SectionDB) FindByID(id int) (section mod.Section, err error) {
 
 // Save saves a section into the database
 func (r *SectionDB) Save(section *mod.Section) (err error) {
-
 	if r.SectionExists(section.SectionNumber) {
 		return utils.ErrSectionRepositoryDuplicated
 	}
@@ -51,13 +51,18 @@ func (r *SectionDB) Save(section *mod.Section) (err error) {
 		}
 	}
 	r.db[section.ID] = *section
+	docs.WriterFile("sections.json", r.db)
 	return nil
 }
 
 // Update updates a section in the database
 func (r *SectionDB) Update(section *mod.Section) (err error) {
-
-	return
+	if r.SectionExists(section.SectionNumber) {
+		return utils.ErrSectionRepositoryNotFound
+	}
+	r.db[section.ID] = *section
+	docs.WriterFile("sections.json", r.db)
+	return nil
 }
 
 // Delete deletes a section from the database by its id

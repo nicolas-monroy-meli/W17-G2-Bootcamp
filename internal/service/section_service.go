@@ -36,7 +36,7 @@ func (s *SectionService) Save(section *mod.Section) (err error) {
 
 // Update updates a section
 func (s *SectionService) Update(section *mod.Section) (err error) {
-	return
+	return s.rp.Update(section)
 }
 
 // Delete deletes a section

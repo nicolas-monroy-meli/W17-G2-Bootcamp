@@ -3,17 +3,13 @@ package handler
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-playground/validator/v10"
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 	"net/http"
 	"strconv"
 )
-
-var model models.Section
 
 // NewSectionHandler creates a new instance of the section handler
 func NewSectionHandler(sv internal.SectionService) *SectionHandler {
@@ -70,54 +66,17 @@ func (h *SectionHandler) GetByID() http.HandlerFunc {
 	}
 }
 
-// ValidateStruct returns a string map of formatted errors
-func ValidateStruct(s interface{}) map[string]string {
-	v := validator.New()
-	errorsList := make(map[string]string)
-
-	err := v.Struct(s)
-	if err == nil {
-		return nil
-	}
-	for _, err := range err.(validator.ValidationErrors) {
-		customMsg := "unexpected error"
-		field := err.Field()
-		switch err.Tag() {
-		case "required":
-			customMsg = fmt.Sprintf("%s is required", field)
-		case "gte":
-			customMsg = fmt.Sprintf("%s must be greater than or equal to %s", field, err.Param())
-		case "gt":
-			customMsg = fmt.Sprintf("%s must be greater than %s", field, err.Param())
-		case "gtefield":
-			customMsg = fmt.Sprintf("%s must be greater than or equal to %s", field, err.Param())
-		case "gtfield":
-			customMsg = fmt.Sprintf("%s must be greater than %s", field, err.Param())
-		case "lte":
-			customMsg = fmt.Sprintf("%s must be less than or equal to %s", field, err.Param())
-		case "lt":
-			customMsg = fmt.Sprintf("%s must be less than %s", field, err.Param())
-		case "ltefield":
-			customMsg = fmt.Sprintf("%s must be less than or equal to %s", field, err.Param())
-		case "ltfield":
-			customMsg = fmt.Sprintf("%s must be less than %s", field, err.Param())
-		default:
-			customMsg = fmt.Sprintf("%s failed on %s validation", field, err.Tag())
-		}
-		errorsList[field] = customMsg
-	}
-	return errorsList
-}
-
 // Create creates a new section
 func (h *SectionHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		var model models.Section
+
 		err := json.NewDecoder(r.Body).Decode(&model)
 		if err != nil {
 			utils.BadResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		validationErrors := ValidateStruct(model)
+		validationErrors := utils.ValidateStruct(model)
 		if len(validationErrors) > 0 {
 			str := ""
 			for _, err := range validationErrors {
@@ -135,10 +94,55 @@ func (h *SectionHandler) Create() http.HandlerFunc {
 	}
 }
 
+func patchSection(model models.Section, section models.Section) models.Section {
+	switch {
+	case model.SectionNumber != 0 && model.SectionNumber != section.SectionNumber:
+		section.SectionNumber = model.SectionNumber
+	case model.CurrentTemperature != 0 && model.CurrentTemperature != section.CurrentTemperature:
+		section.CurrentTemperature = model.CurrentTemperature
+	case model.MinimumTemperature != 0 && model.MinimumTemperature != section.MinimumTemperature:
+		section.MinimumTemperature = model.MinimumTemperature
+	case model.CurrentCapacity != 0 && model.CurrentCapacity != section.CurrentCapacity:
+		section.CurrentCapacity = model.CurrentCapacity
+	case model.MinimumCapacity != 0 && model.MinimumCapacity != section.MinimumCapacity:
+		section.MinimumCapacity = model.MinimumCapacity
+	case model.MaximumCapacity != 0 && model.MaximumCapacity != section.MaximumCapacity:
+		section.MaximumCapacity = model.MaximumCapacity
+	case model.WarehouseID != 0 && model.WarehouseID != section.WarehouseID:
+		section.WarehouseID = model.WarehouseID
+	case model.ProductTypeID != 0 && model.ProductTypeID != section.ProductTypeID:
+		section.ProductTypeID = model.ProductTypeID
+	}
+	return section
+}
+
 // Update updates a section
 func (h *SectionHandler) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		var model models.Section
+		id, err := idRequests(r)
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+		err = json.NewDecoder(r.Body).Decode(&model)
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+		section, err := h.sv.FindByID(id)
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 
+		section = patchSection(model, section)
+		err = h.sv.Update(&section)
+		if err != nil {
+			utils.BadResponse(w, http.StatusNotFound, err.Error())
+			return
+		}
+		utils.GoodResponse(w, http.StatusOK, utils.SectionUpdated, section)
 	}
 }
 
