@@ -25,12 +25,13 @@ func (s *SectionService) FindAll() (sections map[int]mod.Section, err error) {
 
 // FindByID returns a section
 func (s *SectionService) FindByID(id int) (section mod.Section, err error) {
+
 	return s.rp.FindByID(id)
 }
 
 // Save creates a new section
 func (s *SectionService) Save(section *mod.Section) (err error) {
-	return
+	return s.rp.Save(section)
 }
 
 // Update updates a section

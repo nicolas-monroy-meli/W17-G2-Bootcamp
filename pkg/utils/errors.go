@@ -4,6 +4,15 @@ import "errors"
 
 var (
 
+	// EmptyParams string telling the parameters are empty
+	EmptyParams = "handler: empty parameters"
+	// DataRetrievedSuccess string that tells the data was retrieved
+	DataRetrievedSuccess = "handler: data retrieved successfully"
+	// SectionDeleted string that tells the section was deleted successfully
+	SectionDeleted = "handler: section deleted successfully"
+	// SectionCreated string to show a successful creation
+	SectionCreated = "handler: section successfully created"
+
 	//Buyer
 	// ErrBuyerRepositoryNotFound is returned when the buyer is not found
 	ErrBuyerRepositoryNotFound = errors.New("repository: buyer not found")
