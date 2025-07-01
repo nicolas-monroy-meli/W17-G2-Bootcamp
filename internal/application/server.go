@@ -98,8 +98,6 @@ func (a *ServerChi) Run() (err error) {
 	// - sellers
 	rt.Route("/v1/sellers", func(rt chi.Router) {
 		rt.Get("/", selhd.GetAll())
-		rt.Get("/{id}", selhd.GetByID())
-		rt.Post("/", selhd.Create())
 	})
 
 	// - warehouses

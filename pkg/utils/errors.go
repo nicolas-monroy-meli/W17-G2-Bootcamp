@@ -4,11 +4,6 @@ import "errors"
 
 var (
 
-	//Requests
-	ErrRequestIdMustBeInt = errors.New("handler: id must be an integer")
-	ErrRequestNoBody      = errors.New("handler: request must have a body")
-	ErrRequestWrongBody   = errors.New("handler: body does not meet requirements")
-	ErrRequestFailedBody  = errors.New("handler: failed to read body")
 	//Buyer
 	// ErrBuyerRepositoryNotFound is returned when the buyer is not found
 	ErrBuyerRepositoryNotFound = errors.New("repository: buyer not found")
