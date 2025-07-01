@@ -25,12 +25,12 @@ func (s *SellerService) FindAll() (sellers map[int]mod.Seller, err error) {
 
 // FindByID returns a seller
 func (s *SellerService) FindByID(id int) (seller mod.Seller, err error) {
-	return
+	return s.rp.FindByID(id)
 }
 
 // Save creates a new seller
 func (s *SellerService) Save(seller *mod.Seller) (err error) {
-	return
+	return s.rp.Save(seller)
 }
 
 // Update updates a seller
