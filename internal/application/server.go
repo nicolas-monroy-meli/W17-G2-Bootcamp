@@ -121,8 +121,12 @@ func (a *ServerChi) Run() (err error) {
 	})
 
 	// - buyers
-	rt.Route("/v1/buyers", func(rt chi.Router) {
+	rt.Route("/api/v1/buyers", func(rt chi.Router) {
 		rt.Get("/", buyhd.GetAll())
+		rt.Get("/{id}", buyhd.GetByID())
+		rt.Post("/", buyhd.Create())
+		rt.Patch("/{id}", buyhd.Update())
+		rt.Delete("/{id}", buyhd.Delete())
 	})
 
 	// run
