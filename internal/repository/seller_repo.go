@@ -28,20 +28,29 @@ func (r *SellerDB) FindAll() (sellers map[int]mod.Seller, err error) {
 
 // FindByID returns a seller from the database by its id
 func (r *SellerDB) FindByID(id int) (seller mod.Seller, err error) {
-
-	return
+	val, ok := r.db[id]
+	if !ok {
+		return mod.Seller{}, utils.ErrSellerRepositoryNotFound
+	}
+	return val, nil
 }
 
 // Save saves a seller into the database
 func (r *SellerDB) Save(seller *mod.Seller) (err error) {
-
-	return
+	for _, v := range r.db {
+		if v.CID == seller.CID {
+			return utils.ErrSellerRepositoryDuplicated
+		}
+	}
+	seller.ID = len(r.db) + 1
+	r.db[seller.ID] = *seller
+	docs.WriterFile("sellers.json", r.db)
 }
 
 // Update updates a seller in the database
 func (r *SellerDB) Update(seller *mod.Seller) (err error) {
 	r.db[seller.ID] = *seller
-	err = docs.WriterFile("sellers_testing.json", r.db)
+	err = docs.WriterFile("sellers.json", r.db)
 	return err
 }
 
@@ -52,6 +61,6 @@ func (r *SellerDB) Delete(id int) (err error) {
 		return utils.ErrSellerRepositoryNotFound
 	}
 	delete(r.db, id)
-	docs.WriterFile("sellers_testing.json", r.db)
+	docs.WriterFile("sellers.json", r.db)
 	return
 }
