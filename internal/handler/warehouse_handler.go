@@ -8,9 +8,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
-
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
-	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 )
 
 type WarehouseHandler struct {
@@ -34,12 +33,11 @@ func (h *WarehouseHandler) GetAll() http.HandlerFunc {
 			return
 		}
 
-		var warehouses []mod.Warehouse
+		var warehouses []models.Warehouse
 		for _, wh := range warehousesMap {
 			warehouses = append(warehouses, wh)
 		}
 
-		// ✅ Ordenar por ID ascendente
 		sort.Slice(warehouses, func(i, j int) bool {
 			return warehouses[i].ID < warehouses[j].ID
 		})
@@ -69,36 +67,25 @@ func (h *WarehouseHandler) GetByID() http.HandlerFunc {
 // POST /warehouses
 func (h *WarehouseHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var input struct {
-			Address            string  `json:"address" validate:"required"`
-			Telephone          string  `json:"telephone" validate:"required"`
-			WarehouseCode      string  `json:"warehouse_code" validate:"required"`
-			MinimumCapacity    int     `json:"minimun_capacity" validate:"required,min=1"`
-			MinimumTemperature float64 `json:"minimun_temperature" validate:"required"`
-		}
-		if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		var warehouse models.Warehouse
+
+		if err := json.NewDecoder(r.Body).Decode(&warehouse); err != nil {
 			http.Error(w, "JSON inválido", http.StatusBadRequest)
 			return
 		}
-		if err := h.validate.Struct(input); err != nil {
+		if err := h.validate.Struct(warehouse); err != nil {
 			http.Error(w, "Campos inválidos: "+err.Error(), http.StatusUnprocessableEntity)
 			return
 		}
 
-		warehouse := &mod.Warehouse{
-			Address:            input.Address,
-			Telephone:          input.Telephone,
-			WarehouseCode:      input.WarehouseCode,
-			MinimumCapacity:    input.MinimumCapacity,
-			MinimumTemperature: input.MinimumTemperature,
-		}
-
-		err := h.sv.Save(warehouse)
+		// ID será asignado por la capa de servicio o repo
+		err := h.sv.Save(&warehouse)
 		if err != nil {
 			http.Error(w, "Error al crear almacén: "+err.Error(), http.StatusConflict)
 			return
 		}
 
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(warehouse)
 	}
@@ -114,37 +101,26 @@ func (h *WarehouseHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		var input struct {
-			Address            string  `json:"address" validate:"required"`
-			Telephone          string  `json:"telephone" validate:"required"`
-			WarehouseCode      string  `json:"warehouse_code" validate:"required"`
-			MinimumCapacity    int     `json:"minimun_capacity" validate:"required,min=1"`
-			MinimumTemperature float64 `json:"minimun_temperature" validate:"required"`
-		}
+		var warehouse models.Warehouse
 
-		if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		if err := json.NewDecoder(r.Body).Decode(&warehouse); err != nil {
 			http.Error(w, "JSON inválido", http.StatusBadRequest)
 			return
 		}
-		if err := h.validate.Struct(input); err != nil {
+		if err := h.validate.Struct(warehouse); err != nil {
 			http.Error(w, "Campos inválidos: "+err.Error(), http.StatusUnprocessableEntity)
 			return
 		}
 
-		warehouse := &mod.Warehouse{
-			ID:                 id,
-			Address:            input.Address,
-			Telephone:          input.Telephone,
-			WarehouseCode:      input.WarehouseCode,
-			MinimumCapacity:    input.MinimumCapacity,
-			MinimumTemperature: input.MinimumTemperature,
-		}
+		warehouse.ID = id // Asegura que el ID venga de la URL
 
-		err = h.sv.Update(warehouse)
+		err = h.sv.Update(&warehouse)
 		if err != nil {
 			http.Error(w, "Error al actualizar: "+err.Error(), http.StatusNotFound)
 			return
 		}
+
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(warehouse)
 	}
 }

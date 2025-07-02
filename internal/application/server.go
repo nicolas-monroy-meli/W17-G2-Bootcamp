@@ -103,12 +103,12 @@ func (a *ServerChi) Run() (err error) {
 	})
 
 	// - warehouses
-	rt.Route("/v1/warehouses", func(rt chi.Router) {
-		rt.Get("/", wrhhd.GetAll())
-		rt.Get("/{id}", wrhhd.GetByID())
-		rt.Post("/", wrhhd.Create())
-		rt.Put("/{id}", wrhhd.Update())
-		rt.Delete("/{id}", wrhhd.Delete())
+	rt.Route("/v1/warehouses", func(r chi.Router) {
+		r.Get("/", wrhhd.GetAll())
+		r.Get("/{id}", wrhhd.GetByID())
+		r.Post("/", wrhhd.Create())
+		r.Put("/{id}", wrhhd.Update())
+		r.Delete("/{id}", wrhhd.Delete())
 	})
 
 	// - sections
