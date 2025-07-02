@@ -147,7 +147,7 @@ func (h *ProductHandler) Update() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusOK, "success", nil)
+		utils.GoodResponse(w, http.StatusOK, "success", newProduct)
 	}
 }
 
