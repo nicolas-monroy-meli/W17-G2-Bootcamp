@@ -8,6 +8,7 @@ import (
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
 	"net/http"
 	"strconv"
 	"strings"
@@ -141,7 +142,9 @@ func (h *BuyerHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		errValidation := utils.ValidateStruct(buyerPatch)
+		common.ValidatePatchRequest(&buyer, buyerPatch)
+
+		errValidation := utils.ValidateStruct(buyer)
 
 		if errValidation != nil {
 			str := make([]string, 0, len(errValidation))
@@ -154,7 +157,6 @@ func (h *BuyerHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		buyerPatch.MapPatchToEntity(&buyer)
 		err = h.sv.Update(&buyer)
 
 		if err != nil {
