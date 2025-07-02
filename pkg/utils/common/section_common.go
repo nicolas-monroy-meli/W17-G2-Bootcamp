@@ -2,6 +2,7 @@ package common
 
 import (
 	"errors"
+	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
@@ -22,24 +23,34 @@ func IdRequests(r *http.Request) (int, error) {
 	return id, nil
 }
 
-func PatchSection(model models.Section, section models.Section) models.Section {
+func PatchSection(request models.SectionPatch, section models.Section) models.Section {
+	fmt.Println(request.WarehouseID)
 	switch {
-	case model.SectionNumber != 0 && model.SectionNumber != section.SectionNumber:
-		section.SectionNumber = model.SectionNumber
-	case model.CurrentTemperature != 0 && model.CurrentTemperature != section.CurrentTemperature:
-		section.CurrentTemperature = model.CurrentTemperature
-	case model.MinimumTemperature != 0 && model.MinimumTemperature != section.MinimumTemperature:
-		section.MinimumTemperature = model.MinimumTemperature
-	case model.CurrentCapacity != 0 && model.CurrentCapacity != section.CurrentCapacity:
-		section.CurrentCapacity = model.CurrentCapacity
-	case model.MinimumCapacity != 0 && model.MinimumCapacity != section.MinimumCapacity:
-		section.MinimumCapacity = model.MinimumCapacity
-	case model.MaximumCapacity != 0 && model.MaximumCapacity != section.MaximumCapacity:
-		section.MaximumCapacity = model.MaximumCapacity
-	case model.WarehouseID != 0 && model.WarehouseID != section.WarehouseID:
-		section.WarehouseID = model.WarehouseID
-	case model.ProductTypeID != 0 && model.ProductTypeID != section.ProductTypeID:
-		section.ProductTypeID = model.ProductTypeID
+	case request.SectionNumber != nil:
+		section.SectionNumber = *request.SectionNumber
+		fallthrough
+	case request.CurrentTemperature != nil:
+
+		section.CurrentTemperature = *request.CurrentTemperature
+		fallthrough
+	case request.MinimumTemperature != nil:
+		section.MinimumTemperature = *request.MinimumTemperature
+		fallthrough
+	case request.CurrentCapacity != nil:
+		section.CurrentCapacity = *request.CurrentCapacity
+		fallthrough
+	case request.MinimumCapacity != nil:
+		section.MinimumCapacity = *request.MinimumCapacity
+		fallthrough
+	case request.MaximumCapacity != nil:
+		section.MaximumCapacity = *request.MaximumCapacity
+		fallthrough
+	case request.WarehouseID != nil:
+		section.WarehouseID = *request.WarehouseID
+		fallthrough
+	case request.ProductTypeID != nil:
+		section.ProductTypeID = *request.ProductTypeID
 	}
+	fmt.Println(section)
 	return section
 }

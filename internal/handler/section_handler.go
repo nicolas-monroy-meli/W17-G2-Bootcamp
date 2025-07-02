@@ -82,7 +82,7 @@ func (h *SectionHandler) Create() http.HandlerFunc {
 // Update updates a section
 func (h *SectionHandler) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var model models.Section
+		var model models.SectionPatch
 		id, err := common.IdRequests(r)
 		if err != nil {
 			utils.BadResponse(w, http.StatusBadRequest, err.Error())
