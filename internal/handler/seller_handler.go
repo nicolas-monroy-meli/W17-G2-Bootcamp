@@ -1,14 +1,11 @@
 package handler
 
 import (
-	"encoding/json"
-	"io"
 	"net/http"
-	"strconv"
 
 	"github.com/go-chi/chi/v5"
+
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
 )
@@ -31,7 +28,7 @@ func (h *SellerHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		result, err := h.sv.FindAll()
 		if err != nil {
-			utils.BadResponse(w, 400, err.Error())
+			utils.BadResponse(w, 400, "unable to get sellers")
 			return
 		}
 		utils.GoodResponse(w, 200, "succes", result)
@@ -41,6 +38,7 @@ func (h *SellerHandler) GetAll() http.HandlerFunc {
 // GetByID returns a seller
 func (h *SellerHandler) GetByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		req, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
 			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
@@ -52,6 +50,7 @@ func (h *SellerHandler) GetByID() http.HandlerFunc {
 			return
 		}
 		utils.GoodResponse(w, 200, "success", result)
+
 	}
 }
 
@@ -87,6 +86,7 @@ func (h *SellerHandler) Create() http.HandlerFunc {
 			return
 		}
 		utils.GoodResponse(w, 201, "success", nil)
+
 	}
 }
 

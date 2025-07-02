@@ -43,39 +43,22 @@ func ReadFileToMap[T any](fileName string) map[int]T {
 	return result
 }
 
-func WriterFile[T any](fileName string, objMap map[int]T) error {
-	values := make([]T, 0, len(objMap))
-	for _, v := range objMap {
-		values = append(values, v)
+func WriterFile[T any](fileName string, obj T) error {
+	b, err := json.Marshal(obj)
+	if err != nil {
+		return err
 	}
+	b = append(b, '\n')
 
-	file, err := os.OpenFile("docs/db/"+fileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	if _, err := file.WriteString("[\n"); err != nil {
-		return err
-	}
-
-	for i, v := range values {
-		b, err := json.Marshal(v)
-		if err != nil {
-			return err
-		}
-
-		if i < len(values)-1 {
-			b = append(b, ',')
-		}
-		b = append(b, '\n')
-
-		if _, err := file.Write(b); err != nil {
-			return err
-		}
-	}
-
-	if _, err := file.WriteString("]\n"); err != nil {
+	_, err = file.Write(b)
+	if err != nil {
 		return err
 	}
 
