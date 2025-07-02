@@ -115,7 +115,60 @@ func (h *BuyerHandler) Create() http.HandlerFunc {
 // Update updates a buyer
 func (h *BuyerHandler) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			return
+		}
+
+		buyer, err := h.sv.FindByID(id)
+
+		if err != nil {
+			switch {
+			case errors.Is(err, utils.ErrBuyerRepositoryNotFound):
+				utils.BadResponse(w, http.StatusNotFound, err.Error())
+			default:
+				utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			}
+			return
+		}
+
+		var buyerPatch mod.BuyerPatch
+
+		if err := json.NewDecoder(r.Body).Decode(&buyerPatch); err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestFailedBody.Error())
+			return
+		}
+
+		errValidation := utils.ValidateStruct(buyerPatch)
+
+		if errValidation != nil {
+			str := make([]string, 0, len(errValidation))
+			for _, err := range errValidation {
+				str = append(str, err)
+			}
+
+			err := fmt.Errorf("%w: %v", utils.ErrRequestWrongBody, strings.Join(str, ", "))
+			utils.BadResponse(w, http.StatusUnprocessableEntity, err.Error())
+			return
+		}
+
+		buyerPatch.MapPatchToEntity(&buyer)
+		err = h.sv.Update(&buyer)
+
+		if err != nil {
+			switch {
+			case errors.Is(err, utils.ErrBuyerRepositoryCardDuplicated):
+				utils.BadResponse(w, http.StatusConflict, err.Error())
+			default:
+				utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			}
+			return
+		}
+
+		utils.GoodResponse(w, http.StatusCreated, "Buyer actualizado exitosamente", buyer)
+		return
 	}
 }
 

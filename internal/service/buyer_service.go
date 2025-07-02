@@ -35,7 +35,7 @@ func (s *BuyerService) Save(buyer *mod.Buyer) (err error) {
 
 // Update updates a buyer
 func (s *BuyerService) Update(buyer *mod.Buyer) (err error) {
-	return
+	return s.rp.Update(buyer)
 }
 
 // Delete deletes a buyer

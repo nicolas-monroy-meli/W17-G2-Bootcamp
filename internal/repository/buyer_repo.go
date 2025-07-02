@@ -70,7 +70,23 @@ func (r *BuyerDB) Save(buyer *mod.Buyer) (err error) {
 
 // Update updates the given buyer in the database
 func (r *BuyerDB) Update(buyer *mod.Buyer) (err error) {
+	id := buyer.ID
+	_, ok := r.db[id]
 
+	if !ok {
+		err = utils.ErrBuyerRepositoryNotFound
+		return
+	}
+
+	for _, b := range r.db {
+		if b.ID != buyer.ID && b.CardNumberID == buyer.CardNumberID {
+			err = utils.ErrBuyerRepositoryCardDuplicated
+			return
+		}
+	}
+
+	r.db[id] = *buyer
+	err = docs.WriterFile(filePath, r.db)
 	return
 }
 
