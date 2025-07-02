@@ -100,6 +100,17 @@ func (h *SectionHandler) Update() http.HandlerFunc {
 		}
 
 		section = common.PatchSection(model, section)
+
+		validationErrors := utils.ValidateStruct(section)
+		if len(validationErrors) > 0 {
+			str := ""
+			for _, err := range validationErrors {
+				str += err + ", "
+			}
+			utils.BadResponse(w, http.StatusUnprocessableEntity, str)
+			return
+		}
+
 		err = h.sv.Update(&section)
 		if err != nil {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
