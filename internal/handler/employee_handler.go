@@ -58,7 +58,7 @@ func (h *EmployeeHandler) GetEmployeeById() http.HandlerFunc {
 	}
 }
 
-// Create creates a new employee
+// Create creates a new employee~
 func (h *EmployeeHandler) CreateEmployee() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var employee mod.Employee
@@ -78,7 +78,7 @@ func (h *EmployeeHandler) CreateEmployee() http.HandlerFunc {
 		}
 		err = h.sv.SaveEmployee(&employee)
 		if err != nil {
-			utils.BadResponse(w, http.StatusConflict, utils.ErrEmployeeRepositoryDuplicated.Error())
+			utils.BadResponse(w, http.StatusUnprocessableEntity, utils.ErrEmployeeRepositoryDuplicated.Error())
 			return
 		}
 		utils.GoodResponse(w, http.StatusCreated, "succes", employee)
@@ -138,7 +138,7 @@ func (h *EmployeeHandler) DeleteEmployee() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusOK, "succes", nil)
+		utils.GoodResponse(w, http.StatusNoContent, "succes", nil)
 
 	}
 }
