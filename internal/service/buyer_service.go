@@ -20,12 +20,12 @@ type BuyerService struct {
 
 // FindAll returns all buyers
 func (s *BuyerService) FindAll() (buyers map[int]mod.Buyer, err error) {
-	return
+	return s.rp.FindAll()
 }
 
 // FindByID returns a buyer
 func (s *BuyerService) FindByID(id int) (buyer mod.Buyer, err error) {
-	return
+	return s.rp.FindByID(id)
 }
 
 // Save creates a new buyer

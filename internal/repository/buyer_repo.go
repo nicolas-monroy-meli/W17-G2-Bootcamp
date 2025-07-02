@@ -1,7 +1,9 @@
 package repository
 
 import (
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/docs"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 )
 
 // NewBuyerRepo creates a new instance of the Buyer repository
@@ -18,12 +20,17 @@ type BuyerDB struct {
 
 // FindAll returns all buyers from the database
 func (r *BuyerDB) FindAll() (buyers map[int]mod.Buyer, err error) {
+	buyers = r.db
+	if len(buyers) == 0 {
+
+	}
 
 	return
 }
 
 // FindByID returns a buyer from the database by its id
 func (r *BuyerDB) FindByID(id int) (buyer mod.Buyer, err error) {
+	_, ok := r.db[id]
 
 	return
 }

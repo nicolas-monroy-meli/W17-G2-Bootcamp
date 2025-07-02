@@ -22,14 +22,41 @@ type BuyerHandler struct {
 // GetAll returns all buyers
 func (h *BuyerHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		buyers, err := h.sv.FindAll()
 
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+		utils.GoodResponse(w, http.StatusOK, "", buyers)
+		return
 	}
 }
 
 // GetByID returns a buyer
 func (h *BuyerHandler) GetByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			return
+		}
+
+		buyer, err := h.sv.FindByID(id)
+
+		if err != nil {
+			switch {
+			case errors.Is(err, utils.ErrBuyerRepositoryNotFound):
+				utils.BadResponse(w, http.StatusNotFound, err.Error())
+			default:
+				utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			}
+			return
+		}
+
+		utils.GoodResponse(w, http.StatusCreated, "Buyer obtenido con exito", buyer)
+		return
 	}
 }
 
