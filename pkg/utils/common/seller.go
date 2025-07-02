@@ -1,19 +1,31 @@
 package common
 
-import mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
+import (
+	"fmt"
 
-func PatchSeller(seller, newSeller mod.Seller) mod.Seller {
-	if newSeller.Telephone != "" {
-		seller.Telephone = newSeller.Telephone
+	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
+)
+
+func PatchSeller(seller mod.Seller, newSeller mod.SellerPatch) (*mod.Seller, error) {
+	c := 0
+	if newSeller.Telephone != nil {
+		seller.Telephone = *newSeller.Telephone
+		c++
 	}
-	if newSeller.Address != "" {
-		seller.Address = newSeller.Address
+	if newSeller.Address != nil {
+		seller.Address = *newSeller.Address
+		c++
 	}
-	if newSeller.CompanyName != "" {
-		seller.CompanyName = newSeller.CompanyName
+	if newSeller.CompanyName != nil {
+		seller.CompanyName = *newSeller.CompanyName
+		c++
 	}
-	if newSeller.CID != 0 {
-		seller.CID = newSeller.CID
+	if newSeller.CID != nil {
+		seller.CID = *newSeller.CID
+		c++
 	}
-	return seller
+	if c == 0 {
+		return nil, fmt.Errorf("error")
+	}
+	return &seller, nil
 }

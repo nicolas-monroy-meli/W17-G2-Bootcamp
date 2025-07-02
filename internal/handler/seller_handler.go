@@ -7,7 +7,6 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-playground/validator/v10"
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
@@ -72,11 +71,13 @@ func (h *SellerHandler) Create() http.HandlerFunc {
 			return
 		}
 
-		var validate = validator.New(validator.WithRequiredStructEnabled())
-		errValidate := validate.Struct(req)
-		if errValidate != nil {
-			utils.BadResponse(w, 422,
-				utils.ErrRequestWrongBody.Error()+"\n"+errValidate.Error())
+		errValidate := utils.ValidateStruct(req)
+		if len(errValidate) > 0 {
+			str := ""
+			for _, err := range errValidate {
+				str += err + ", "
+			}
+			utils.BadResponse(w, http.StatusUnprocessableEntity, str)
 			return
 		}
 
@@ -92,7 +93,7 @@ func (h *SellerHandler) Create() http.HandlerFunc {
 // Update updates a seller
 func (h *SellerHandler) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req models.Seller
+		var req models.SellerPatch
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
 			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
@@ -117,16 +118,23 @@ func (h *SellerHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		seller := common.PatchSeller(currentSeller, req)
-		var validate = validator.New(validator.WithRequiredStructEnabled())
-		errValidate := validate.Struct(seller)
-		if errValidate != nil {
-			utils.BadResponse(w, 422,
-				utils.ErrRequestWrongBody.Error()+"\n"+errValidate.Error())
+		seller, err := common.PatchSeller(currentSeller, req)
+		if err != nil {
+			utils.BadResponse(w, 407, err.Error())
 			return
 		}
 
-		h.sv.Update(&seller)
+		errValidate := utils.ValidateStruct(seller)
+		if len(errValidate) > 0 {
+			str := ""
+			for _, err := range errValidate {
+				str += err + ", "
+			}
+			utils.BadResponse(w, http.StatusUnprocessableEntity, str)
+			return
+		}
+
+		h.sv.Update(seller)
 		utils.GoodResponse(w, 200, "success", nil)
 
 	}
