@@ -20,7 +20,8 @@ var (
 	SectionDeleted = "handler: section deleted successfully"
 	// SectionCreated string to show a successful creation
 	SectionCreated = "handler: section successfully created"
-
+	// SectionUpdated string to show a successful update
+	SectionUpdated = "handler: section successfully updated"
 	//Buyer
 	// ErrBuyerRepositoryNotFound is returned when the buyer is not found
 	ErrBuyerRepositoryNotFound = errors.New("repository: buyer not found")
