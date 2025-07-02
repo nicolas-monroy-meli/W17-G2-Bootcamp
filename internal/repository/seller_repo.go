@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/docs"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 )
@@ -45,6 +46,7 @@ func (r *SellerDB) Save(seller *mod.Seller) (err error) {
 	seller.ID = len(r.db) + 1
 	r.db[seller.ID] = *seller
 	docs.WriterFile("sellers.json", r.db)
+	return nil
 }
 
 // Update updates a seller in the database
