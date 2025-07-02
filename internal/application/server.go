@@ -123,7 +123,11 @@ func (a *ServerChi) Run() (err error) {
 
 	// - employees
 	rt.Route("/v1/employees", func(rt chi.Router) {
-		rt.Get("/", emphd.GetAll())
+		rt.Get("/", emphd.GetAllEmployees())
+		rt.Get("/{id}", emphd.GetEmployeeById())
+		rt.Post("/", emphd.CreateEmployee())
+		rt.Patch("/{id}", emphd.EditEmployee())
+		rt.Delete("/{id}", emphd.DeleteEmployee())
 	})
 
 	// - buyers
