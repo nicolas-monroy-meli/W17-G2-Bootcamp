@@ -71,5 +71,6 @@ func (r *SectionDB) Delete(id int) (err error) {
 		return utils.ErrSectionRepositoryNotFound
 	}
 	delete(r.db, id)
+	docs.WriterFile("sections.json", r.db)
 	return nil
 }

@@ -2,13 +2,11 @@ package handler
 
 import (
 	"encoding/json"
-	"errors"
-	"github.com/go-chi/chi/v5"
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
 	"net/http"
-	"strconv"
 )
 
 // NewSectionHandler creates a new instance of the section handler
@@ -36,23 +34,10 @@ func (h *SectionHandler) GetAll() http.HandlerFunc {
 	}
 }
 
-// idRequests encapsulates the process of getting the id parameter and returns an int number and an error if necessary
-func idRequests(r *http.Request) (int, error) {
-	idStr := chi.URLParam(r, "id")
-	if idStr == "" {
-		return 0, errors.New(utils.EmptyParams)
-	}
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		return 0, errors.New(err.Error())
-	}
-	return id, nil
-}
-
 // GetByID returns a section
 func (h *SectionHandler) GetByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id, err := idRequests(r)
+		id, err := common.IdRequests(r)
 		if err != nil {
 			utils.BadResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -94,33 +79,11 @@ func (h *SectionHandler) Create() http.HandlerFunc {
 	}
 }
 
-func patchSection(model models.Section, section models.Section) models.Section {
-	switch {
-	case model.SectionNumber != 0 && model.SectionNumber != section.SectionNumber:
-		section.SectionNumber = model.SectionNumber
-	case model.CurrentTemperature != 0 && model.CurrentTemperature != section.CurrentTemperature:
-		section.CurrentTemperature = model.CurrentTemperature
-	case model.MinimumTemperature != 0 && model.MinimumTemperature != section.MinimumTemperature:
-		section.MinimumTemperature = model.MinimumTemperature
-	case model.CurrentCapacity != 0 && model.CurrentCapacity != section.CurrentCapacity:
-		section.CurrentCapacity = model.CurrentCapacity
-	case model.MinimumCapacity != 0 && model.MinimumCapacity != section.MinimumCapacity:
-		section.MinimumCapacity = model.MinimumCapacity
-	case model.MaximumCapacity != 0 && model.MaximumCapacity != section.MaximumCapacity:
-		section.MaximumCapacity = model.MaximumCapacity
-	case model.WarehouseID != 0 && model.WarehouseID != section.WarehouseID:
-		section.WarehouseID = model.WarehouseID
-	case model.ProductTypeID != 0 && model.ProductTypeID != section.ProductTypeID:
-		section.ProductTypeID = model.ProductTypeID
-	}
-	return section
-}
-
 // Update updates a section
 func (h *SectionHandler) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var model models.Section
-		id, err := idRequests(r)
+		id, err := common.IdRequests(r)
 		if err != nil {
 			utils.BadResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -132,11 +95,11 @@ func (h *SectionHandler) Update() http.HandlerFunc {
 		}
 		section, err := h.sv.FindByID(id)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
 
-		section = patchSection(model, section)
+		section = common.PatchSection(model, section)
 		err = h.sv.Update(&section)
 		if err != nil {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
@@ -149,7 +112,7 @@ func (h *SectionHandler) Update() http.HandlerFunc {
 // Delete deletes a section
 func (h *SectionHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id, err := idRequests(r)
+		id, err := common.IdRequests(r)
 		if err != nil {
 			utils.BadResponse(w, http.StatusBadRequest, err.Error())
 			return
