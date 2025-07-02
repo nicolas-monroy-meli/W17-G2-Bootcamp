@@ -100,7 +100,7 @@ func (h *ProductHandler) Create() http.HandlerFunc {
 // Update updates a product
 func (h *ProductHandler) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req models.Product
+		var req models.ProductPatch
 
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
@@ -130,15 +130,15 @@ func (h *ProductHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		newProduct := common.PatchProduct(currentProduct, req)
+		common.PatchProduct(&currentProduct, req)
 		var validate = validator.New(validator.WithRequiredStructEnabled())
-		errValidate := validate.Struct(newProduct)
+		errValidate := validate.Struct(currentProduct)
 		if errValidate != nil {
 			utils.BadResponse(w, http.StatusUnprocessableEntity, errValidate.Error())
 			return
 		}
 
-		err = h.sv.Update(&newProduct)
+		err = h.sv.Update(&currentProduct)
 		if errors.Is(err, utils.ErrProductRepositoryNotFound) {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -147,7 +147,7 @@ func (h *ProductHandler) Update() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusOK, "success", newProduct)
+		utils.GoodResponse(w, http.StatusOK, "success", currentProduct)
 	}
 }
 
