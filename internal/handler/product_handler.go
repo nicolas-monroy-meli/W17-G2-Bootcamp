@@ -12,6 +12,7 @@ import (
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
 )
 
 // NewProductHandler creates a new instance of the product handler
@@ -48,6 +49,10 @@ func (h *ProductHandler) GetByID() http.HandlerFunc {
 			return
 		}
 		result, err := h.sv.FindByID(id)
+		if errors.Is(err, utils.ErrProductRepositoryNotFound) {
+			utils.BadResponse(w, http.StatusNotFound, err.Error())
+			return
+		}
 		if err != nil {
 			utils.BadResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -88,20 +93,81 @@ func (h *ProductHandler) Create() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusCreated, "success", nil)
+		utils.GoodResponse(w, http.StatusCreated, "success", req)
 	}
 }
 
 // Update updates a product
 func (h *ProductHandler) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		var req models.Product
 
+		id, err := strconv.Atoi(chi.URLParam(r, "id"))
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			return
+		}
+
+		currentProduct, err := h.sv.FindByID(id)
+		if errors.Is(err, utils.ErrProductRepositoryNotFound) {
+			utils.BadResponse(w, http.StatusNotFound, err.Error())
+			return
+		}
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		body, err := io.ReadAll(r.Body)
+		if err != nil || body == nil {
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestFailedBody.Error())
+			return
+		}
+
+		err = json.Unmarshal(body, &req)
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestNoBody.Error())
+			return
+		}
+
+		newProduct := common.PatchProduct(currentProduct, req)
+		var validate = validator.New(validator.WithRequiredStructEnabled())
+		errValidate := validate.Struct(newProduct)
+		if errValidate != nil {
+			utils.BadResponse(w, http.StatusUnprocessableEntity, errValidate.Error())
+			return
+		}
+
+		err = h.sv.Update(&newProduct)
+		if errors.Is(err, utils.ErrProductRepositoryNotFound) {
+			utils.BadResponse(w, http.StatusNotFound, err.Error())
+			return
+		}
+		if err != nil {
+			utils.BadResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		utils.GoodResponse(w, http.StatusOK, "success", nil)
 	}
 }
 
 // Delete deletes a product
 func (h *ProductHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
+		id, err := strconv.Atoi(chi.URLParam(r, "id"))
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			return
+		}
+		err = h.sv.Delete(id)
+		if errors.Is(err, utils.ErrProductRepositoryNotFound) {
+			utils.BadResponse(w, http.StatusNotFound, err.Error())
+			return
+		}
+		if err != nil {
+			utils.BadResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		utils.GoodResponse(w, http.StatusNoContent, "success", nil)
 	}
 }

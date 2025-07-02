@@ -51,12 +51,26 @@ func (r *ProductDB) Save(product *mod.Product) (err error) {
 
 // Update updates a product in the database
 func (r *ProductDB) Update(product *mod.Product) (err error) {
-
-	return
+	// Check if the product exists
+	if _, exists := r.db[product.ID]; !exists {
+		return utils.ErrProductRepositoryNotFound
+	}
+	// Update the product in the database
+	r.db[product.ID] = *product
+	docs.WriterFile("products.json", r.db)
+	// Return nil to indicate success
+	return nil
 }
 
 // Delete deletes a product from the database by its id
 func (r *ProductDB) Delete(id int) (err error) {
-
-	return
+	// Check if the product exists
+	if _, exists := r.db[id]; !exists {
+		return utils.ErrProductRepositoryNotFound
+	}
+	// Delete the product from the database
+	delete(r.db, id)
+	docs.WriterFile("products.json", r.db)
+	// Return nil to indicate success
+	return nil
 }

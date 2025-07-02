@@ -19,9 +19,9 @@ type Product struct {
 	// ExpirationRate is the rate at which the product expires
 	ExpirationRate float64 `json:"expiration_rate" validate:"required,gte=0"`
 	// FreezingRate is the rate at which the product should be frozen
-	FreezingRate float64 `json:"freezing_rate" validate:"required,gte=0"`
+	FreezingRate float64 `json:"freezing_rate" validate:"required"`
 	// RecomFreezTemp is the recommended freezing temperature for the product
-	RecomFreezTemp float64 `json:"recommended_freezing_temperature" validate:"required,gte=0"`
+	RecomFreezTemp float64 `json:"recommended_freezing_temperature" validate:"required"`
 	// ProductTypeID is the unique identifier of the product type
 	ProductTypeID int `json:"product_type_id" validate:"required"`
 	// SellerID is the unique identifier of the seller

@@ -117,6 +117,8 @@ func (a *ServerChi) Run() (err error) {
 		rt.Get("/", prdhd.GetAll())
 		rt.Get("/{id}", prdhd.GetByID())
 		rt.Post("/", prdhd.Create())
+		rt.Patch("/{id}", prdhd.Update())
+		rt.Delete("/{id}", prdhd.Delete())
 	})
 
 	// - employees

@@ -35,10 +35,10 @@ func (s *ProductService) Save(product *mod.Product) (err error) {
 
 // Update updates a product
 func (s *ProductService) Update(product *mod.Product) (err error) {
-	return
+	return s.rp.Update(product)
 }
 
 // Delete deletes a product
 func (s *ProductService) Delete(id int) (err error) {
-	return
+	return s.rp.Delete(id)
 }
