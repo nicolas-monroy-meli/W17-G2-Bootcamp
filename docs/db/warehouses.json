@@ -1,0 +1,82 @@
+[
+  {
+    "ID": 1,
+    "WarehouseCode": "DHM",
+    "Address": "Monroe 860",
+    "Telephone": "47470000",
+    "MinimumCapacity": 10,
+    "MinimumTemperature": 10.0
+  },
+  {
+    "ID": 2,
+    "WarehouseCode": "NORTH01",
+    "Address": "Av. Siempre Viva 742",
+    "Telephone": "41559948",
+    "MinimumCapacity": 15,
+    "MinimumTemperature": 8.3
+  },
+  {
+    "ID": 3,
+    "WarehouseCode": "SOUTH01",
+    "Address": "Calle Falsa 123",
+    "Telephone": "47895564",
+    "MinimumCapacity": 20,
+    "MinimumTemperature": 6.5
+  },
+  {
+    "ID": 4,
+    "WarehouseCode": "WEST02",
+    "Address": "Boulevard Central 198",
+    "Telephone": "47780021",
+    "MinimumCapacity": 8,
+    "MinimumTemperature": 12.4
+  },
+  {
+    "ID": 5,
+    "WarehouseCode": "EAST03",
+    "Address": "Ramírez 569",
+    "Telephone": "42030085",
+    "MinimumCapacity": 18,
+    "MinimumTemperature": 9.0
+  },
+  {
+    "ID": 6,
+    "WarehouseCode": "MAIN04",
+    "Address": "Gran Via 200",
+    "Telephone": "41000599",
+    "MinimumCapacity": 25,
+    "MinimumTemperature": 5.8
+  },
+  {
+    "ID": 7,
+    "WarehouseCode": "DEP05",
+    "Address": "Polígono Sur 55",
+    "Telephone": "43015977",
+    "MinimumCapacity": 22,
+    "MinimumTemperature": 7.7
+  },
+  {
+    "ID": 8,
+    "WarehouseCode": "VENTA06",
+    "Address": "Ruta 8 km 25",
+    "Telephone": "46001236",
+    "MinimumCapacity": 12,
+    "MinimumTemperature": 9.5
+  },
+  {
+    "ID": 9,
+    "WarehouseCode": "SUB07",
+    "Address": "Diagonal Norte 1001",
+    "Telephone": "49018213",
+    "MinimumCapacity": 30,
+    "MinimumTemperature": 6.2
+  },
+  {
+    "ID": 10,
+    "WarehouseCode": "LOG08",
+    "Address": "Pasaje San Martín 22",
+    "Telephone": "45590011",
+    "MinimumCapacity": 16,
+    "MinimumTemperature": 8.9
+  }
+]

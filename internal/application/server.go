@@ -98,31 +98,57 @@ func (a *ServerChi) Run() (err error) {
 	// - sellers
 	rt.Route("/v1/sellers", func(rt chi.Router) {
 		rt.Get("/", selhd.GetAll())
+
+		rt.Get("/{id}", selhd.GetByID())
+		rt.Post("/", selhd.Create())
+		rt.Patch("/{id}", selhd.Update())
+		rt.Delete("/{id}", selhd.Delete())
+
 	})
 
 	// - warehouses
-	rt.Route("/v1/warehouses", func(rt chi.Router) {
-		rt.Get("/", wrhhd.GetAll())
+	rt.Route("/v1/warehouses", func(r chi.Router) {
+		r.Get("/", wrhhd.GetAll())
+		r.Get("/{id}", wrhhd.GetByID())
+		r.Post("/", wrhhd.Create())
+		r.Put("/{id}", wrhhd.Update())
+		r.Delete("/{id}", wrhhd.Delete())
 	})
 
 	// - sections
 	rt.Route("/v1/sections", func(rt chi.Router) {
 		rt.Get("/", sechd.GetAll())
+		rt.Get("/{id}", sechd.GetByID())
+		rt.Delete("/{id}", sechd.Delete())
+		rt.Post("/", sechd.Create())
+		rt.Patch("/{id}", sechd.Update())
 	})
 
 	// - products
 	rt.Route("/v1/products", func(rt chi.Router) {
 		rt.Get("/", prdhd.GetAll())
+		rt.Get("/{id}", prdhd.GetByID())
+		rt.Post("/", prdhd.Create())
+		rt.Patch("/{id}", prdhd.Update())
+		rt.Delete("/{id}", prdhd.Delete())
 	})
 
 	// - employees
 	rt.Route("/v1/employees", func(rt chi.Router) {
-		rt.Get("/", emphd.GetAll())
+		rt.Get("/", emphd.GetAllEmployees())
+		rt.Get("/{id}", emphd.GetEmployeeById())
+		rt.Post("/", emphd.CreateEmployee())
+		rt.Patch("/{id}", emphd.EditEmployee())
+		rt.Delete("/{id}", emphd.DeleteEmployee())
 	})
 
 	// - buyers
-	rt.Route("/v1/buyers", func(rt chi.Router) {
+	rt.Route("/api/v1/buyers", func(rt chi.Router) {
 		rt.Get("/", buyhd.GetAll())
+		rt.Get("/{id}", buyhd.GetByID())
+		rt.Post("/", buyhd.Create())
+		rt.Patch("/{id}", buyhd.Update())
+		rt.Delete("/{id}", buyhd.Delete())
 	})
 
 	// run
