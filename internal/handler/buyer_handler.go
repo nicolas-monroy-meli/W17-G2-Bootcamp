@@ -175,6 +175,26 @@ func (h *BuyerHandler) Update() http.HandlerFunc {
 // Delete deletes a buyer
 func (h *BuyerHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			return
+		}
+
+		if err := h.sv.Delete(id); err != nil {
+
+			switch {
+			case errors.Is(err, utils.ErrBuyerRepositoryNotFound):
+				utils.BadResponse(w, http.StatusNotFound, err.Error())
+			default:
+				utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			}
+			return
+
+		}
+
+		utils.GoodResponse(w, http.StatusNoContent, "Buyer eliminado exitosamente", nil)
+		return
 	}
 }

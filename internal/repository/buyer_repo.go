@@ -92,6 +92,14 @@ func (r *BuyerDB) Update(buyer *mod.Buyer) (err error) {
 
 // Delete deletes a buyer from the database by its id
 func (r *BuyerDB) Delete(id int) (err error) {
+	_, ok := r.db[id]
 
+	if !ok {
+		err = utils.ErrBuyerRepositoryNotFound
+		return
+	}
+
+	delete(r.db, id)
+	err = docs.WriterFile(filePath, r.db)
 	return
 }

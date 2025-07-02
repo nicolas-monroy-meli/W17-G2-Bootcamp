@@ -40,5 +40,5 @@ func (s *BuyerService) Update(buyer *mod.Buyer) (err error) {
 
 // Delete deletes a buyer
 func (s *BuyerService) Delete(id int) (err error) {
-	return
+	return s.rp.Delete(id)
 }
