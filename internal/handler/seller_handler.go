@@ -1,7 +1,11 @@
 package handler
 
 import (
+	"encoding/json"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
+	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/go-chi/chi/v5"
 
