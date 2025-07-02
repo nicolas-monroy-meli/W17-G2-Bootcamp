@@ -30,6 +30,7 @@ func PatchSection(request models.SectionPatch, section models.Section) models.Se
 		section.SectionNumber = *request.SectionNumber
 		fallthrough
 	case request.CurrentTemperature != nil:
+
 		section.CurrentTemperature = *request.CurrentTemperature
 		fallthrough
 	case request.MinimumTemperature != nil:
