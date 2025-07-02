@@ -10,6 +10,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
 )
 
 type WarehouseHandler struct {
@@ -107,12 +108,18 @@ func (h *WarehouseHandler) Update() http.HandlerFunc {
 			http.Error(w, "JSON inválido", http.StatusBadRequest)
 			return
 		}
+
 		if err := h.validate.Struct(warehouse); err != nil {
 			http.Error(w, "Campos inválidos: "+err.Error(), http.StatusUnprocessableEntity)
 			return
 		}
 
-		warehouse.ID = id // Asegura que el ID venga de la URL
+		if err := common.ValidateWarehouseUpdate(warehouse); err != nil {
+			http.Error(w, "Error de validación: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		warehouse.ID = id
 
 		err = h.sv.Update(&warehouse)
 		if err != nil {
