@@ -6,6 +6,7 @@ import (
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
 	"net/http"
 	"strconv"
 )
@@ -87,13 +88,57 @@ func (h *EmployeeHandler) CreateEmployee() http.HandlerFunc {
 // Update updates a employee
 func (h *EmployeeHandler) EditEmployee() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		
+		var model mod.Employee
+		idObj := chi.URLParam(r, "id")
+		if idObj == "" {
+			utils.BadResponse(w, http.StatusBadRequest, "id required")
+			return
+		}
+		idNum, err := strconv.Atoi(idObj)
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			return
+		}
+		err = json.NewDecoder(r.Body).Decode(&model)
+		if err != nil {
+			utils.BadResponse(w, http.StatusUnprocessableEntity, utils.ErrRequestWrongBody.Error())
+			return
+		}
+		emplo, err := h.sv.FindEmployeeByID(idNum)
+		if err != nil {
+			utils.BadResponse(w, http.StatusNotFound, err.Error())
+			return
+		}
+		employee := common.PatchEmployees(model, emplo)
+		employee.ID = idNum
+		err = h.sv.UpdateEmployee(idNum, &employee)
+		if err != nil {
+			utils.BadResponse(w, http.StatusConflict, err.Error())
+			return
+		}
+		utils.GoodResponse(w, http.StatusOK, "succes", employee)
 	}
 }
 
 // Delete deletes a employee
 func (h *EmployeeHandler) DeleteEmployee() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		idObj := chi.URLParam(r, "id")
+		if idObj == "" {
+			utils.BadResponse(w, http.StatusBadRequest, "id required")
+			return
+		}
+		idNum, err := strconv.Atoi(idObj)
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			return
+		}
+		err = h.sv.DeleteEmployee(idNum)
+		if err != nil {
+			utils.BadResponse(w, http.StatusNotFound, err.Error())
+			return
+		}
+		utils.GoodResponse(w, http.StatusOK, "succes", nil)
 
 	}
 }

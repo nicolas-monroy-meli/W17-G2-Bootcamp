@@ -56,17 +56,22 @@ func (r *EmployeeDB) SaveEmployee(employee *mod.Employee) (err error) {
 
 // Update updates a employee
 func (r *EmployeeDB) UpdateEmployee(id int, employee *mod.Employee) (err error) {
+	r.db[id] = *employee
+	err = docs.WriterFile("employees.json", r.db)
+	if err != nil {
+		return utils.ErrRequestWrongBody
+	}
+	return nil
+}
+
+// Delete deletes a employee
+func (r *EmployeeDB) DeleteEmployee(id int) (err error) {
 	for _, e := range r.db {
 		if e.ID == id {
-			r.db[employee.ID] = *employee
+			delete(r.db, id)
 			docs.WriterFile("employees.json", r.db)
 			return nil
 		}
 	}
 	return utils.ErrEmployeeRepositoryNotFound
-}
-
-// Delete deletes a employee
-func (r *EmployeeDB) DeleteEmployee(id int) (err error) {
-	return
 }

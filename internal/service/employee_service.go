@@ -44,5 +44,6 @@ func (s *EmployeeService) UpdateEmployee(id int, employee *mod.Employee) (err er
 
 // Delete deletes a employee
 func (s *EmployeeService) DeleteEmployee(id int) (err error) {
+	err = s.rp.DeleteEmployee(id)
 	return
 }
