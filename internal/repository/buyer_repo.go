@@ -18,6 +18,8 @@ type BuyerDB struct {
 	db map[int]mod.Buyer
 }
 
+var filePath = "/buyers.json"
+
 // FindAll returns all buyers from the database
 func (r *BuyerDB) FindAll() (buyers map[int]mod.Buyer, err error) {
 	buyers = r.db
@@ -32,12 +34,37 @@ func (r *BuyerDB) FindAll() (buyers map[int]mod.Buyer, err error) {
 func (r *BuyerDB) FindByID(id int) (buyer mod.Buyer, err error) {
 	_, ok := r.db[id]
 
-	return
+	if !ok {
+		err = utils.ErrBuyerRepositoryNotFound
+		return
+	}
+
+	return r.db[id], nil
 }
 
 // Save saves the given buyer in the database
 func (r *BuyerDB) Save(buyer *mod.Buyer) (err error) {
+	_, ok := r.db[buyer.ID]
+	id := 1
 
+	if ok {
+		err = utils.ErrBuyerRepositoryDuplicated
+		return
+	}
+
+	for _, b := range r.db {
+		if b.CardNumberID == buyer.CardNumberID {
+			err = utils.ErrBuyerRepositoryCardDuplicated
+			return
+		}
+		if b.ID > id {
+			id = b.ID
+		}
+	}
+
+	(*buyer).ID = id + 1
+	r.db[buyer.ID] = *buyer
+	err = docs.WriterFile(filePath, r.db)
 	return
 }
 

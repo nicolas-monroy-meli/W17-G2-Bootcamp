@@ -30,7 +30,7 @@ func (s *BuyerService) FindByID(id int) (buyer mod.Buyer, err error) {
 
 // Save creates a new buyer
 func (s *BuyerService) Save(buyer *mod.Buyer) (err error) {
-	return
+	return s.rp.Save(buyer)
 }
 
 // Update updates a buyer

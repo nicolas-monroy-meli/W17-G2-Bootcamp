@@ -1,9 +1,16 @@
 package handler
 
 import (
-	"net/http"
-
+	"encoding/json"
+	"errors"
+	"fmt"
+	"github.com/go-chi/chi/v5"
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
+	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
+	"net/http"
+	"strconv"
+	"strings"
 )
 
 // NewBuyerHandler creates a new instance of the buyer handler
@@ -63,7 +70,45 @@ func (h *BuyerHandler) GetByID() http.HandlerFunc {
 // Create creates a new buyer
 func (h *BuyerHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		var newBuyer mod.Buyer
 
+		if err := json.NewDecoder(r.Body).Decode(&newBuyer); err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestFailedBody.Error())
+			return
+		}
+
+		errValidation := utils.ValidateStruct(newBuyer)
+
+		//validate := validator.New()
+		//err := validate.Struct(newBuyer)
+
+		if errValidation != nil {
+			//err = err.(validator.ValidationErrors)
+			str := make([]string, 0, len(errValidation))
+			for _, err := range errValidation {
+				str = append(str, err)
+			}
+
+			err := fmt.Errorf("%w: %v", utils.ErrRequestWrongBody, strings.Join(str, ", "))
+			utils.BadResponse(w, http.StatusUnprocessableEntity, err.Error())
+			return
+
+		}
+
+		err := h.sv.Save(&newBuyer)
+
+		if err != nil {
+			switch {
+			case errors.Is(err, utils.ErrBuyerRepositoryCardDuplicated):
+				utils.BadResponse(w, http.StatusConflict, err.Error())
+			default:
+				utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			}
+			return
+		}
+
+		utils.GoodResponse(w, http.StatusCreated, "Buyer creado exitosamente", newBuyer)
+		return
 	}
 }
 
