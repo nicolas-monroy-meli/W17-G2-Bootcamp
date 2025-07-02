@@ -11,6 +11,7 @@ import (
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
 )
 
 // NewSellerHandler creates a new instance of the seller handler
@@ -116,7 +117,7 @@ func (h *SellerHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		seller := h.sv.PatchValidator(currentSeller, req)
+		seller := common.PatchSeller(currentSeller, req)
 		var validate = validator.New(validator.WithRequiredStructEnabled())
 		errValidate := validate.Struct(seller)
 		if errValidate != nil {
@@ -124,6 +125,7 @@ func (h *SellerHandler) Update() http.HandlerFunc {
 				utils.ErrRequestWrongBody.Error()+"\n"+errValidate.Error())
 			return
 		}
+
 		h.sv.Update(&seller)
 		utils.GoodResponse(w, 200, "success", nil)
 
