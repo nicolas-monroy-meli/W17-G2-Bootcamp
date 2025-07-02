@@ -35,10 +35,10 @@ func (s *SellerService) Save(seller *mod.Seller) (err error) {
 
 // Update updates a seller
 func (s *SellerService) Update(seller *mod.Seller) (err error) {
-	return
+	return s.rp.Update(seller)
 }
 
 // Delete deletes a seller
 func (s *SellerService) Delete(id int) (err error) {
-	return
+	return s.rp.Delete(id)
 }

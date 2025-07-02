@@ -100,6 +100,8 @@ func (a *ServerChi) Run() (err error) {
 		rt.Get("/", selhd.GetAll())
 		rt.Get("/{id}", selhd.GetByID())
 		rt.Post("/", selhd.Create())
+		rt.Patch("/{id}", selhd.Update())
+		rt.Delete("/{id}", selhd.Delete())
 	})
 
 	// - warehouses
