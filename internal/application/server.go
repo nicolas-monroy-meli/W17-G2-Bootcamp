@@ -119,6 +119,10 @@ func (a *ServerChi) Run() (err error) {
 	// - products
 	rt.Route("/v1/products", func(rt chi.Router) {
 		rt.Get("/", prdhd.GetAll())
+		rt.Get("/{id}", prdhd.GetByID())
+		rt.Post("/", prdhd.Create())
+		rt.Patch("/{id}", prdhd.Update())
+		rt.Delete("/{id}", prdhd.Delete())
 	})
 
 	// - employees
