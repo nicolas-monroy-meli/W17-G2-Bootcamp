@@ -1,44 +1,61 @@
 package service
 
 import (
+	"errors"
+
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 )
 
-// NewWarehouseService creates a new instance of the warehouse service
-func NewWarehouseService(warehouses internal.WarehouseRepository) *WarehouseService {
-	return &WarehouseService{
-		rp: warehouses,
+type warehouseService struct {
+	repo internal.WarehouseRepository
+}
+
+// NewWarehouseService creates a new instance of the service
+func NewWarehouseService(repo internal.WarehouseRepository) *warehouseService {
+	return &warehouseService{
+		repo: repo,
 	}
 }
 
-// WarehouseService is the default implementation of the warehouse service
-type WarehouseService struct {
-	// rp is the repository used by the service
-	rp internal.WarehouseRepository
-}
-
 // FindAll returns all warehouses
-func (s *WarehouseService) FindAll() (warehouses map[int]mod.Warehouse, err error) {
-	return
+func (s *warehouseService) FindAll() (map[int]mod.Warehouse, error) {
+	return s.repo.FindAll()
 }
 
-// FindByID returns a warehouse
-func (s *WarehouseService) FindByID(id int) (warehouse mod.Warehouse, err error) {
-	return
+// FindByID returns a warehouse by ID
+func (s *warehouseService) FindByID(id int) (mod.Warehouse, error) {
+	return s.repo.FindByID(id)
 }
 
-// Save creates a new warehouse
-func (s *WarehouseService) Save(warehouse *mod.Warehouse) (err error) {
-	return
+// Save adds a new warehouse after checking for duplicate WarehouseCode
+func (s *warehouseService) Save(w *mod.Warehouse) error {
+	all, err := s.repo.FindAll()
+	if err != nil {
+		return err
+	}
+
+	// Verificar código duplicado
+	for _, existing := range all {
+		if existing.WarehouseCode == w.WarehouseCode {
+			return errors.New("ya existe un almacén con ese código")
+		}
+	}
+
+	return s.repo.Save(w)
 }
 
-// Update updates a warehouse
-func (s *WarehouseService) Update(warehouse *mod.Warehouse) (err error) {
-	return
+// Update modifies an existing warehouse
+func (s *warehouseService) Update(w *mod.Warehouse) error {
+	_, err := s.repo.FindByID(w.ID)
+	if err != nil {
+		return err
+	}
+
+	return s.repo.Update(w)
 }
 
-// Delete deletes a warehouse
-func (s *WarehouseService) Delete(id int) (err error) {
-	return
+// Delete removes a warehouse by ID
+func (s *warehouseService) Delete(id int) error {
+	return s.repo.Delete(id)
 }
