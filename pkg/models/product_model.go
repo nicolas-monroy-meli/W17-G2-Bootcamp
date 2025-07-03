@@ -11,7 +11,7 @@ type Product struct {
 	// Height is the height of the product
 	Height float64 `json:"height" validate:"required,gte=0"`
 	// Length is the length of the product
-	Length float64 `json:"lenght" validate:"required,gte=0"`
+	Length float64 `json:"length" validate:"required,gte=0"`
 	// Width is the width of the product
 	Width float64 `json:"width" validate:"required,gte=0"`
 	// Weight is the weight of the product
