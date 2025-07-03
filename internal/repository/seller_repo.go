@@ -38,12 +38,16 @@ func (r *SellerDB) FindByID(id int) (seller mod.Seller, err error) {
 
 // Save saves a seller into the database
 func (r *SellerDB) Save(seller *mod.Seller) (err error) {
-	for _, v := range r.db {
+	maxi := 0
+	for ind, v := range r.db {
 		if v.CID == seller.CID {
 			return utils.ErrSellerRepositoryDuplicated
 		}
+		if maxi < ind {
+			maxi = ind
+		}
 	}
-	seller.ID = len(r.db) + 1
+	seller.ID = maxi + 1
 	r.db[seller.ID] = *seller
 	docs.WriterFile("sellers.json", r.db)
 	return nil
