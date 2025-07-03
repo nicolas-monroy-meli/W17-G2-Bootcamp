@@ -7,6 +7,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+
 var (
 	ErrRequestIdMustBeInt = errors.New("handler: id must be an integer")
 	ErrRequestNoBody      = errors.New("handler: request must have a body")
@@ -28,7 +29,8 @@ var (
 	// ErrBuyerRepositoryNotFound is returned when the buyer is not found
 	ErrBuyerRepositoryNotFound = errors.New("repository: buyer not found")
 	// ErrBuyerRepositoryDuplicated is returned when the buyer already exists
-	ErrBuyerRepositoryDuplicated = errors.New("repository: buyer already exists")
+	ErrBuyerRepositoryDuplicated     = errors.New("repository: buyer already exists") // ErrBuyerRepositoryDuplicated is returned when the buyer already exists
+	ErrBuyerRepositoryCardDuplicated = errors.New("repository: Card id duplicated")
 
 	//Employee
 	// ErrEmployeeRepositoryNotFound is returned when the employee is not found

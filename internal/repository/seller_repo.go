@@ -45,18 +45,24 @@ func (r *SellerDB) Save(seller *mod.Seller) (err error) {
 	}
 	seller.ID = len(r.db) + 1
 	r.db[seller.ID] = *seller
-	docs.WriterFile("sellers_testing.json", r.db)
+	docs.WriterFile("sellers.json", r.db)
 	return nil
 }
 
 // Update updates a seller in the database
 func (r *SellerDB) Update(seller *mod.Seller) (err error) {
-
-	return
+	r.db[seller.ID] = *seller
+	err = docs.WriterFile("sellers.json", r.db)
+	return err
 }
 
 // Delete deletes a seller from the database
 func (r *SellerDB) Delete(id int) (err error) {
-
+	_, exists := r.db[id]
+	if !exists {
+		return utils.ErrSellerRepositoryNotFound
+	}
+	delete(r.db, id)
+	docs.WriterFile("sellers.json", r.db)
 	return
 }
