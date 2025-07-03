@@ -10,6 +10,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
 )
 
@@ -30,7 +31,7 @@ func (h *WarehouseHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		warehousesMap, err := h.sv.FindAll()
 		if err != nil {
-			http.Error(w, "Error al obtener los almacenes", http.StatusInternalServerError)
+			utils.BadResponse(w, http.StatusInternalServerError, "Error al obtener los almacenes")
 			return
 		}
 
@@ -43,7 +44,7 @@ func (h *WarehouseHandler) GetAll() http.HandlerFunc {
 			return warehouses[i].ID < warehouses[j].ID
 		})
 
-		json.NewEncoder(w).Encode(warehouses)
+		utils.GoodResponse(w, http.StatusOK, "success", warehouses)
 	}
 }
 
@@ -53,15 +54,15 @@ func (h *WarehouseHandler) GetByID() http.HandlerFunc {
 		idStr := chi.URLParam(r, "id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			http.Error(w, "ID inválido", http.StatusBadRequest)
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
 			return
 		}
 		wh, err := h.sv.FindByID(id)
 		if err != nil {
-			http.Error(w, "Almacén no encontrado", http.StatusNotFound)
+			utils.BadResponse(w, http.StatusNotFound, utils.ErrWarehouseRepositoryNotFound.Error())
 			return
 		}
-		json.NewEncoder(w).Encode(wh)
+		utils.GoodResponse(w, http.StatusOK, "success", wh)
 	}
 }
 
@@ -71,24 +72,22 @@ func (h *WarehouseHandler) Create() http.HandlerFunc {
 		var warehouse models.Warehouse
 
 		if err := json.NewDecoder(r.Body).Decode(&warehouse); err != nil {
-			http.Error(w, "JSON inválido", http.StatusBadRequest)
-			return
-		}
-		if err := h.validate.Struct(warehouse); err != nil {
-			http.Error(w, "Campos inválidos: "+err.Error(), http.StatusUnprocessableEntity)
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestWrongBody.Error())
 			return
 		}
 
-		// ID será asignado por la capa de servicio o repo
+		if err := h.validate.Struct(warehouse); err != nil {
+			utils.BadResponse(w, http.StatusUnprocessableEntity, "Campos inválidos: "+err.Error())
+			return
+		}
+
 		err := h.sv.Save(&warehouse)
 		if err != nil {
-			http.Error(w, "Error al crear almacén: "+err.Error(), http.StatusConflict)
+			utils.BadResponse(w, http.StatusConflict, utils.ErrWarehouseRepositoryDuplicated.Error())
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(warehouse)
+		utils.GoodResponse(w, http.StatusCreated, "warehouse created successfully", warehouse)
 	}
 }
 
@@ -98,24 +97,24 @@ func (h *WarehouseHandler) Update() http.HandlerFunc {
 		idStr := chi.URLParam(r, "id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			http.Error(w, "ID inválido", http.StatusBadRequest)
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
 			return
 		}
 
 		var warehouse models.Warehouse
 
 		if err := json.NewDecoder(r.Body).Decode(&warehouse); err != nil {
-			http.Error(w, "JSON inválido", http.StatusBadRequest)
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestWrongBody.Error())
 			return
 		}
 
 		if err := h.validate.Struct(warehouse); err != nil {
-			http.Error(w, "Campos inválidos: "+err.Error(), http.StatusUnprocessableEntity)
+			utils.BadResponse(w, http.StatusUnprocessableEntity, "Campos inválidos: "+err.Error())
 			return
 		}
 
 		if err := common.ValidateWarehouseUpdate(warehouse); err != nil {
-			http.Error(w, "Error de validación: "+err.Error(), http.StatusBadRequest)
+			utils.BadResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -123,12 +122,11 @@ func (h *WarehouseHandler) Update() http.HandlerFunc {
 
 		err = h.sv.Update(&warehouse)
 		if err != nil {
-			http.Error(w, "Error al actualizar: "+err.Error(), http.StatusNotFound)
+			utils.BadResponse(w, http.StatusNotFound, utils.ErrWarehouseRepositoryNotFound.Error())
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(warehouse)
+		utils.GoodResponse(w, http.StatusOK, "warehouse updated successfully", warehouse)
 	}
 }
 
@@ -138,15 +136,16 @@ func (h *WarehouseHandler) Delete() http.HandlerFunc {
 		idStr := chi.URLParam(r, "id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			http.Error(w, "ID inválido", http.StatusBadRequest)
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
 			return
 		}
 
 		err = h.sv.Delete(id)
 		if err != nil {
-			http.Error(w, "Error al eliminar: "+err.Error(), http.StatusNotFound)
+			utils.BadResponse(w, http.StatusNotFound, utils.ErrWarehouseRepositoryNotFound.Error())
 			return
 		}
-		w.WriteHeader(http.StatusNoContent)
+
+		utils.GoodResponse(w, http.StatusNoContent, "warehouse deleted successfully", nil)
 	}
 }
