@@ -44,7 +44,9 @@ func (h *WarehouseHandler) GetAll() http.HandlerFunc {
 			return warehouses[i].ID < warehouses[j].ID
 		})
 
-		utils.GoodResponse(w, http.StatusOK, "success", warehouses)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(warehouses)
 	}
 }
 
@@ -62,7 +64,10 @@ func (h *WarehouseHandler) GetByID() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusNotFound, utils.ErrWarehouseRepositoryNotFound.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusOK, "success", wh)
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(wh)
 	}
 }
 
@@ -87,7 +92,9 @@ func (h *WarehouseHandler) Create() http.HandlerFunc {
 			return
 		}
 
-		utils.GoodResponse(w, http.StatusCreated, "warehouse created successfully", warehouse)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(warehouse)
 	}
 }
 
@@ -126,7 +133,9 @@ func (h *WarehouseHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		utils.GoodResponse(w, http.StatusOK, "warehouse updated successfully", warehouse)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(warehouse)
 	}
 }
 
@@ -146,6 +155,6 @@ func (h *WarehouseHandler) Delete() http.HandlerFunc {
 			return
 		}
 
-		utils.GoodResponse(w, http.StatusNoContent, "warehouse deleted successfully", nil)
+		w.WriteHeader(http.StatusNoContent)
 	}
 }

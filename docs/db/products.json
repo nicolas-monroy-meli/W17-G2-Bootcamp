@@ -1,8 +1,8 @@
 [
-{"id":6,"product_code":"A1011","description":"Crema batida 250ml","height":12,"lenght":6,"width":6,"net_weight":0.25,"expiration_rate":0.07,"freezing_rate":0.01,"recommended_freezing_temperature":4,"product_type_id":1,"seller_id":111},
-{"id":1,"product_code":"A1001-EDIT","description":"Leche entera 1L - Actualizada","height":26,"lenght":7,"width":7,"net_weight":1,"expiration_rate":0.04,"freezing_rate":0.03,"recommended_freezing_temperature":4,"product_type_id":1,"seller_id":201},
-{"id":2,"product_code":"P1002","description":"Queso gouda 300g","height":6,"lenght":10,"width":10,"net_weight":0.3,"expiration_rate":0.07,"freezing_rate":0.01,"recommended_freezing_temperature":3,"product_type_id":2,"seller_id":202},
-{"id":3,"product_code":"P1003","description":"Yogur frutilla 200g","height":9,"lenght":6,"width":6,"net_weight":0.2,"expiration_rate":0.09,"freezing_rate":0,"recommended_freezing_temperature":4,"product_type_id":1,"seller_id":203},
-{"id":4,"product_code":"P1004","description":"Manteca 250g","height":4,"lenght":11,"width":6,"net_weight":0.25,"expiration_rate":0.06,"freezing_rate":0.02,"recommended_freezing_temperature":5,"product_type_id":3,"seller_id":204},
-{"id":5,"product_code":"P1005","description":"Helado chocolate 1L","height":14,"lenght":12,"width":12,"net_weight":1,"expiration_rate":0.03,"freezing_rate":0.18,"recommended_freezing_temperature":-18,"product_type_id":4,"seller_id":205}
+{"id":6,"product_code":"A1011","description":"Crema batida 250ml","height":12,"length":6,"width":6,"net_weight":0.25,"expiration_rate":0.07,"freezing_rate":0.01,"recommended_freezing_temperature":4,"product_type_id":1,"seller_id":111},
+{"id":1,"product_code":"A1001-EDIT","description":"Leche entera 1L - Actualizada OTRA VEZ","height":26,"length":7,"width":7,"net_weight":1,"expiration_rate":0.04,"freezing_rate":0.03,"recommended_freezing_temperature":4,"product_type_id":1,"seller_id":201},
+{"id":2,"product_code":"P1002","description":"Queso gouda 300g","height":6,"length":10,"width":10,"net_weight":0.3,"expiration_rate":0.07,"freezing_rate":0.01,"recommended_freezing_temperature":3,"product_type_id":2,"seller_id":202},
+{"id":3,"product_code":"P1003","description":"Yogur frutilla 200g","height":9,"length":6,"width":6,"net_weight":0.2,"expiration_rate":0.09,"freezing_rate":0,"recommended_freezing_temperature":4,"product_type_id":1,"seller_id":203},
+{"id":4,"product_code":"P1004","description":"Manteca 250g","height":4,"length":11,"width":6,"net_weight":0.25,"expiration_rate":0.06,"freezing_rate":0.02,"recommended_freezing_temperature":5,"product_type_id":3,"seller_id":204},
+{"id":5,"product_code":"P1005","description":"Helado chocolate 1L","height":14,"length":12,"width":12,"net_weight":1,"expiration_rate":0.03,"freezing_rate":0.18,"recommended_freezing_temperature":-18,"product_type_id":4,"seller_id":205}
 ]
