@@ -1,5 +1,6 @@
-USE `storage_db`;
+USE `fescos_db`;
 
+DROP TABLE IF EXISTS sections;
 CREATE TABLE `sections` (
                          `id` INT AUTO_INCREMENT PRIMARY KEY,
                          `sectionNumber` INT NOT NULL CHECK (sectionNumber > 0),
@@ -24,3 +25,4 @@ CREATE TABLE `sections` (
 -- Optional: add indexes if you'll filter/search by fields like warehouseID/productTypeID
 -- CREATE INDEX idx_section_warehouse ON Section (warehouseID);
 -- CREATE INDEX idx_section_product_type ON Section (productTypeID);
+

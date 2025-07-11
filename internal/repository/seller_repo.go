@@ -3,7 +3,7 @@ package repository
 import (
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/docs"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
+	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 )
 
 // NewSellerRepo creates a new instance of the Seller repository
@@ -22,7 +22,7 @@ type SellerDB struct {
 func (r *SellerDB) FindAll() (sellers map[int]mod.Seller, err error) {
 	result := r.db
 	if len(r.db) == 0 {
-		return nil, utils.ErrSellerRepositoryNotFound
+		return nil, e.ErrSellerRepositoryNotFound
 	}
 	return result, nil
 }
@@ -31,7 +31,7 @@ func (r *SellerDB) FindAll() (sellers map[int]mod.Seller, err error) {
 func (r *SellerDB) FindByID(id int) (seller mod.Seller, err error) {
 	val, ok := r.db[id]
 	if !ok {
-		return mod.Seller{}, utils.ErrSellerRepositoryNotFound
+		return mod.Seller{}, e.ErrSellerRepositoryNotFound
 	}
 	return val, nil
 }
@@ -40,7 +40,7 @@ func (r *SellerDB) FindByID(id int) (seller mod.Seller, err error) {
 func (r *SellerDB) Save(seller *mod.Seller) (err error) {
 	for _, v := range r.db {
 		if v.CID == seller.CID {
-			return utils.ErrSellerRepositoryDuplicated
+			return e.ErrSellerRepositoryDuplicated
 		}
 	}
 	seller.ID = len(r.db) + 1
@@ -60,7 +60,7 @@ func (r *SellerDB) Update(seller *mod.Seller) (err error) {
 func (r *SellerDB) Delete(id int) (err error) {
 	_, exists := r.db[id]
 	if !exists {
-		return utils.ErrSellerRepositoryNotFound
+		return e.ErrSellerRepositoryNotFound
 	}
 	delete(r.db, id)
 	docs.WriterFile("sellers.json", r.db)

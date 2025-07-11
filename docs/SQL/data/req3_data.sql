@@ -1,3 +1,4 @@
+DELETE FROM sections;
 INSERT INTO `sections` (`sectionNumber`, `currentTemperature`, `minimumTemperature`, `currentCapacity`, `minimumCapacity`, `maximumCapacity`, `warehouseID`, `productTypeID`) VALUES
 (1, 0, -5, 50, 20, 100, 1, 1),
 (2, -2, -6, 60, 30, 110, 2, 2),
