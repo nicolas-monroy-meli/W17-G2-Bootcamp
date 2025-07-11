@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 )
 
 // NewSectionRepo creates a new instance of the Section repository
@@ -53,7 +53,7 @@ func (r *SectionDB) SectionExists(id int) (bool, error) {
 // FindByID returns a section from the database by its id
 func (r *SectionDB) FindByID(id int) (section mod.Section, err error) {
 	if exists, _ := r.SectionExists(id); !exists {
-		return mod.Section{}, utils.ErrSectionRepositoryNotFound
+		return mod.Section{}, errors.ErrSectionRepositoryNotFound
 	}
 
 	row := r.db.QueryRow("SELECT `id`, `sectionNumber`,`currentTemperature`,`minimumTemperature`,`currentCapacity`,`minimumCapacity`,`maximumCapacity`,`warehouseID`,`productTypeID`  FROM `sections` WHERE `id`=?", id)
@@ -69,7 +69,7 @@ func (r *SectionDB) FindByID(id int) (section mod.Section, err error) {
 // Save saves a section into the database
 func (r *SectionDB) Save(section *mod.Section) (err error) {
 	if exists, _ := r.SectionExists(section.SectionNumber); exists {
-		return utils.ErrSectionRepositoryDuplicated
+		return errors.ErrSectionRepositoryDuplicated
 	}
 	result, err := r.db.Exec(
 		"INSERT INTO `sections` (`section_number`, `current_temperature`, `minimum_temperature`, `current_capacity`, `minimum_capacity`, `maximum_capacity`, `warehouse_id`, `product_type_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
@@ -95,7 +95,7 @@ func (r *SectionDB) Save(section *mod.Section) (err error) {
 // Update updates a section in the database
 func (r *SectionDB) Update(section *mod.Section) (err error) {
 	if exists, _ := r.SectionExists(section.SectionNumber); !exists {
-		return utils.ErrSectionRepositoryNotFound
+		return errors.ErrSectionRepositoryNotFound
 	}
 	// execute the query
 	_, err = r.db.Exec(
@@ -113,7 +113,7 @@ func (r *SectionDB) Update(section *mod.Section) (err error) {
 // Delete deletes a section from the database by its id
 func (r *SectionDB) Delete(id int) (err error) {
 	if exists, _ := r.SectionExists(id); !exists {
-		return utils.ErrSectionRepositoryNotFound
+		return errors.ErrSectionRepositoryNotFound
 	}
 	// execute the query
 	_, err = r.db.Exec("DELETE FROM `sections` WHERE `id` = ?", id)
