@@ -9,9 +9,9 @@ import (
 // SectionRepository is an interface that contains the methods that the section repository should support
 type SectionRepository interface {
 	// FindAll returns all the sections
-	FindAll() (map[int]mod.Section, error)
+	FindAll() ([]mod.Section, error)
 	//SectionExists returns a boolean that verifies if a section is in the db through its id
-	SectionExists(id int) bool
+	SectionExists(id int) (bool, error)
 	// FindByID returns the section with the given ID
 	FindByID(id int) (mod.Section, error)
 	// Save saves the given section
@@ -25,7 +25,7 @@ type SectionRepository interface {
 // SectionService is an interface that contains the methods that the section service should support
 type SectionService interface {
 	// FindAll returns all the sections
-	FindAll() (map[int]mod.Section, error)
+	FindAll() ([]mod.Section, error)
 	// FindByID returns the section with the given ID
 	FindByID(id int) (mod.Section, error)
 	// Save saves the given section
