@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
+	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 	"net/http"
 	"strconv"
 )
@@ -14,7 +14,7 @@ import (
 func IdRequests(r *http.Request) (int, error) {
 	idStr := chi.URLParam(r, "id")
 	if idStr == "" {
-		return 0, errors.New(utils.EmptyParams)
+		return 0, errors.New(e.EmptyParams)
 	}
 	id, err := strconv.Atoi(idStr)
 	if err != nil {

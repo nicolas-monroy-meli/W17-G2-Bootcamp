@@ -58,7 +58,7 @@ func (a *ServerChi) Run() (err error) {
 	buyers := docs.ReadFileToMap[mod.Buyer](a.loaderFilePath + "buyers.json")
 	employees := docs.ReadFileToMap[mod.Employee](a.loaderFilePath + "employees.json")
 	products := docs.ReadFileToMap[mod.Product](a.loaderFilePath + "products.json")
-	sections := docs.ReadFileToMap[mod.Section](a.loaderFilePath + "sections.json")
+	//sections := docs.ReadFileToMap[mod.Section](a.loaderFilePath + "sections.json")
 	sellers := docs.ReadFileToMap[mod.Seller](a.loaderFilePath + "sellers.json")
 	warehouses := docs.ReadFileToMap[mod.Warehouse](a.loaderFilePath + "warehouses.json")
 
@@ -66,7 +66,7 @@ func (a *ServerChi) Run() (err error) {
 	buyrp := repo.NewBuyerRepo(buyers)
 	emprp := repo.NewEmployeeRepo(employees)
 	prdrp := repo.NewProductRepo(products)
-	secrp := repo.NewSectionRepo(sections)
+	//secrp := repo.NewSectionRepo(sections)
 	selrp := repo.NewSellerRepo(sellers)
 	wrhrp := repo.NewWarehouseRepo(warehouses)
 
@@ -74,7 +74,7 @@ func (a *ServerChi) Run() (err error) {
 	buysv := srv.NewBuyerService(buyrp)
 	empsv := srv.NewEmployeeService(emprp)
 	prdsv := srv.NewProductService(prdrp)
-	secsv := srv.NewSectionService(secrp)
+	//secsv := srv.NewSectionService(secrp)
 	selsv := srv.NewSellerService(selrp)
 	wrhsv := srv.NewWarehouseService(wrhrp)
 
@@ -82,7 +82,7 @@ func (a *ServerChi) Run() (err error) {
 	buyhd := cont.NewBuyerHandler(buysv)
 	emphd := cont.NewEmployeeHandler(empsv)
 	prdhd := cont.NewProductHandler(prdsv)
-	sechd := cont.NewSectionHandler(secsv)
+	//sechd := cont.NewSectionHandler(secsv)
 	selhd := cont.NewSellerHandler(selsv)
 	wrhhd := cont.NewWarehouseHandler(wrhsv)
 
@@ -116,13 +116,14 @@ func (a *ServerChi) Run() (err error) {
 	})
 
 	// - sections
-	rt.Route("/v1/sections", func(rt chi.Router) {
+
+	/*rt.Route("/v1/sections", func(rt chi.Router) {
 		rt.Get("/", sechd.GetAll())
 		rt.Get("/{id}", sechd.GetByID())
 		rt.Delete("/{id}", sechd.Delete())
 		rt.Post("/", sechd.Create())
 		rt.Patch("/{id}", sechd.Update())
-	})
+	})*/
 
 	// - products
 	rt.Route("/v1/products", func(rt chi.Router) {

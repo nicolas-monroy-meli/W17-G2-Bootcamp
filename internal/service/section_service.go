@@ -19,7 +19,7 @@ type SectionService struct {
 }
 
 // FindAll returns all sections
-func (s *SectionService) FindAll() (sections map[int]mod.Section, err error) {
+func (s *SectionService) FindAll() (sections []mod.Section, err error) {
 	return s.rp.FindAll()
 }
 
