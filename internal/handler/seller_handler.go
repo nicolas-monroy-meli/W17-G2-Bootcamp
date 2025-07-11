@@ -2,15 +2,16 @@ package handler
 
 import (
 	"encoding/json"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"io"
 	"net/http"
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-playground/validator/v10"
+
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
 )
 
 // NewSellerHandler creates a new instance of the seller handler
@@ -31,7 +32,7 @@ func (h *SellerHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		result, err := h.sv.FindAll()
 		if err != nil {
-			utils.BadResponse(w, 400, err.Error())
+			utils.BadResponse(w, 400, "unable to get sellers")
 			return
 		}
 		utils.GoodResponse(w, 200, "succes", result)
@@ -53,6 +54,7 @@ func (h *SellerHandler) GetByID() http.HandlerFunc {
 			return
 		}
 		utils.GoodResponse(w, 200, "success", result)
+
 	}
 }
 
@@ -68,15 +70,17 @@ func (h *SellerHandler) Create() http.HandlerFunc {
 
 		err = json.Unmarshal(body, &req)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestNoBody.Error())
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestWrongBody.Error())
 			return
 		}
 
-		var validate = validator.New(validator.WithRequiredStructEnabled())
-		errValidate := validate.Struct(req)
-		if errValidate != nil {
-			utils.BadResponse(w, 422,
-				utils.ErrRequestWrongBody.Error()+"\n"+errValidate.Error())
+		errValidate := utils.ValidateStruct(req)
+		if len(errValidate) > 0 {
+			str := ""
+			for _, err := range errValidate {
+				str += err + ", "
+			}
+			utils.BadResponse(w, http.StatusUnprocessableEntity, str)
 			return
 		}
 
@@ -86,12 +90,56 @@ func (h *SellerHandler) Create() http.HandlerFunc {
 			return
 		}
 		utils.GoodResponse(w, 201, "success", nil)
+
 	}
 }
 
 // Update updates a seller
 func (h *SellerHandler) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		var req models.SellerPatch
+		id, err := strconv.Atoi(chi.URLParam(r, "id"))
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			return
+		}
+
+		currentSeller, err := h.sv.FindByID(id)
+		if err != nil {
+			utils.BadResponse(w, 404, err.Error())
+			return
+		}
+
+		body, err := io.ReadAll(r.Body)
+		if err != nil || body == nil {
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestFailedBody.Error())
+			return
+		}
+
+		err = json.Unmarshal(body, &req)
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestWrongBody.Error())
+			return
+		}
+
+		seller, err := common.PatchSeller(currentSeller, req)
+		if err != nil {
+			utils.BadResponse(w, 407, err.Error())
+			return
+		}
+
+		errValidate := utils.ValidateStruct(seller)
+		if len(errValidate) > 0 {
+			str := ""
+			for _, err := range errValidate {
+				str += err + ", "
+			}
+			utils.BadResponse(w, http.StatusUnprocessableEntity, str)
+			return
+		}
+
+		h.sv.Update(seller)
+		utils.GoodResponse(w, 200, "success", nil)
 
 	}
 }
@@ -99,6 +147,16 @@ func (h *SellerHandler) Update() http.HandlerFunc {
 // Delete deletes a seller
 func (h *SellerHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
+		req, err := strconv.Atoi(chi.URLParam(r, "id"))
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			return
+		}
+		err = h.sv.Delete(req)
+		if err != nil {
+			utils.BadResponse(w, 404, err.Error())
+			return
+		}
+		utils.GoodResponse(w, 204, "success", nil)
 	}
 }
