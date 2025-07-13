@@ -19,7 +19,7 @@ type BuyerService struct {
 }
 
 // FindAll returns all buyers
-func (s *BuyerService) FindAll() (buyers map[int]mod.Buyer, err error) {
+func (s *BuyerService) FindAll() (buyers []mod.Buyer, err error) {
 	return s.rp.FindAll()
 }
 

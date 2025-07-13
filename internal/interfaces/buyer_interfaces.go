@@ -9,7 +9,7 @@ import (
 // BuyerRepository is an interface that contains the methods that the buyer repository should support
 type BuyerRepository interface {
 	// FindAll returns all the buyers
-	FindAll() (map[int]mod.Buyer, error)
+	FindAll() ([]mod.Buyer, error)
 	// FindByID returns the buyer with the given ID
 	FindByID(id int) (mod.Buyer, error)
 	// Save saves the given buyer
@@ -23,7 +23,7 @@ type BuyerRepository interface {
 // BuyerService is an interface that contains the methods that the buyer service should support
 type BuyerService interface {
 	// FindAll returns all the buyers
-	FindAll() (map[int]mod.Buyer, error)
+	FindAll() ([]mod.Buyer, error)
 	// FindByID returns the buyer with the given ID
 	FindByID(id int) (mod.Buyer, error)
 	// Save saves the given buyer
