@@ -2,16 +2,17 @@ package main
 
 import (
 	"fmt"
-	"github.com/go-sql-driver/mysql"
-	"github.com/joho/godotenv"
 	"log"
 	"os"
+
+	"github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 
 	server "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/application"
 )
 
 func main() {
-	err := godotenv.Load("docs/db/dev.env")
+	err := godotenv.Load("dev.env")
 	if err != nil {
 		log.Println("No .env found!")
 	}

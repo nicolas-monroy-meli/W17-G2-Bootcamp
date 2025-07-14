@@ -1,5 +1,6 @@
 package server
 
+/*
 import (
 	"net/http"
 
@@ -55,36 +56,20 @@ func (a *ServerChi) Run() (err error) {
 	// dependencies
 
 	// - database loaders
-	buyers := docs.ReadFileToMap[mod.Buyer](a.loaderFilePath + "buyers.json")
-	employees := docs.ReadFileToMap[mod.Employee](a.loaderFilePath + "employees.json")
-	products := docs.ReadFileToMap[mod.Product](a.loaderFilePath + "products.json")
 	//sections := docs.ReadFileToMap[mod.Section](a.loaderFilePath + "sections.json")
 	sellers := docs.ReadFileToMap[mod.Seller](a.loaderFilePath + "sellers.json")
-	warehouses := docs.ReadFileToMap[mod.Warehouse](a.loaderFilePath + "warehouses.json")
 
 	// - repositories
-	buyrp := repo.NewBuyerRepo(buyers)
-	emprp := repo.NewEmployeeRepo(employees)
-	prdrp := repo.NewProductRepo(products)
 	//secrp := repo.NewSectionRepo(sections)
-	selrp := repo.NewSellerRepo(sellers)
-	wrhrp := repo.NewWarehouseRepo(warehouses)
+	//selrp := repo.NewSellerRepo(sellers)
 
 	// - services
-	buysv := srv.NewBuyerService(buyrp)
-	empsv := srv.NewEmployeeService(emprp)
-	prdsv := srv.NewProductService(prdrp)
 	//secsv := srv.NewSectionService(secrp)
-	selsv := srv.NewSellerService(selrp)
-	wrhsv := srv.NewWarehouseService(wrhrp)
+	//selsv := srv.NewSellerService(selrp)
 
 	// - handlers
-	buyhd := cont.NewBuyerHandler(buysv)
-	emphd := cont.NewEmployeeHandler(empsv)
-	prdhd := cont.NewProductHandler(prdsv)
 	//sechd := cont.NewSectionHandler(secsv)
-	selhd := cont.NewSellerHandler(selsv)
-	wrhhd := cont.NewWarehouseHandler(wrhsv)
+	//selhd := cont.NewSellerHandler(selsv)
 
 	// router
 	rt := chi.NewRouter()
@@ -106,15 +91,6 @@ func (a *ServerChi) Run() (err error) {
 
 	})
 
-	// - warehouses
-	rt.Route("/v1/warehouses", func(r chi.Router) {
-		r.Get("/", wrhhd.GetAll())
-		r.Get("/{id}", wrhhd.GetByID())
-		r.Post("/", wrhhd.Create())
-		r.Put("/{id}", wrhhd.Update())
-		r.Delete("/{id}", wrhhd.Delete())
-	})
-
 	// - sections
 
 	/*rt.Route("/v1/sections", func(rt chi.Router) {
@@ -123,36 +99,10 @@ func (a *ServerChi) Run() (err error) {
 		rt.Delete("/{id}", sechd.Delete())
 		rt.Post("/", sechd.Create())
 		rt.Patch("/{id}", sechd.Update())
-	})*/
-
-	// - products
-	rt.Route("/v1/products", func(rt chi.Router) {
-		rt.Get("/", prdhd.GetAll())
-		rt.Get("/{id}", prdhd.GetByID())
-		rt.Post("/", prdhd.Create())
-		rt.Patch("/{id}", prdhd.Update())
-		rt.Delete("/{id}", prdhd.Delete())
-	})
-
-	// - employees
-	rt.Route("/v1/employees", func(rt chi.Router) {
-		rt.Get("/", emphd.GetAllEmployees())
-		rt.Get("/{id}", emphd.GetEmployeeById())
-		rt.Post("/", emphd.CreateEmployee())
-		rt.Patch("/{id}", emphd.EditEmployee())
-		rt.Delete("/{id}", emphd.DeleteEmployee())
-	})
-
-	// - buyers
-	rt.Route("/api/v1/buyers", func(rt chi.Router) {
-		rt.Get("/", buyhd.GetAll())
-		rt.Get("/{id}", buyhd.GetByID())
-		rt.Post("/", buyhd.Create())
-		rt.Patch("/{id}", buyhd.Update())
-		rt.Delete("/{id}", buyhd.Delete())
 	})
 
 	// run
 	err = http.ListenAndServe(a.serverAddress, rt)
 	return
 }
+*/

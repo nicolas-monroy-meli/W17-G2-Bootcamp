@@ -12,9 +12,13 @@ type Seller struct {
 	Address string `json:"address" validate:"required"`
 	// Telephone is the telephone number of the company
 	Telephone string `json:"telephone" validate:"required"`
+	// Locality is the locality_id of the company
+	Locality int `json:"locality_id" validate:"required,gte=1"`
 }
 
 type SellerPatch struct {
+	// ID is the unique identifier of the seller
+	ID int `json:"id"`
 	// CID is the unique identifier of the company
 	CID *int `json:"cid"`
 	// CompanyName is the name of the company
@@ -23,4 +27,6 @@ type SellerPatch struct {
 	Address *string `json:"address"`
 	// Telephone is the telephone number of the company
 	Telephone *string `json:"telephone"`
+	// Locality is the locality_id of the company
+	Locality *int `json:"locality_id" validate:"required,gte=1"`
 }

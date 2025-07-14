@@ -7,12 +7,19 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-
 var (
+	// Requests
 	ErrRequestIdMustBeInt = errors.New("handler: id must be an integer")
 	ErrRequestNoBody      = errors.New("handler: request must have a body")
 	ErrRequestWrongBody   = errors.New("handler: body does not meet requirements")
 	ErrRequestFailedBody  = errors.New("handler: failed to read body")
+
+	//Query
+	ErrQueryError   = errors.New("repository: insert is returning an error")
+	ErrQueryIsEmpty = errors.New("repository: query returned no info")
+
+	//Insert
+	ErrForeignKeyError = errors.New("repository: unable to execute query due to foreign key error")
 
 	// EmptyParams string telling the parameters are empty
 	EmptyParams = "handler: empty parameters"
