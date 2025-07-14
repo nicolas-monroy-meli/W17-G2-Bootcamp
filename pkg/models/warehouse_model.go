@@ -1,5 +1,6 @@
 package models
 
+// Estructura
 type Warehouse struct {
 	ID                 int     `json:"ID"`
 	WarehouseCode      string  `json:"WarehouseCode"`
