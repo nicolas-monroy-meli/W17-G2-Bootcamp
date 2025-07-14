@@ -26,7 +26,7 @@ type SellerDB struct {
 func (r *SellerDB) FindAll() (sellers []mod.Seller, err error) {
 	rows, err := r.db.Query("SELECT `id`, `cid`,`company_name`,`address`,`telephone`,`locality_id` FROM `sellers`")
 	if err != nil {
-		return nil, e.ErrQueryError
+		return nil, e.ErrInsertError
 	}
 	defer rows.Close()
 	for rows.Next() {

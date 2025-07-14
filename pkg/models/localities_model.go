@@ -11,3 +11,9 @@ type Locality struct {
 	// Country is the country's name
 	Country string `json:"country_name" validate:"required"`
 }
+
+type SelByLoc struct {
+	ID    int    `json:"locality_id"`
+	Name  string `json:"locality_name"`
+	Count int    `json:"sellers_count"`
+}
