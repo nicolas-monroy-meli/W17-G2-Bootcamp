@@ -7,15 +7,24 @@ import (
 )
 
 type WarehouseDB struct {
-	db map[int]mod.Warehouse
+	db         map[int]mod.Warehouse
+	carries    map[int]mod.Carry
+	localities map[int]string
 }
 
 func NewWarehouseRepo(warehouses map[int]mod.Warehouse) *WarehouseDB {
 	return &WarehouseDB{
-		db: warehouses,
+		db:      warehouses,
+		carries: make(map[int]mod.Carry),
+		localities: map[int]string{ // ejemplo de localidades precargadas
+			1: "Palermo",
+			2: "Belgrano",
+			3: "Caballito",
+		},
 	}
 }
 
+// Métodos existentes
 func (r *WarehouseDB) FindAll() (map[int]mod.Warehouse, error) {
 	return r.db, nil
 }
@@ -29,13 +38,11 @@ func (r *WarehouseDB) FindByID(id int) (mod.Warehouse, error) {
 }
 
 func (r *WarehouseDB) Save(warehouse *mod.Warehouse) error {
-	// Verificamos si ya existe un warehouse con el mismo código
 	for _, wh := range r.db {
 		if wh.WarehouseCode == warehouse.WarehouseCode {
 			return errors.New("ya existe un warehouse con ese código")
 		}
 	}
-	// Creamos un ID nuevo (máximo ID + 1)
 	maxID := 0
 	for id := range r.db {
 		if id > maxID {
@@ -63,4 +70,53 @@ func (r *WarehouseDB) Delete(id int) error {
 	}
 	delete(r.db, id)
 	return nil
+}
+
+///////////////////////////////////////////
+//  Métodos nuevos para Carry
+///////////////////////////////////////////
+
+func (r *WarehouseDB) CreateCarry(c *mod.Carry) error {
+	// Validación simple de duplicado por ID
+	if _, exists := r.carries[c.ID]; exists {
+		return errors.New("carry con ese ID ya existe")
+	}
+	r.carries[c.ID] = *c
+	return nil
+}
+
+func (r *WarehouseDB) ExistsCID(cid int) bool {
+	for _, c := range r.carries {
+		if c.CID == cid {
+			return true
+		}
+	}
+	return false
+}
+
+func (r *WarehouseDB) ExistsLocality(id int) bool {
+	_, ok := r.localities[id]
+	return ok
+}
+
+func (r *WarehouseDB) ReportByLocality(id int) ([]mod.LocalityCarryReport, error) {
+	count := 0
+	for _, c := range r.carries {
+		if c.LocalityID == id {
+			count++
+		}
+	}
+
+	name, ok := r.localities[id]
+	if !ok {
+		return nil, errors.New("localidad no encontrada")
+	}
+
+	report := mod.LocalityCarryReport{
+		LocalityID:   id,
+		LocalityName: name,
+		CarriesCount: count,
+	}
+
+	return []mod.LocalityCarryReport{report}, nil
 }
