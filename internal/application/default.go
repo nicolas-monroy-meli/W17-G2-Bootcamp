@@ -2,13 +2,14 @@ package server
 
 import (
 	"database/sql"
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-sql-driver/mysql"
 	hand "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/handler"
 	repo "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/repository"
 	serv "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/service"
-	"net/http"
 )
 
 type SQLConfig struct {
@@ -47,7 +48,7 @@ func (d *SQLConfig) Run() (err error) {
 	// instancing repository layer
 	//buyRepo := repo.NewBuyerRepo(db)
 	//empRepo := repo.NewEmployeeRepo(db)
-	//prdRepo := repo.NewProductRepo(db)
+	prdRepo := repo.NewProductRepo(db)
 	secRepo := repo.NewSectionRepo(db)
 	//selRepo := repo.NewSellerRepo(db)
 	//wrhRepo := repo.NewWarehouseRepo(db)
@@ -55,7 +56,7 @@ func (d *SQLConfig) Run() (err error) {
 	//instancing service layer
 	//buyServ := serv.NewBuyerService(buyRepo)
 	//empServ := serv.NewEmployeeService(empRepo)
-	//prdServ := serv.NewProductService(prdRepo)
+	prdServ := serv.NewProductService(prdRepo)
 	secServ := serv.NewSectionService(secRepo)
 	//selServ := serv.NewSellerService(selRepo)
 	//wrhServ := serv.NewWarehouseService(wrhRepo)
@@ -63,7 +64,7 @@ func (d *SQLConfig) Run() (err error) {
 	//instancing handler layer
 	//buyHand := hand.NewBuyerHandler(buyServ)
 	//empHand := hand.NewEmployeeHandler(empServ)
-	//prdHand := hand.NewProductHandler(prdServ)
+	prdHand := hand.NewProductHandler(prdServ)
 	secHand := hand.NewSectionHandler(secServ)
 	//selHand := hand.NewSellerHandler(selServ)
 	//wrhHand := hand.NewWarehouseHandler(wrhServ)
@@ -105,15 +106,15 @@ func (d *SQLConfig) Run() (err error) {
 		rt.Patch("/{id}", secHand.Update())
 	})
 
-	//// - products
-	//rt.Route("/v1/products", func(rt chi.Router) {
-	//	rt.Get("/", prdHand.GetAll())
-	//	rt.Get("/{id}", prdHand.GetByID())
-	//	rt.Post("/", prdHand.Create())
-	//	rt.Patch("/{id}", prdHand.Update())
-	//	rt.Delete("/{id}", prdHand.Delete())
-	//})
-	//
+	// - products
+	rt.Route("/v1/products", func(rt chi.Router) {
+		rt.Get("/", prdHand.GetAll())
+		rt.Get("/{id}", prdHand.GetByID())
+		rt.Post("/", prdHand.Create())
+		rt.Patch("/{id}", prdHand.Update())
+		rt.Delete("/{id}", prdHand.Delete())
+	})
+
 	//// - employees
 	//rt.Route("/v1/employees", func(rt chi.Router) {
 	//	rt.Get("/", empHand.GetAllEmployees())

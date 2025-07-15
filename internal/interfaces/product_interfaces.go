@@ -39,11 +39,11 @@ type ProductHandler interface {
 	// FindAll returns all the buyers
 	GetAll() http.HandlerFunc
 	// FindByID returns the buyer with the given ID
-	GetByID(id int) http.HandlerFunc
+	GetByID() http.HandlerFunc
 	// Save saves the given buyer
-	Create(buyer *mod.Product) http.HandlerFunc
+	Create() http.HandlerFunc
 	// Update updates the given buyer
-	Update(buyer *mod.Product) http.HandlerFunc
+	Update() http.HandlerFunc
 	// Delete deletes the buyer with the given ID
-	Delete(id int) http.HandlerFunc
+	Delete() http.HandlerFunc
 }
