@@ -113,6 +113,12 @@ func (d *SQLConfig) Run() (err error) {
 		rt.Post("/", prdHand.Create())
 		rt.Patch("/{id}", prdHand.Update())
 		rt.Delete("/{id}", prdHand.Delete())
+		rt.Get("/reportRecords", prdHand.GetRecords())
+	})
+
+	// - product records
+	rt.Route("/v1/productRecords", func(rt chi.Router) {
+		rt.Post("/", prdHand.CreateRecord())
 	})
 
 	//// - employees

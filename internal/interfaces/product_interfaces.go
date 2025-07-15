@@ -18,6 +18,12 @@ type ProductRepository interface {
 	Update(product *mod.Product) error
 	// Delete deletes the product with the given ID
 	Delete(id int) error
+	// FindAllPR returns all product records from the database
+	FindAllPR() (map[int]mod.ProductRecord, error)
+	// FindAllByProductIDPR returns all product records for a given product ID
+	FindAllByProductIDPR(productID int) (map[int]mod.ProductRecord, error)
+	// SavePR saves the given product record
+	SavePR(productRecord *mod.ProductRecord) error
 }
 
 // ProductService is an interface that contains the methods that the product service should support
@@ -32,6 +38,12 @@ type ProductService interface {
 	Update(product *mod.Product) error
 	// Delete deletes the product with the given ID
 	Delete(id int) error
+	// FindAllPR returns all product records from the database
+	FindAllPR() (map[int]mod.ProductRecord, error)
+	// FindAllByProductIDPR returns all product records for a given product ID
+	FindAllByProductIDPR(productID int) (map[int]mod.ProductRecord, error)
+	// SavePR saves the given product record
+	SavePR(productRecord *mod.ProductRecord) error
 }
 
 // ProductService is an interface that contains the methods that the buyer service should support
@@ -46,4 +58,8 @@ type ProductHandler interface {
 	Update() http.HandlerFunc
 	// Delete deletes the buyer with the given ID
 	Delete() http.HandlerFunc
+	// GetRecords returns all product records, if productId is provided, it returns the records for that product, if not, it returns all records
+	GetRecords() http.HandlerFunc
+	// CreateRecord creates a new product record
+	CreateRecord() http.HandlerFunc
 }
