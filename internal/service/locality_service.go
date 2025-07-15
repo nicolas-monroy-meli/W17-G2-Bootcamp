@@ -19,18 +19,15 @@ type LocalityService struct {
 }
 
 // FindAll returns all sellers
-func (s *LocalityService) FindSellersByLocality() (result []mod.SelByLoc, err error) {
-	return s.rp.FindSellersByLocality()
+func (s *LocalityService) FindAllLocalities() (result []mod.Locality, err error) {
+	return s.rp.FindAllLocalities()
 }
 
-func (s *LocalityService) FindSellersByLocID(id int) (result mod.SelByLoc, err error) {
+func (s *LocalityService) FindSellersByLocID(id int) (result []mod.SelByLoc, err error) {
 	return s.rp.FindSellersByLocID(id)
 }
 
-
-/*
-// Save creates a new seller
-func (s *LocalityService) Save(seller *mod.Locality) (id int, err error) {
-	return s.rp.Save(seller)
+// Save creates a new locality
+func (s *LocalityService) Save(locality *mod.Locality) (id int, err error) {
+	return s.rp.Save(locality)
 }
-	*/

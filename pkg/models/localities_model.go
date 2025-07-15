@@ -3,7 +3,7 @@ package models
 // Locality is a struct that contains the locality's information
 type Locality struct {
 	// ID is the unique identifier of the seller
-	ID int `json:"id" validate:"required,gte=1"`
+	ID int `json:"id"`
 	// Name is the locality's name
 	Name string `json:"locality_name" validate:"required"`
 	// Province is the province's name

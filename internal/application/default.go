@@ -109,9 +109,9 @@ func (d *SQLConfig) Run() (err error) {
 
 	// - localities
 	rt.Route("/v1/localities", func(rt chi.Router) {
-		//rt.Post("/", secHand.GetAll())
-		rt.Get("/reportSellers", locHand.GetSelByLoc())
-		rt.Get("/reportSeller", locHand.GetSelByLocID())
+		rt.Post("/", locHand.Create())
+		rt.Get("/", locHand.GetSelByLoc())
+		rt.Get("/reportSellers", locHand.GetSelByLocID())
 
 	})
 

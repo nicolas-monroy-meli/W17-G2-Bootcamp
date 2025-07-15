@@ -1,10 +1,12 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 )
@@ -25,7 +27,7 @@ type LocalityHandler struct {
 // GetByID returns a seller
 func (h *LocalityHandler) GetSelByLoc() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		result, err := h.sv.FindSellersByLocality()
+		result, err := h.sv.FindAllLocalities()
 		if err != nil {
 			utils.BadResponse(w, 404, err.Error())
 			return
@@ -36,7 +38,15 @@ func (h *LocalityHandler) GetSelByLoc() http.HandlerFunc {
 
 func (h *LocalityHandler) GetSelByLocID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.Atoi(r.URL.Query().Get("id"))
+		var id int
+		var err error
+		req := r.URL.Query().Get("id")
+		switch req {
+		case "":
+			id = -1
+		default:
+			id, err = strconv.Atoi(req)
+		}
 		if err != nil {
 			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
 			return
@@ -50,8 +60,7 @@ func (h *LocalityHandler) GetSelByLocID() http.HandlerFunc {
 	}
 }
 
-/*
-// Create creates a new seller
+// Create creates a new locality
 func (h *LocalityHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req models.Locality
@@ -77,7 +86,5 @@ func (h *LocalityHandler) Create() http.HandlerFunc {
 			return
 		}
 		utils.GoodResponse(w, 201, "success", id)
-
 	}
 }
-*/
