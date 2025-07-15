@@ -14,43 +14,40 @@ import (
 func IdRequests(r *http.Request) (int, error) {
 	idStr := chi.URLParam(r, "id")
 	if idStr == "" {
-		return 0, errors.New(e.EmptyParams)
+		return 0, e.EmptyParams
 	}
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return 0, errors.New(err.Error())
+		return 0, errors.New(fmt.Sprintf("unexpected: %s", err.Error()))
 	}
 	return id, nil
 }
 
 func PatchSection(request models.SectionPatch, section models.Section) models.Section {
-	fmt.Println(request.WarehouseID)
-	switch {
-	case request.SectionNumber != nil:
+	fmt.Println(request.CurrentCapacity)
+	if request.SectionNumber != nil {
 		section.SectionNumber = *request.SectionNumber
-		fallthrough
-	case request.CurrentTemperature != nil:
-
+	}
+	if request.CurrentTemperature != nil {
 		section.CurrentTemperature = *request.CurrentTemperature
-		fallthrough
-	case request.MinimumTemperature != nil:
+	}
+	if request.MinimumTemperature != nil {
 		section.MinimumTemperature = *request.MinimumTemperature
-		fallthrough
-	case request.CurrentCapacity != nil:
+	}
+	if request.CurrentCapacity != nil {
 		section.CurrentCapacity = *request.CurrentCapacity
-		fallthrough
-	case request.MinimumCapacity != nil:
+	}
+	if request.MinimumCapacity != nil {
 		section.MinimumCapacity = *request.MinimumCapacity
-		fallthrough
-	case request.MaximumCapacity != nil:
+	}
+	if request.MaximumCapacity != nil {
 		section.MaximumCapacity = *request.MaximumCapacity
-		fallthrough
-	case request.WarehouseID != nil:
+	}
+	if request.WarehouseID != nil {
 		section.WarehouseID = *request.WarehouseID
-		fallthrough
-	case request.ProductTypeID != nil:
+	}
+	if request.ProductTypeID != nil {
 		section.ProductTypeID = *request.ProductTypeID
 	}
-	fmt.Println(section)
 	return section
 }

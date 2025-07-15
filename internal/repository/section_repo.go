@@ -21,29 +21,39 @@ type SectionDB struct {
 
 // FindAll returns all sections from the database
 func (r *SectionDB) FindAll() (sections []mod.Section, err error) {
-	rows, err := r.db.Query("SELECT `id`, `sectionNumber`,`currentTemperature`,`minimumTemperature`,`currentCapacity`, `minimumCapacity`,`maximumCapacity`,`warehouseID`,`productTypeID` FROM `sections`")
+	rows, err := r.db.Query("SELECT `id`, `section_number`,`current_temperature`,`minimum_temperature`,`current_capacity`, `minimum_capacity`,`maximum_capacity`,`warehouse_id`,`product_type_id` FROM `sections`")
 	if err != nil {
 		fmt.Println(err.Error())
-		return
+		return nil, err
 	}
+
 	defer rows.Close()
+
 	for rows.Next() {
 		var section mod.Section
 		err = rows.Scan(&section.ID, &section.SectionNumber, &section.CurrentTemperature, &section.MinimumTemperature, &section.CurrentCapacity, &section.MinimumCapacity, &section.MaximumCapacity, &section.WarehouseID, &section.ProductTypeID)
 		if err != nil {
-			fmt.Println(err.Error())
-			return
+			return nil, err
 		}
 		sections = append(sections, section)
 	}
-	return
+
+	if len(sections) == 0 {
+		return nil, errors.ErrEmptySectionDB
+	}
+	return sections, nil
 }
 
 // SectionExists returns a boolean that verifies if a section is in the db through its id
-func (r *SectionDB) SectionExists(id int) (bool, error) {
+func (r *SectionDB) SectionExists(id int, sectionNumber *int) (res bool, err error) {
 	var exists bool
-	query := `SELECT EXISTS (SELECT 1 FROM sections WHERE id = ?)`
-	err := r.db.QueryRow(query, id).Scan(&exists)
+	if sectionNumber != nil {
+		query := `SELECT EXISTS (SELECT 1 FROM sections WHERE id = ? or section_number=?)`
+		err = r.db.QueryRow(query, id, *sectionNumber).Scan(&exists)
+	} else {
+		query := `SELECT EXISTS (SELECT 1 FROM sections WHERE id = ?)`
+		err = r.db.QueryRow(query, id).Scan(&exists)
+	}
 	if err != nil {
 		return false, err
 	}
@@ -52,23 +62,19 @@ func (r *SectionDB) SectionExists(id int) (bool, error) {
 
 // FindByID returns a section from the database by its id
 func (r *SectionDB) FindByID(id int) (section mod.Section, err error) {
-	if exists, _ := r.SectionExists(id); !exists {
-		return mod.Section{}, errors.ErrSectionRepositoryNotFound
-	}
-
-	row := r.db.QueryRow("SELECT `id`, `sectionNumber`,`currentTemperature`,`minimumTemperature`,`currentCapacity`,`minimumCapacity`,`maximumCapacity`,`warehouseID`,`productTypeID`  FROM `sections` WHERE `id`=?", id)
+	row := r.db.QueryRow("SELECT `id`, `section_number`,`current_temperature`,`minimum_temperature`,`current_capacity`, `minimum_capacity`,`maximum_capacity`,`warehouse_id`,`product_type_id`  FROM `sections` WHERE `id`=?", id)
 
 	err = row.Scan(&section.ID, &section.SectionNumber, &section.CurrentTemperature, &section.MinimumTemperature, &section.CurrentCapacity, &section.MinimumCapacity, &section.MaximumCapacity, &section.WarehouseID, &section.ProductTypeID)
 	if err != nil {
 		fmt.Println(err.Error())
-		return mod.Section{}, err
+		return mod.Section{}, errors.ErrSectionRepositoryNotFound
 	}
 	return section, nil
 }
 
 // Save saves a section into the database
 func (r *SectionDB) Save(section *mod.Section) (err error) {
-	if exists, _ := r.SectionExists(section.SectionNumber); exists {
+	if exists, _ := r.SectionExists(section.ID, &section.SectionNumber); exists {
 		return errors.ErrSectionRepositoryDuplicated
 	}
 	result, err := r.db.Exec(
@@ -94,7 +100,7 @@ func (r *SectionDB) Save(section *mod.Section) (err error) {
 
 // Update updates a section in the database
 func (r *SectionDB) Update(section *mod.Section) (err error) {
-	if exists, _ := r.SectionExists(section.SectionNumber); !exists {
+	if exists, _ := r.SectionExists(section.ID, &section.SectionNumber); !exists {
 		return errors.ErrSectionRepositoryNotFound
 	}
 	// execute the query
@@ -112,7 +118,7 @@ func (r *SectionDB) Update(section *mod.Section) (err error) {
 
 // Delete deletes a section from the database by its id
 func (r *SectionDB) Delete(id int) (err error) {
-	if exists, _ := r.SectionExists(id); !exists {
+	if exists, _ := r.SectionExists(id, nil); !exists {
 		return errors.ErrSectionRepositoryNotFound
 	}
 	// execute the query

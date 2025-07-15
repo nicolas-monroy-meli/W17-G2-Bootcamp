@@ -31,7 +31,7 @@ func (h *SectionHandler) GetAll() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusOK, "data retrieved successfully", result)
+		utils.GoodResponse(w, http.StatusOK, errors.DataRetrievedSuccess, result)
 	}
 }
 
@@ -59,7 +59,7 @@ func (h *SectionHandler) Create() http.HandlerFunc {
 
 		err := json.NewDecoder(r.Body).Decode(&model)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestFailedBody.Error())
 			return
 		}
 		validationErrors := errors.ValidateStruct(model)
@@ -86,12 +86,12 @@ func (h *SectionHandler) Update() http.HandlerFunc {
 		var model models.SectionPatch
 		id, err := common.IdRequests(r)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestIdMustBeInt.Error())
 			return
 		}
 		err = json.NewDecoder(r.Body).Decode(&model)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestFailedBody.Error())
 			return
 		}
 		section, err := h.sv.FindByID(id)
@@ -126,7 +126,7 @@ func (h *SectionHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := common.IdRequests(r)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestIdMustBeInt.Error())
 			return
 		}
 		err = h.sv.Delete(id)

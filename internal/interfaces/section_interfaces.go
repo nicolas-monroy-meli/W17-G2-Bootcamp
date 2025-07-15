@@ -11,7 +11,7 @@ type SectionRepository interface {
 	// FindAll returns all the sections
 	FindAll() ([]mod.Section, error)
 	//SectionExists returns a boolean that verifies if a section is in the db through its id
-	SectionExists(id int) (bool, error)
+	SectionExists(id int, sectionNumber *int) (res bool, err error)
 	// FindByID returns the section with the given ID
 	FindByID(id int) (mod.Section, error)
 	// Save saves the given section
@@ -36,16 +36,16 @@ type SectionService interface {
 	Delete(id int) error
 }
 
-// SectionHandler is an interface that contains the methods that the buyer service should support
+// SectionHandler is an interface that contains the methods that the section service should support
 type SectionHandler interface {
-	// GetAll returns all the buyers
+	// GetAll returns all the sections
 	GetAll() http.HandlerFunc
-	// GetByID returns the buyer with the given ID
-	GetByID(id int) http.HandlerFunc
-	// Create saves the given buyer
-	Create(buyer *mod.Section) http.HandlerFunc
-	// Update updates the given buyer
-	Update(buyer *mod.Section) http.HandlerFunc
-	// Delete deletes the buyer with the given ID
-	Delete(id int) http.HandlerFunc
+	// GetByID returns the section with the given ID
+	GetByID() http.HandlerFunc
+	// Create saves the given section
+	Create() http.HandlerFunc
+	// Update updates the given section
+	Update() http.HandlerFunc
+	// Delete deletes the section with the given ID
+	Delete() http.HandlerFunc
 }

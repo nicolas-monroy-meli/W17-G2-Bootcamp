@@ -3,11 +3,11 @@ package models
 // Section is a struct that contains the section's information
 type Section struct {
 	// ID is the unique identifier of the section
-	ID int `json:"id" validate:"required"`
+	ID int `json:"id,omitempty"`
 	// SectionNumber is the number of the section
 	SectionNumber int `json:"sectionNumber" validate:"required,gt=0"`
 	// CurrentTemperature is the current temperature of the section
-	CurrentTemperature float64 `json:"currentTemperature" validate:"required,gtefield=MinimumTemperature"`
+	CurrentTemperature float64 `json:"currentTemperature" validate:"gtefield=MinimumTemperature"`
 	// MinimumTemperature is the minimum temperature that can be maintained in the section
 	MinimumTemperature float64 `json:"minimumTemperature" validate:"required"`
 	// CurrentCapacity is the current capacity of the section
@@ -29,7 +29,7 @@ type SectionPatch struct {
 	// MinimumTemperature is the minimum temperature that can be maintained in the section
 	MinimumTemperature *float64 `json:"minimumTemperature" `
 	// CurrentCapacity is the current capacity of the section
-	CurrentCapacity *int `json:"CurrentCapacity"`
+	CurrentCapacity *int `json:"currentCapacity"`
 	// MinimumCapacity is the minimum capacity of the section
 	MinimumCapacity *int `json:"minimumCapacity"`
 	// MaximumCapacity is the maximum capacity of the section

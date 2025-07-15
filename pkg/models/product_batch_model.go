@@ -3,7 +3,7 @@ package models
 import "time"
 
 type ProductBatch struct {
-	ID                 int       `json:"id" validate:"required"`
+	ID                 int       `json:"id,omitempty"`
 	BatchNumber        int       `json:"batchNumber" validate:"required,gt=0"`
 	CurrentQuantity    int       `json:"currentQuantity" validate:"required,gtefield=InitialQuantity"`
 	InitialQuantity    int       `json:"initialQuantity" validate:"required,gt=0"`

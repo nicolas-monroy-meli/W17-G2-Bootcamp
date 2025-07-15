@@ -49,6 +49,7 @@ func (d *SQLConfig) Run() (err error) {
 	//empRepo := repo.NewEmployeeRepo(db)
 	//prdRepo := repo.NewProductRepo(db)
 	secRepo := repo.NewSectionRepo(db)
+	pbRepo := repo.NewProductBatchRepo(db)
 	//selRepo := repo.NewSellerRepo(db)
 	//wrhRepo := repo.NewWarehouseRepo(db)
 
@@ -57,6 +58,7 @@ func (d *SQLConfig) Run() (err error) {
 	//empServ := serv.NewEmployeeService(empRepo)
 	//prdServ := serv.NewProductService(prdRepo)
 	secServ := serv.NewSectionService(secRepo)
+	pbServ := serv.NewProductBatchRepository(pbRepo)
 	//selServ := serv.NewSellerService(selRepo)
 	//wrhServ := serv.NewWarehouseService(wrhRepo)
 
@@ -65,6 +67,7 @@ func (d *SQLConfig) Run() (err error) {
 	//empHand := hand.NewEmployeeHandler(empServ)
 	//prdHand := hand.NewProductHandler(prdServ)
 	secHand := hand.NewSectionHandler(secServ)
+	pbHand := hand.NewProductBatchHandler(pbServ)
 	//selHand := hand.NewSellerHandler(selServ)
 	//wrhHand := hand.NewWarehouseHandler(wrhServ)
 
@@ -103,6 +106,11 @@ func (d *SQLConfig) Run() (err error) {
 		rt.Delete("/{id}", secHand.Delete())
 		rt.Post("/", secHand.Create())
 		rt.Patch("/{id}", secHand.Update())
+	})
+
+	rt.Route("/v1/productBatches", func(rt chi.Router) {
+		rt.Get("/", pbHand.GetAll())
+		rt.Post("/", pbHand.Create())
 	})
 
 	//// - products
