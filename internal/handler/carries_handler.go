@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -31,6 +32,7 @@ func (h *carryHandler) Create() http.HandlerFunc {
 		var carry models.Carry
 
 		if err := json.NewDecoder(r.Body).Decode(&carry); err != nil {
+			fmt.Println(err.Error())
 			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestWrongBody.Error())
 			return
 		}

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"sort"
 	"strconv"
@@ -106,6 +107,7 @@ func (h *warehouseHandler) Update() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusUnprocessableEntity, "Campos inválidos: "+err.Error())
 			return
 		}
+		fmt.Println(warehouse)
 
 		if err := common.ValidateWarehouseUpdate(warehouse); err != nil {
 			utils.BadResponse(w, http.StatusBadRequest, err.Error())

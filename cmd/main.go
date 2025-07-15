@@ -2,23 +2,24 @@ package main
 
 import (
 	"fmt"
-	"github.com/go-sql-driver/mysql"
-	"github.com/joho/godotenv"
 	"log"
 	"os"
+
+	"github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 
 	server "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/application"
 )
 
 func main() {
-	err := godotenv.Load("docs/db/dev.env")
+	err := godotenv.Load("dev.env.example")
 	if err != nil {
 		log.Println("No .env found!")
 	}
 	cfg := &server.SQLConfig{
 		Database: mysql.Config{
 			User:      os.Getenv("DB_USER"),
-			Passwd:    "",
+			Passwd:    os.Getenv("PASSWD"),
 			Net:       "tcp",
 			Addr:      os.Getenv("DB_ADDRESS"),
 			DBName:    os.Getenv("DB_NAME"),

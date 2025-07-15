@@ -29,3 +29,6 @@ CREATE TABLE warehouses (
     minimum_capacity INT NOT NULL,
     minimum_temperature FLOAT NOT NULL
 );
+
+
+
