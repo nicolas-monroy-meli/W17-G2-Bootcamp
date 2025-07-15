@@ -22,6 +22,7 @@ type CarryService interface {
 	Update(c *models.Carry) error
 	Delete(id int) error
 	ReportByLocality(localityID int) ([]models.LocalityCarryReport, error)
+	ReportByLocalityAll() ([]models.LocalityCarryReport, error)
 }
 
 type CarryRepository interface {
@@ -33,5 +34,6 @@ type CarryRepository interface {
 	ExistsLocality(localityID int) (bool, error)
 	ExistsCID(cid string) (bool, error)
 	GetReportByLocality(localityID int) ([]models.LocalityCarryReport, error)
-	GetByCID(cid string) (models.Carry, error) // Añadido
+	GetByCID(cid string) (models.Carry, error)
+	GetReportByLocalityAll() ([]models.LocalityCarryReport, error)
 }

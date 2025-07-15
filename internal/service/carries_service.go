@@ -54,3 +54,7 @@ func (s *carryService) Delete(id int) error {
 func (s *carryService) ReportByLocality(localityID int) ([]mod.LocalityCarryReport, error) {
 	return s.repo.GetReportByLocality(localityID)
 }
+
+func (s *carryService) ReportByLocalityAll() ([]mod.LocalityCarryReport, error) {
+	return s.repo.GetReportByLocalityAll()
+}

@@ -56,8 +56,14 @@ func (h *carryHandler) GetReportByLocality() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idStr := r.URL.Query().Get("id")
 		if idStr == "" {
-			utils.BadResponse(w, http.StatusBadRequest, "Debe especificar un ID")
+			report, err := h.sv.ReportByLocalityAll()
+			if err != nil {
+				utils.BadResponse(w, http.StatusInternalServerError, "Error al generar el reporte: "+err.Error())
+				return
+			}
+			utils.GoodResponse(w, http.StatusOK, "", report)
 			return
+
 		}
 
 		id, err := strconv.Atoi(idStr)
@@ -73,5 +79,6 @@ func (h *carryHandler) GetReportByLocality() http.HandlerFunc {
 		}
 
 		utils.GoodResponse(w, http.StatusOK, "", report)
+		return
 	}
 }

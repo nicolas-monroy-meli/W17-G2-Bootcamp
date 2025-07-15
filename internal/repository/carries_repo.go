@@ -107,7 +107,7 @@ func (r *carryRepository) Save(c *models.Carry) error {
 	return nil
 }
 
-// Update sin contexto
+// Update
 func (r *carryRepository) Update(c *models.Carry) error {
 	existingCarry, err := r.GetByCID(c.CID)
 	if err != nil && err != utils.ErrCarryRepositoryNotFound {
@@ -129,7 +129,7 @@ func (r *carryRepository) Update(c *models.Carry) error {
 		WHERE id = ?
 	`
 
-	result, err := r.db.Exec(query, // Exec sin contexto
+	result, err := r.db.Exec(query, // Exec
 		c.CID,
 		c.LocalityID,
 		c.CompanyName,
@@ -149,10 +149,9 @@ func (r *carryRepository) Update(c *models.Carry) error {
 	return nil
 }
 
-// Delete sin contexto
 func (r *carryRepository) Delete(id int) error {
 	query := `DELETE FROM carries WHERE id = ?`
-	result, err := r.db.Exec(query, id) // Exec sin contexto
+	result, err := r.db.Exec(query, id)
 	if err != nil {
 		return fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
 	}
@@ -165,7 +164,7 @@ func (r *carryRepository) Delete(id int) error {
 	return nil
 }
 
-// GetReportByLocality sin contexto
+// GetReportByLocality
 func (r *carryRepository) GetReportByLocality(localityID int) ([]models.LocalityCarryReport, error) {
 	query := `
 		SELECT 
@@ -178,7 +177,44 @@ func (r *carryRepository) GetReportByLocality(localityID int) ([]models.Locality
 		GROUP BY l.id, l.name;
 	`
 
-	rows, err := r.db.Query(query, localityID) // Query sin contexto
+	rows, err := r.db.Query(query, localityID) // Query
+	if err != nil {
+		return nil, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+	}
+	defer rows.Close()
+
+	var reports []models.LocalityCarryReport
+	for rows.Next() {
+		var report models.LocalityCarryReport
+		if err := rows.Scan(
+			&report.LocalityID,
+			&report.LocalityName,
+			&report.CarriesCount,
+		); err != nil {
+			return nil, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		}
+		reports = append(reports, report)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+	}
+
+	return reports, nil
+}
+
+func (r *carryRepository) GetReportByLocalityAll() ([]models.LocalityCarryReport, error) {
+	query := `
+		SELECT 
+			l.id AS locality_id, 
+			l.name AS locality_name, 
+			COUNT(c.id) AS carries_count
+		FROM localities l
+		LEFT JOIN carries c ON l.id = c.locality_id
+		GROUP BY l.id, l.name;
+	`
+
+	rows, err := r.db.Query(query) // Query
 	if err != nil {
 		return nil, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
 	}
@@ -214,18 +250,18 @@ func (r *carryRepository) ExistsLocality(localityID int) (bool, error) {
 	return exists, nil
 }
 
-// ExistsCID sin contexto
+// ExistsCID
 func (r *carryRepository) ExistsCID(cid string) (bool, error) {
 	var exists bool
 	query := `SELECT EXISTS(SELECT 1 FROM carries WHERE cid = ?)`
-	err := r.db.QueryRow(query, cid).Scan(&exists) // QueryRow sin contexto
+	err := r.db.QueryRow(query, cid).Scan(&exists) // QueryRow
 	if err != nil {
 		return false, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
 	}
 	return exists, nil
 }
 
-// GetByCID sin contexto
+// GetByCID
 func (r *carryRepository) GetByCID(cid string) (models.Carry, error) {
 	query := `
 		SELECT id, cid, locality_id, company_name, address, telephone 
