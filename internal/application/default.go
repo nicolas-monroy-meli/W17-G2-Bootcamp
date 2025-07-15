@@ -46,23 +46,23 @@ func (d *SQLConfig) Run() (err error) {
 	}
 	// instancing repository layer
 	//buyRepo := repo.NewBuyerRepo(db)
-	//empRepo := repo.NewEmployeeRepo(db)
+	empRepo := repo.NewEmployeeRepo(db)
 	//prdRepo := repo.NewProductRepo(db)
-	secRepo := repo.NewSectionRepo(db)
+	secRepo := repo.NewEmployeeRepo(db)
 	//selRepo := repo.NewSellerRepo(db)
 	//wrhRepo := repo.NewWarehouseRepo(db)
 
 	//instancing service layer
 	//buyServ := serv.NewBuyerService(buyRepo)
-	//empServ := serv.NewEmployeeService(empRepo)
+	empServ := serv.NewEmployeeService(empRepo)
 	//prdServ := serv.NewProductService(prdRepo)
-	secServ := serv.NewSectionService(secRepo)
+	//secServ := serv.NewSectionService(secRepo)
 	//selServ := serv.NewSellerService(selRepo)
 	//wrhServ := serv.NewWarehouseService(wrhRepo)
 
 	//instancing handler layer
 	//buyHand := hand.NewBuyerHandler(buyServ)
-	//empHand := hand.NewEmployeeHandler(empServ)
+	empHand := hand.NewEmployeeHandler(empServ)
 	//prdHand := hand.NewProductHandler(prdServ)
 	secHand := hand.NewSectionHandler(secServ)
 	//selHand := hand.NewSellerHandler(selServ)
@@ -115,13 +115,13 @@ func (d *SQLConfig) Run() (err error) {
 	//})
 	//
 	//// - employees
-	//rt.Route("/v1/employees", func(rt chi.Router) {
-	//	rt.Get("/", empHand.GetAllEmployees())
-	//	rt.Get("/{id}", empHand.GetEmployeeById())
-	//	rt.Post("/", empHand.CreateEmployee())
-	//	rt.Patch("/{id}", empHand.EditEmployee())
-	//	rt.Delete("/{id}", empHand.DeleteEmployee())
-	//})
+	rt.Route("/v1/employees", func(rt chi.Router) {
+		rt.Get("/", empHand.GetAll())
+		rt.Get("/{id}", empHand.GetById())
+		rt.Post("/", empHand.Create())
+		rt.Patch("/{id}", empHand.Edit())
+		rt.Delete("/{id}", empHand.Delete())
+	})
 	//
 	//// - buyers
 	//rt.Route("/v1/buyers", func(rt chi.Router) {

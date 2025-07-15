@@ -7,6 +7,7 @@ import (
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
+	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 	"net/http"
 	"strconv"
 )
@@ -25,9 +26,9 @@ type EmployeeHandler struct {
 }
 
 // GetAll returns all employees
-func (h *EmployeeHandler) GetAllEmployees() http.HandlerFunc {
+func (h *EmployeeHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		result, err := h.sv.FindAllEmployees()
+		result, err := h.sv.FindAll()
 		if err != nil {
 			utils.BadResponse(w, 400, err.Error())
 			return
@@ -37,7 +38,7 @@ func (h *EmployeeHandler) GetAllEmployees() http.HandlerFunc {
 }
 
 // GetByID returns a employee
-func (h *EmployeeHandler) GetEmployeeById() http.HandlerFunc {
+func (h *EmployeeHandler) GetById() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idUrl := chi.URLParam(r, "id")
 		if idUrl == "" {
@@ -46,10 +47,10 @@ func (h *EmployeeHandler) GetEmployeeById() http.HandlerFunc {
 		}
 		idNum, err := strconv.Atoi(idUrl)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
 			return
 		}
-		result, err := h.sv.FindEmployeeByID(idNum)
+		result, err := h.sv.FindByID(idNum)
 		if err != nil {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -59,7 +60,7 @@ func (h *EmployeeHandler) GetEmployeeById() http.HandlerFunc {
 }
 
 // Create creates a new employee~
-func (h *EmployeeHandler) CreateEmployee() http.HandlerFunc {
+func (h *EmployeeHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var employee mod.Employee
 		err := json.NewDecoder(r.Body).Decode(&employee)
@@ -68,7 +69,7 @@ func (h *EmployeeHandler) CreateEmployee() http.HandlerFunc {
 			return
 		}
 		if employee.FirstName == "" || employee.LastName == "" || employee.CardNumberID == "" || employee.WarehouseID == 0 {
-			utils.BadResponse(w, http.StatusUnprocessableEntity, utils.ErrRequestWrongBody.Error())
+			utils.BadResponse(w, http.StatusUnprocessableEntity, e.ErrRequestWrongBody.Error())
 			return
 		}
 		_, err = strconv.Atoi(employee.CardNumberID)
@@ -76,9 +77,9 @@ func (h *EmployeeHandler) CreateEmployee() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusUnprocessableEntity, "required only number in card Number")
 			return
 		}
-		err = h.sv.SaveEmployee(&employee)
+		err = h.sv.Save(&employee)
 		if err != nil {
-			utils.BadResponse(w, http.StatusUnprocessableEntity, utils.ErrEmployeeRepositoryDuplicated.Error())
+			utils.BadResponse(w, http.StatusUnprocessableEntity, e.ErrEmployeeRepositoryDuplicated.Error())
 			return
 		}
 		utils.GoodResponse(w, http.StatusCreated, "succes", employee)
@@ -86,7 +87,7 @@ func (h *EmployeeHandler) CreateEmployee() http.HandlerFunc {
 }
 
 // Update updates a employee
-func (h *EmployeeHandler) EditEmployee() http.HandlerFunc {
+func (h *EmployeeHandler) Edit() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var model mod.Employee
 		idObj := chi.URLParam(r, "id")
@@ -96,22 +97,22 @@ func (h *EmployeeHandler) EditEmployee() http.HandlerFunc {
 		}
 		idNum, err := strconv.Atoi(idObj)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
 			return
 		}
 		err = json.NewDecoder(r.Body).Decode(&model)
 		if err != nil {
-			utils.BadResponse(w, http.StatusUnprocessableEntity, utils.ErrRequestWrongBody.Error())
+			utils.BadResponse(w, http.StatusUnprocessableEntity, e.ErrRequestWrongBody.Error())
 			return
 		}
-		emplo, err := h.sv.FindEmployeeByID(idNum)
+		emplo, err := h.sv.FindByID(idNum)
 		if err != nil {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
 		employee := common.PatchEmployees(model, emplo)
 		employee.ID = idNum
-		err = h.sv.UpdateEmployee(idNum, &employee)
+		err = h.sv.Update(idNum, &employee)
 		if err != nil {
 			utils.BadResponse(w, http.StatusConflict, err.Error())
 			return
@@ -121,7 +122,7 @@ func (h *EmployeeHandler) EditEmployee() http.HandlerFunc {
 }
 
 // Delete deletes a employee
-func (h *EmployeeHandler) DeleteEmployee() http.HandlerFunc {
+func (h *EmployeeHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idObj := chi.URLParam(r, "id")
 		if idObj == "" {
@@ -130,10 +131,10 @@ func (h *EmployeeHandler) DeleteEmployee() http.HandlerFunc {
 		}
 		idNum, err := strconv.Atoi(idObj)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
 			return
 		}
-		err = h.sv.DeleteEmployee(idNum)
+		err = h.sv.Delete(idNum)
 		if err != nil {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return

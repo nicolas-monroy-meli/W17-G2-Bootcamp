@@ -56,7 +56,7 @@ func (a *ServerChi) Run() (err error) {
 
 	// - database loaders
 	buyers := docs.ReadFileToMap[mod.Buyer](a.loaderFilePath + "buyers.json")
-	employees := docs.ReadFileToMap[mod.Employee](a.loaderFilePath + "employees.json")
+	//employees := docs.ReadFileToMap[mod.Employee](a.loaderFilePath + "employees.json")
 	products := docs.ReadFileToMap[mod.Product](a.loaderFilePath + "products.json")
 	//sections := docs.ReadFileToMap[mod.Section](a.loaderFilePath + "sections.json")
 	sellers := docs.ReadFileToMap[mod.Seller](a.loaderFilePath + "sellers.json")
@@ -64,7 +64,7 @@ func (a *ServerChi) Run() (err error) {
 
 	// - repositories
 	buyrp := repo.NewBuyerRepo(buyers)
-	emprp := repo.NewEmployeeRepo(employees)
+	//emprp := repo.NewEmployeeRepo(employees)
 	prdrp := repo.NewProductRepo(products)
 	//secrp := repo.NewSectionRepo(sections)
 	selrp := repo.NewSellerRepo(sellers)
@@ -72,7 +72,7 @@ func (a *ServerChi) Run() (err error) {
 
 	// - services
 	buysv := srv.NewBuyerService(buyrp)
-	empsv := srv.NewEmployeeService(emprp)
+	//empsv := srv.NewEmployeeService(emprp)
 	prdsv := srv.NewProductService(prdrp)
 	//secsv := srv.NewSectionService(secrp)
 	selsv := srv.NewSellerService(selrp)
@@ -80,7 +80,7 @@ func (a *ServerChi) Run() (err error) {
 
 	// - handlers
 	buyhd := cont.NewBuyerHandler(buysv)
-	emphd := cont.NewEmployeeHandler(empsv)
+	//emphd := cont.NewEmployeeHandler(empsv)
 	prdhd := cont.NewProductHandler(prdsv)
 	//sechd := cont.NewSectionHandler(secsv)
 	selhd := cont.NewSellerHandler(selsv)
@@ -135,13 +135,13 @@ func (a *ServerChi) Run() (err error) {
 	})
 
 	// - employees
-	rt.Route("/v1/employees", func(rt chi.Router) {
-		rt.Get("/", emphd.GetAllEmployees())
-		rt.Get("/{id}", emphd.GetEmployeeById())
-		rt.Post("/", emphd.CreateEmployee())
-		rt.Patch("/{id}", emphd.EditEmployee())
-		rt.Delete("/{id}", emphd.DeleteEmployee())
-	})
+	//rt.Route("/v1/employees", func(rt chi.Router) {
+	//	rt.Get("/", emphd.GetAll())
+	//	rt.Get("/{id}", emphd.GetById())
+	//	rt.Post("/", emphd.Create())
+	//	rt.Patch("/{id}", emphd.Edit())
+	//	rt.Delete("/{id}", emphd.Delete())
+	//})
 
 	// - buyers
 	rt.Route("/api/v1/buyers", func(rt chi.Router) {
