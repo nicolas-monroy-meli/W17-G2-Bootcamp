@@ -8,7 +8,9 @@ CREATE TABLE localities(
     id INT PRIMARY KEY AUTO_INCREMENT,
     locality_name VARCHAR(255),
     province_name VARCHAR(255),
-    country_name VARCHAR(255)
+    country_name VARCHAR(255),
+
+    UNIQUE(locality_name, province_name, country_name)
 );
 
 DROP TABLE IF EXISTS sellers;

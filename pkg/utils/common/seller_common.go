@@ -17,5 +17,8 @@ func PatchSeller(seller mod.Seller, newSeller mod.SellerPatch) (*mod.Seller, err
 	if newSeller.CID != nil {
 		seller.CID = *newSeller.CID
 	}
+	if newSeller.Locality != nil {
+		seller.Locality = *newSeller.Locality
+	}
 	return &seller, nil
 }
