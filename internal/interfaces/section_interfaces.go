@@ -17,9 +17,11 @@ type SectionRepository interface {
 	// Save saves the given section
 	Save(section *mod.Section) error
 	// Update updates the given section
-	Update(section *mod.Section) error
+	Update(id int, fields map[string]interface{}) (*mod.Section, error)
 	// Delete deletes the section with the given ID
 	Delete(id int) error
+	//ReportProducts it will return the quantity of products of each section
+	ReportProducts(ids []int) ([]mod.ReportProductsResponse, error)
 }
 
 // SectionService is an interface that contains the methods that the section service should support
@@ -31,9 +33,10 @@ type SectionService interface {
 	// Save saves the given section
 	Save(section *mod.Section) error
 	// Update updates the given section
-	Update(section *mod.Section) error
+	Update(id int, fields map[string]interface{}) (*mod.Section, error)
 	// Delete deletes the section with the given ID
 	Delete(id int) error
+	ReportProducts(ids []int) ([]mod.ReportProductsResponse, error)
 }
 
 // SectionHandler is an interface that contains the methods that the section service should support
@@ -48,4 +51,5 @@ type SectionHandler interface {
 	Update() http.HandlerFunc
 	// Delete deletes the section with the given ID
 	Delete() http.HandlerFunc
+	ReportProducts() http.HandlerFunc
 }

@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type ProductBatch struct {
 	ID                 int       `json:"id,omitempty"`
@@ -11,7 +13,7 @@ type ProductBatch struct {
 	MinimumTemperature int       `json:"minimumTemperature" validate:"required"`
 	DueDate            time.Time `json:"dueDate" validate:"required"`
 	ManufacturingDate  time.Time `json:"manufacturingDate" validate:"required"`
-	ManufacturingHour  time.Time `json:"manufacturingHour" validate:"required"`
+	ManufacturingHour  string    `json:"manufacturingHour" validate:"required,hhmmss"`
 	ProductId          int       `json:"productId" validate:"required,gt=0"`
 	SectionId          int       `json:"sectionId" validate:"required,gt=0"`
 }

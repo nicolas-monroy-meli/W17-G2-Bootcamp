@@ -106,6 +106,7 @@ func (d *SQLConfig) Run() (err error) {
 		rt.Delete("/{id}", secHand.Delete())
 		rt.Post("/", secHand.Create())
 		rt.Patch("/{id}", secHand.Update())
+		rt.Get("/reportProducts", secHand.ReportProducts())
 	})
 
 	rt.Route("/v1/productBatches", func(rt chi.Router) {

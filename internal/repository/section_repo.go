@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
+	"strconv"
 )
 
 // NewSectionRepo creates a new instance of the Section repository
@@ -99,21 +101,26 @@ func (r *SectionDB) Save(section *mod.Section) (err error) {
 }
 
 // Update updates a section in the database
-func (r *SectionDB) Update(section *mod.Section) (err error) {
-	if exists, _ := r.SectionExists(section.ID, &section.SectionNumber); !exists {
-		return errors.ErrSectionRepositoryNotFound
-	}
+// send from here
+func (r *SectionDB) Update(id int, fields map[string]interface{}) (result *mod.Section, err error) {
+	//Build query
+	query, args := common.BuildPatchQuery("sections", fields, strconv.Itoa(id))
 	// execute the query
-	_, err = r.db.Exec(
-		"UPDATE `sections` SET `section_number` = ?, `current_temperature` = ?, `minimum_temperature` = ?, `current_capacity` = ?, `minimum_capacity` = ?, `maximum_capacity` = ?, `warehouse_id` = ?, `product_type_id` = ? WHERE `id` = ?",
-		(*section).SectionNumber, (*section).CurrentTemperature, (*section).MinimumTemperature, (*section).CurrentCapacity, (*section).MinimumCapacity, (*section).MaximumCapacity, (*section).WarehouseID, (*section).ProductTypeID, (*section).ID,
-	)
+	res, err := r.db.Exec(query, args...)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
 
-	return
+	sec, err := r.FindByID(id)
+	if err != nil {
+		return nil, errors.ErrSectionRepositoryNotFound
+	}
+	rowsAffected, _ := res.RowsAffected()
+	if int(rowsAffected) == 0 {
+		return nil, errors.NoRowsAffected
+	}
+	return &sec, nil
 }
 
 // Delete deletes a section from the database by its id
@@ -128,4 +135,36 @@ func (r *SectionDB) Delete(id int) (err error) {
 		return
 	}
 	return
+}
+
+func (r *SectionDB) ReportProducts(ids []int) ([]mod.ReportProductsResponse, error) {
+	query, args := common.GetQueryReport(ids)
+	rows, err := r.db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	results := make([]mod.ReportProductsResponse, 0)
+	foundIDs := make(map[int]bool)
+
+	for rows.Next() {
+		var result mod.ReportProductsResponse
+		err := rows.Scan(&result.SectionId, &result.SectionNumber, &result.ProductsCount)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, result)
+		foundIDs[result.SectionId] = true
+	}
+
+	for _, id := range ids {
+		if !foundIDs[id] {
+			results = append(results, mod.ReportProductsResponse{
+				SectionId:     id,
+				SectionNumber: 0,
+				ProductsCount: 0,
+			})
+		}
+	}
+	return results, nil
 }

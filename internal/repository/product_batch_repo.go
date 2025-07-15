@@ -29,6 +29,10 @@ func (r *ProductBatchDB) FindAll() (batches []mod.ProductBatch, err error) {
 	for rows.Next() {
 		var batch mod.ProductBatch
 		err = rows.Scan(&batch.ID, &batch.BatchNumber, &batch.CurrentQuantity, &batch.InitialQuantity, &batch.CurrentTemperature, &batch.MinimumTemperature, &batch.DueDate, &batch.ManufacturingDate, &batch.ManufacturingHour, &batch.ProductId, &batch.SectionId)
+		if err != nil {
+			return nil, err
+		}
+		batches = append(batches, batch)
 	}
 
 	if len(batches) == 0 {
@@ -40,7 +44,7 @@ func (r *ProductBatchDB) FindAll() (batches []mod.ProductBatch, err error) {
 func (r *ProductBatchDB) BatchExists(id int, batchNumber *int) (res bool, err error) {
 	var exists bool
 	if batchNumber != nil {
-		query := `SELECT EXISTS (SELECT 1 FROM product_batches WHERE id = ? or batch_number=?)`
+		query := `SELECT EXISTS (SELECT 1 FROM product_batches WHERE batch_number=?)`
 		err = r.db.QueryRow(query, id, *batchNumber).Scan(&exists)
 
 	} else {
@@ -54,9 +58,7 @@ func (r *ProductBatchDB) BatchExists(id int, batchNumber *int) (res bool, err er
 }
 
 func (r *ProductBatchDB) Save(batch *mod.ProductBatch) (err error) {
-	if exists, _ := r.BatchExists(batch.ID, &batch.BatchNumber); !exists {
-		return errors.ErrProductBatchDuplicated
-	}
+
 	result, err := r.db.Exec("INSERT INTO `product_batches` (`batch_number`,`current_quantity`,`initial_quantity`,`current_temperature`, `minimum_temperature`, `due_date`, `manufacturing_date`, `manufacturing_hour`, `product_id`, `section_id`) VALUES(?,?,?,?,?,?,?,?,?,?)",
 		(*batch).BatchNumber, (*batch).CurrentQuantity, (*batch).InitialQuantity, (*batch).CurrentTemperature, (*batch).MinimumTemperature, (*batch).DueDate, (*batch).ManufacturingDate, (*batch).ManufacturingHour, (*batch).ProductId, (*batch).SectionId)
 	if err != nil {

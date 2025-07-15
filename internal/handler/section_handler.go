@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
@@ -94,15 +95,15 @@ func (h *SectionHandler) Update() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestFailedBody.Error())
 			return
 		}
-		section, err := h.sv.FindByID(id)
-		if err != nil {
-			utils.BadResponse(w, http.StatusNotFound, err.Error())
+
+		fields := common.PatchSection(model)
+
+		if len(fields) == 0 {
+			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestNoBody.Error())
 			return
 		}
 
-		section = common.PatchSection(model, section)
-
-		validationErrors := errors.ValidateStruct(section)
+		validationErrors := errors.ValidateStruct(model)
 		if len(validationErrors) > 0 {
 			str := ""
 			for _, err := range validationErrors {
@@ -112,12 +113,12 @@ func (h *SectionHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		err = h.sv.Update(&section)
+		result, err := h.sv.Update(id, fields)
 		if err != nil {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusOK, errors.SectionUpdated, section)
+		utils.GoodResponse(w, http.StatusOK, errors.SectionUpdated, result)
 	}
 }
 
@@ -135,5 +136,27 @@ func (h *SectionHandler) Delete() http.HandlerFunc {
 			return
 		}
 		utils.GoodResponse(w, http.StatusNoContent, errors.SectionDeleted, nil)
+	}
+}
+
+func (h *SectionHandler) ReportProducts() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		params := r.URL.Query().Get("ids")
+		fmt.Printf("p: %s", params)
+		if params == "" {
+			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestWrongBody.Error())
+			return
+		}
+		ids, err := common.ParseWarehouseIDs(params)
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestWrongBody.Error())
+			return
+		}
+		res, err := h.sv.ReportProducts(ids)
+		if err != nil {
+			utils.BadResponse(w, http.StatusInternalServerError, fmt.Sprintf("db error: %s", err.Error()))
+			return
+		}
+		utils.GoodResponse(w, http.StatusOK, errors.DataRetrievedSuccess, res)
 	}
 }

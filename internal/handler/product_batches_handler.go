@@ -50,6 +50,7 @@ func (h *ProductBatchHandler) Create() http.HandlerFunc {
 		err = h.sv.Save(&model)
 		if err != nil {
 			utils.BadResponse(w, http.StatusConflict, err.Error())
+			return
 		}
 		utils.GoodResponse(w, http.StatusCreated, errors.SectionCreated, model)
 	}

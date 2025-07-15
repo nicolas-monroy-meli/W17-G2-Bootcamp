@@ -3,10 +3,10 @@ package errors
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 )
-
 
 var (
 	ErrRequestIdMustBeInt = errors.New("handler: id must be an integer")
@@ -15,7 +15,8 @@ var (
 	ErrRequestFailedBody  = errors.New("handler: failed to read body")
 
 	// EmptyParams string telling the parameters are empty
-	EmptyParams = "handler: empty parameters"
+	EmptyParams    = errors.New("handler: empty parameters")
+	NoRowsAffected = errors.New("repository: no rows were affected")
 	// DataRetrievedSuccess string that tells the data was retrieved
 	DataRetrievedSuccess = "handler: data retrieved successfully"
 	// SectionDeleted string that tells the section was deleted successfully
@@ -53,6 +54,10 @@ var (
 	// ErrSectionRepositoryDuplicated is returned when the section already exists
 	ErrSectionRepositoryDuplicated = errors.New("repository: section already exists")
 
+	//ProductBatch
+	ErrProductBatchNotFound   = errors.New("repository: Product Batch not found")
+	ErrProductBatchDuplicated = errors.New("repository: Product Batch already exists")
+
 	//Seller
 	// ErrSellerRepositoryNotFound is returned when the seller is not found
 	ErrSellerRepositoryNotFound = errors.New("repository: seller not found")
@@ -66,9 +71,15 @@ var (
 	ErrWarehouseRepositoryDuplicated = errors.New("repository: warehouse already exists")
 )
 
+func validTime(fl validator.FieldLevel) bool {
+	_, err := time.Parse("15:04:05", fl.Field().String())
+	return err == nil
+}
+
 // ValidateStruct returns a string map of formatted errors
 func ValidateStruct(s interface{}) map[string]string {
 	v := validator.New()
+	v.RegisterValidation("hhmmss", validTime)
 	errorsList := make(map[string]string)
 
 	err := v.Struct(s)
@@ -97,6 +108,8 @@ func ValidateStruct(s interface{}) map[string]string {
 			customMsg = fmt.Sprintf("%s must be less than or equal to %s", field, err.Param())
 		case "ltfield":
 			customMsg = fmt.Sprintf("%s must be less than %s", field, err.Param())
+		case "hhmmss":
+			customMsg = fmt.Sprintf("%s must follow HH:MM:SS format", field)
 		default:
 			customMsg = fmt.Sprintf("%s failed on %s validation", field, err.Tag())
 		}
@@ -104,3 +117,5 @@ func ValidateStruct(s interface{}) map[string]string {
 	}
 	return errorsList
 }
+
+//tablas dependencias inexistentes
