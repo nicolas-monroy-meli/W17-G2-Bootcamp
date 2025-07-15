@@ -9,10 +9,11 @@ import (
 
 var (
 	// Requests
-	ErrRequestIdMustBeInt = errors.New("handler: id must be an integer")
-	ErrRequestNoBody      = errors.New("handler: request must have a body")
-	ErrRequestWrongBody   = errors.New("handler: body does not meet requirements")
-	ErrRequestFailedBody  = errors.New("handler: failed to read body")
+	ErrRequestIdMustBeInt  = errors.New("handler: id must be an integer")
+	ErrRequestIdMustBeGte0 = errors.New("handler: id must be greater than 0")
+	ErrRequestNoBody       = errors.New("handler: request must have a body")
+	ErrRequestWrongBody    = errors.New("handler: body does not meet requirements")
+	ErrRequestFailedBody   = errors.New("handler: failed to read body")
 
 	//Query
 	ErrQueryError   = errors.New("repository: unable to execute query")
@@ -66,6 +67,10 @@ var (
 	ErrSellerRepositoryNotFound = errors.New("repository: seller not found")
 	// ErrSellerRepositoryDuplicated is returned when the seller already exists
 	ErrSellerRepositoryDuplicated = errors.New("repository: seller already exists")
+
+	//Locality
+	// ErrLocalityNotFound is returned when the locality is not found
+	ErrLocalityRepositoryNotFound = errors.New("repository: locality not found")
 
 	//Warehouse
 	// ErrWarehouseRepositoryNotFound is returned when the warehouse is not found

@@ -68,13 +68,14 @@ func (r *SellerDB) findByCID(cid int) (err error) {
 
 // Save saves a seller into the database
 func (r *SellerDB) Save(seller *mod.Seller) (id int, err error) {
-	err = r.findByCID(seller.CID)
-	if err == nil {
-		return 0, e.ErrSellerRepositoryDuplicated
-	}
-
 	result, err := r.db.Exec("INSERT INTO `sellers`(`cid`,`company_name`,`address`,`telephone`,`locality_id`) VALUES(?,?,?,?,?)", seller.CID, seller.CompanyName, seller.Address, seller.Telephone, seller.Locality)
 	if err != nil {
+		var mySQLErr *mysql.MySQLError
+		if errors.As(err, &mySQLErr) {
+			if mySQLErr.Number == 1062 {
+				return 0, e.ErrSellerRepositoryDuplicated
+			}
+		}
 		return 0, e.ErrForeignKeyError
 	}
 	id64, _ := result.LastInsertId()

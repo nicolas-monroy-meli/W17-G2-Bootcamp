@@ -61,6 +61,9 @@ func (r *LocalityDB) FindSellersByLocID(id int) (result []models.SelByLoc, err e
 		}
 		result = append(result, locality)
 	}
+	if len(result) == 0 {
+		return nil, e.ErrLocalityRepositoryNotFound
+	}
 	return result, nil
 }
 

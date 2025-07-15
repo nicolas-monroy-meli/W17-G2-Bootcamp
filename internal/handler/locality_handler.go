@@ -46,6 +46,10 @@ func (h *LocalityHandler) GetSelByLocID() http.HandlerFunc {
 			id = -1
 		default:
 			id, err = strconv.Atoi(req)
+			if id < 0 {
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
+			return
+		}
 		}
 		if err != nil {
 			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
