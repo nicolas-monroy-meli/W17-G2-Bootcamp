@@ -42,20 +42,3 @@ func (s *ProductService) Update(product *mod.Product) (err error) {
 func (s *ProductService) Delete(id int) (err error) {
 	return s.rp.Delete(id)
 }
-
-////////////////////////////////////
-
-// FindAllPR returns all product records from the repository
-func (s *ProductService) FindAllPR() (productRecords map[int]mod.ProductRecord, err error) {
-	return s.rp.FindAllPR()
-}
-
-// FindAllByProductIDPR returns all product records for a given product ID
-func (s *ProductService) FindAllByProductIDPR(productID int) (productRecords map[int]mod.ProductRecord, err error) {
-	return s.rp.FindAllByProductIDPR(productID)
-}
-
-// SavePR creates a new product record
-func (s *ProductService) SavePR(productRecord *mod.ProductRecord) (err error) {
-	return s.rp.SavePR(productRecord)
-}
