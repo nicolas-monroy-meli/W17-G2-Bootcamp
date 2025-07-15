@@ -2,13 +2,14 @@ package server
 
 import (
 	"database/sql"
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-sql-driver/mysql"
 	hand "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/handler"
 	repo "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/repository"
 	serv "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/service"
-	"net/http"
 )
 
 type SQLConfig struct {
@@ -48,25 +49,28 @@ func (d *SQLConfig) Run() (err error) {
 	//buyRepo := repo.NewBuyerRepo(db)
 	//empRepo := repo.NewEmployeeRepo(db)
 	//prdRepo := repo.NewProductRepo(db)
-	secRepo := repo.NewSectionRepo(db)
+	//secRepo := repo.NewSectionRepo(db)
 	//selRepo := repo.NewSellerRepo(db)
-	//wrhRepo := repo.NewWarehouseRepo(db)
+	wrhRepo := repo.NewWarehouseRepository(db)
+	carrRepo := repo.NewCarryRepository(db)
 
 	//instancing service layer
 	//buyServ := serv.NewBuyerService(buyRepo)
 	//empServ := serv.NewEmployeeService(empRepo)
 	//prdServ := serv.NewProductService(prdRepo)
-	secServ := serv.NewSectionService(secRepo)
+	//secServ := serv.NewSectionService(secRepo)
 	//selServ := serv.NewSellerService(selRepo)
-	//wrhServ := serv.NewWarehouseService(wrhRepo)
+	wrhServ := serv.NewWarehouseService(wrhRepo)
+	carrServ := serv.NewCarryService(carrRepo)
 
 	//instancing handler layer
 	//buyHand := hand.NewBuyerHandler(buyServ)
 	//empHand := hand.NewEmployeeHandler(empServ)
 	//prdHand := hand.NewProductHandler(prdServ)
-	secHand := hand.NewSectionHandler(secServ)
+	//secHand := hand.NewSectionHandler(secServ)
 	//selHand := hand.NewSellerHandler(selServ)
-	//wrhHand := hand.NewWarehouseHandler(wrhServ)
+	wrhHand := hand.NewWarehouseHandler(wrhServ)
+	carrHand := hand.NewCarryHandler(carrServ)
 
 	//routing
 
@@ -88,22 +92,31 @@ func (d *SQLConfig) Run() (err error) {
 	//})
 	//
 	//// - warehouses
-	//rt.Route("/v1/warehouses", func(r chi.Router) {
-	//	r.Get("/", wrhHand.GetAll())
-	//	r.Get("/{id}", wrhHand.GetByID())
-	//	r.Post("/", wrhHand.Create())
-	//	r.Put("/{id}", wrhHand.Update())
-	//	r.Delete("/{id}", wrhHand.Delete())
-	//})
+	rt.Route("/v1/warehouses", func(r chi.Router) {
+		r.Get("/", wrhHand.GetAll())
+		r.Get("/{id}", wrhHand.GetByID())
+		r.Post("/", wrhHand.Create())
+		r.Put("/{id}", wrhHand.Update())
+		r.Delete("/{id}", wrhHand.Delete())
+	})
+
+	/// - Carries
+	rt.Route("/v1/carries", func(r chi.Router) {
+		r.Post("/", carrHand.Create()) // Crea un nuevo carry
+	})
+
+	rt.Route("/v1/localities", func(r chi.Router) {
+		r.Get("/reportCarries", carrHand.GetReportByLocality()) // Reporta carries por localidad
+	})
 
 	// - sections
-	rt.Route("/v1/sections", func(rt chi.Router) {
-		rt.Get("/", secHand.GetAll())
-		rt.Get("/{id}", secHand.GetByID())
-		rt.Delete("/{id}", secHand.Delete())
-		rt.Post("/", secHand.Create())
-		rt.Patch("/{id}", secHand.Update())
-	})
+	// rt.Route("/v1/sections", func(rt chi.Router) {
+	// 	rt.Get("/", secHand.GetAll())
+	// 	rt.Get("/{id}", secHand.GetByID())
+	// 	rt.Delete("/{id}", secHand.Delete())
+	// 	rt.Post("/", secHand.Create())
+	// 	rt.Patch("/{id}", secHand.Update())
+	// })
 
 	//// - products
 	//rt.Route("/v1/products", func(rt chi.Router) {

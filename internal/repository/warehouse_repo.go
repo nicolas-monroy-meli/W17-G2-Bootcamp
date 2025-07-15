@@ -1,122 +1,203 @@
 package repository
 
 import (
-	"errors"
+	"database/sql"
+	"fmt"
 
-	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 )
 
-type WarehouseDB struct {
-	db         map[int]mod.Warehouse
-	carries    map[int]mod.Carry
-	localities map[int]string
+type warehouseRepository struct {
+	db *sql.DB
 }
 
-func NewWarehouseRepo(warehouses map[int]mod.Warehouse) *WarehouseDB {
-	return &WarehouseDB{
-		db:      warehouses,
-		carries: make(map[int]mod.Carry),
-		localities: map[int]string{ // ejemplo de localidades precargadas
-			1: "Palermo",
-			2: "Belgrano",
-			3: "Caballito",
-		},
+func NewWarehouseRepository(db *sql.DB) *warehouseRepository {
+	return &warehouseRepository{db: db}
+}
+
+// GetAll devuelve un slice de warehouses
+func (r *warehouseRepository) GetAll() ([]models.Warehouse, error) {
+	query := `
+		SELECT id, warehouse_code, address, telephone, minimum_capacity, minimum_temperature 
+		FROM warehouses
+	`
+
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
 	}
-}
+	defer rows.Close()
 
-// Métodos existentes
-func (r *WarehouseDB) FindAll() (map[int]mod.Warehouse, error) {
-	return r.db, nil
-}
-
-func (r *WarehouseDB) FindByID(id int) (mod.Warehouse, error) {
-	wh, exists := r.db[id]
-	if !exists {
-		return mod.Warehouse{}, errors.New("almacén no encontrado")
+	var warehouses []models.Warehouse
+	for rows.Next() {
+		var wh models.Warehouse
+		if err := rows.Scan(
+			&wh.ID,
+			&wh.WarehouseCode,
+			&wh.Address,
+			&wh.Telephone,
+			&wh.MinimumCapacity,
+			&wh.MinimumTemperature,
+		); err != nil {
+			return nil, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		}
+		warehouses = append(warehouses, wh)
 	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+	}
+
+	return warehouses, nil
+}
+
+// GetByID sin contexto
+func (r *warehouseRepository) GetByID(id int) (models.Warehouse, error) {
+	query := `
+		SELECT id, warehouse_code, address, telephone, minimum_capacity, minimum_temperature 
+		FROM warehouses 
+		WHERE id = ?
+	`
+
+	var wh models.Warehouse
+	err := r.db.QueryRow(query, id).Scan(
+		&wh.ID,
+		&wh.WarehouseCode,
+		&wh.Address,
+		&wh.Telephone,
+		&wh.MinimumCapacity,
+		&wh.MinimumTemperature,
+	)
+
+	switch {
+	case err == sql.ErrNoRows:
+		return models.Warehouse{}, utils.ErrWarehouseRepositoryNotFound
+	case err != nil:
+		return models.Warehouse{}, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+	}
+
 	return wh, nil
 }
 
-func (r *WarehouseDB) Save(warehouse *mod.Warehouse) error {
-	for _, wh := range r.db {
-		if wh.WarehouseCode == warehouse.WarehouseCode {
-			return errors.New("ya existe un warehouse con ese código")
-		}
+// Save sin validaciones (hechas en el servicio)
+func (r *warehouseRepository) Save(wh *models.Warehouse) error {
+	exists, err := r.ExistsWarehouseCode(wh.WarehouseCode)
+	if err != nil {
+		return err
 	}
-	maxID := 0
-	for id := range r.db {
-		if id > maxID {
-			maxID = id
-		}
+	if exists {
+		return utils.ErrWarehouseRepositoryDuplicated
 	}
-	warehouse.ID = maxID + 1
-	r.db[warehouse.ID] = *warehouse
+
+	query := `
+		INSERT INTO warehouses 
+			(warehouse_code, address, telephone, minimum_capacity, minimum_temperature) 
+		VALUES (?, ?, ?, ?, ?)
+	`
+
+	result, err := r.db.Exec(query,
+		wh.WarehouseCode,
+		wh.Address,
+		wh.Telephone,
+		wh.MinimumCapacity,
+		wh.MinimumTemperature,
+	)
+	if err != nil {
+		return fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+	}
+
+	wh.ID = int(id)
 	return nil
 }
 
-func (r *WarehouseDB) Update(warehouse *mod.Warehouse) error {
-	_, exists := r.db[warehouse.ID]
-	if !exists {
-		return errors.New("warehouse no encontrado")
+// Update sin contexto
+func (r *warehouseRepository) Update(wh *models.Warehouse) error {
+	query := `
+		UPDATE warehouses 
+		SET 
+			warehouse_code = ?, 
+			address = ?, 
+			telephone = ?, 
+			minimum_capacity = ?,
+			minimum_temperature = ?
+		WHERE id = ?
+	`
+
+	result, err := r.db.Exec(query,
+		wh.WarehouseCode,
+		wh.Address,
+		wh.Telephone,
+		wh.MinimumCapacity,
+		wh.MinimumTemperature,
+		wh.ID,
+	)
+	if err != nil {
+		return fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
 	}
-	r.db[warehouse.ID] = *warehouse
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		return utils.ErrWarehouseRepositoryNotFound
+	}
+
 	return nil
 }
 
-func (r *WarehouseDB) Delete(id int) error {
-	_, exists := r.db[id]
-	if !exists {
-		return errors.New("warehouse no encontrado")
+// Delete sin contexto
+func (r *warehouseRepository) Delete(id int) error {
+	query := `DELETE FROM warehouses WHERE id = ?`
+	result, err := r.db.Exec(query, id)
+	if err != nil {
+		return fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
 	}
-	delete(r.db, id)
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		return utils.ErrWarehouseRepositoryNotFound
+	}
+
 	return nil
 }
 
-///////////////////////////////////////////
-//  Métodos nuevos para Carry
-///////////////////////////////////////////
-
-func (r *WarehouseDB) CreateCarry(c *mod.Carry) error {
-	// Validación simple de duplicado por ID
-	if _, exists := r.carries[c.ID]; exists {
-		return errors.New("carry con ese ID ya existe")
+// ExistsWarehouseCode verifica si el código ya existe
+func (r *warehouseRepository) ExistsWarehouseCode(code string) (bool, error) {
+	var exists bool
+	query := `SELECT EXISTS(SELECT 1 FROM warehouses WHERE warehouse_code = ?)`
+	err := r.db.QueryRow(query, code).Scan(&exists)
+	if err != nil {
+		return false, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
 	}
-	r.carries[c.ID] = *c
-	return nil
+	return exists, nil
 }
+func (r *warehouseRepository) GetByWarehouseCode(code string) (models.Warehouse, error) {
+	query := `
+		SELECT id, warehouse_code, address, telephone, minimum_capacity, minimum_temperature 
+		FROM warehouses 
+		WHERE warehouse_code = ?
+	`
 
-func (r *WarehouseDB) ExistsCID(cid int) bool {
-	for _, c := range r.carries {
-		if c.CID == cid {
-			return true
-		}
-	}
-	return false
-}
+	var wh models.Warehouse
+	err := r.db.QueryRow(query, code).Scan(
+		&wh.ID,
+		&wh.WarehouseCode,
+		&wh.Address,
+		&wh.Telephone,
+		&wh.MinimumCapacity,
+		&wh.MinimumTemperature,
+	)
 
-func (r *WarehouseDB) ExistsLocality(id int) bool {
-	_, ok := r.localities[id]
-	return ok
-}
-
-func (r *WarehouseDB) ReportByLocality(id int) ([]mod.LocalityCarryReport, error) {
-	count := 0
-	for _, c := range r.carries {
-		if c.LocalityID == id {
-			count++
-		}
-	}
-
-	name, ok := r.localities[id]
-	if !ok {
-		return nil, errors.New("localidad no encontrada")
+	switch {
+	case err == sql.ErrNoRows:
+		return models.Warehouse{}, utils.ErrWarehouseRepositoryNotFound
+	case err != nil:
+		return models.Warehouse{}, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
 	}
 
-	report := mod.LocalityCarryReport{
-		LocalityID:   id,
-		LocalityName: name,
-		CarriesCount: count,
-	}
-
-	return []mod.LocalityCarryReport{report}, nil
+	return wh, nil
 }

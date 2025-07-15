@@ -1,61 +1,61 @@
 package service
 
 import (
-	"errors"
-
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 )
 
 type warehouseService struct {
 	repo internal.WarehouseRepository
 }
 
-// NewWarehouseService creates a new instance of the service
 func NewWarehouseService(repo internal.WarehouseRepository) *warehouseService {
-	return &warehouseService{
-		repo: repo,
-	}
+	return &warehouseService{repo: repo}
 }
 
-// FindAll returns all warehouses
-func (s *warehouseService) FindAll() (map[int]mod.Warehouse, error) {
-	return s.repo.FindAll()
+// FindAll devuelve un slice de warehouses (no un mapa)
+func (s *warehouseService) FindAll() ([]mod.Warehouse, error) {
+	return s.repo.GetAll() // Usamos el método GetAll del repositorio
 }
 
-// FindByID returns a warehouse by ID
 func (s *warehouseService) FindByID(id int) (mod.Warehouse, error) {
-	return s.repo.FindByID(id)
+	return s.repo.GetByID(id) // Usamos GetByID del repositorio
 }
 
-// Save adds a new warehouse after checking for duplicate WarehouseCode
 func (s *warehouseService) Save(w *mod.Warehouse) error {
-	all, err := s.repo.FindAll()
+	// Usamos el método ExistsWarehouseCode del repositorio
+	exists, err := s.repo.ExistsWarehouseCode(w.WarehouseCode)
 	if err != nil {
 		return err
 	}
-
-	// Verificar código duplicado
-	for _, existing := range all {
-		if existing.WarehouseCode == w.WarehouseCode {
-			return errors.New("ya existe un almacén con ese código")
-		}
+	if exists {
+		return utils.ErrWarehouseRepositoryDuplicated // Usamos el error definido
 	}
 
 	return s.repo.Save(w)
 }
 
-// Update modifies an existing warehouse
 func (s *warehouseService) Update(w *mod.Warehouse) error {
-	_, err := s.repo.FindByID(w.ID)
+	// Verificamos si el warehouse existe antes de actualizar
+	_, err := s.repo.GetByID(w.ID)
 	if err != nil {
 		return err
+	}
+
+	// Verificamos si el nuevo código ya existe en otro registro
+	existingWarehouse, err := s.repo.GetByWarehouseCode(w.WarehouseCode)
+	if err != nil && err != utils.ErrWarehouseRepositoryNotFound {
+		return err
+	}
+
+	if existingWarehouse.ID != 0 && existingWarehouse.ID != w.ID {
+		return utils.ErrWarehouseRepositoryDuplicated
 	}
 
 	return s.repo.Update(w)
 }
 
-// Delete removes a warehouse by ID
 func (s *warehouseService) Delete(id int) error {
 	return s.repo.Delete(id)
 }

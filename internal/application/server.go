@@ -60,7 +60,7 @@ func (a *ServerChi) Run() (err error) {
 	products := docs.ReadFileToMap[mod.Product](a.loaderFilePath + "products.json")
 	//sections := docs.ReadFileToMap[mod.Section](a.loaderFilePath + "sections.json")
 	sellers := docs.ReadFileToMap[mod.Seller](a.loaderFilePath + "sellers.json")
-	warehouses := docs.ReadFileToMap[mod.Warehouse](a.loaderFilePath + "warehouses.json")
+	// warehouses := docs.ReadFileToMap[mod.Warehouse](a.loaderFilePath + "warehouses.json")
 
 	// - repositories
 	buyrp := repo.NewBuyerRepo(buyers)
@@ -68,7 +68,7 @@ func (a *ServerChi) Run() (err error) {
 	prdrp := repo.NewProductRepo(products)
 	//secrp := repo.NewSectionRepo(sections)
 	selrp := repo.NewSellerRepo(sellers)
-	wrhrp := repo.NewWarehouseRepo(warehouses)
+	// wrhrp := repo.NewWarehouseRepository(warehouses)
 
 	// - services
 	buysv := srv.NewBuyerService(buyrp)
@@ -76,7 +76,7 @@ func (a *ServerChi) Run() (err error) {
 	prdsv := srv.NewProductService(prdrp)
 	//secsv := srv.NewSectionService(secrp)
 	selsv := srv.NewSellerService(selrp)
-	wrhsv := srv.NewWarehouseService(wrhrp)
+	// wrhsv := srv.NewWarehouseService(wrhrp)
 
 	// - handlers
 	buyhd := cont.NewBuyerHandler(buysv)
@@ -84,7 +84,7 @@ func (a *ServerChi) Run() (err error) {
 	prdhd := cont.NewProductHandler(prdsv)
 	//sechd := cont.NewSectionHandler(secsv)
 	selhd := cont.NewSellerHandler(selsv)
-	wrhhd := cont.NewWarehouseHandler(wrhsv)
+	// wrhhd := cont.NewWarehouseHandler(wrhsv)
 
 	// router
 	rt := chi.NewRouter()
@@ -107,13 +107,13 @@ func (a *ServerChi) Run() (err error) {
 	})
 
 	// - warehouses
-	rt.Route("/v1/warehouses", func(r chi.Router) {
-		r.Get("/", wrhhd.GetAll())
-		r.Get("/{id}", wrhhd.GetByID())
-		r.Post("/", wrhhd.Create())
-		r.Put("/{id}", wrhhd.Update())
-		r.Delete("/{id}", wrhhd.Delete())
-	})
+	// rt.Route("/v1/warehouses", func(r chi.Router) {
+	// 	r.Get("/", wrhhd.GetAll())
+	// 	r.Get("/{id}", wrhhd.GetByID())
+	// 	r.Post("/", wrhhd.Create())
+	// 	r.Put("/{id}", wrhhd.Update())
+	// 	r.Delete("/{id}", wrhhd.Delete())
+	// })
 
 	// - sections
 
