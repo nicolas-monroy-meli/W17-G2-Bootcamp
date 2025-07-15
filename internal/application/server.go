@@ -95,7 +95,7 @@ func (a *ServerChi) Run() (err error) {
 		utils.GoodResponse(w, 200, "pong!", nil)
 	}))
 
-	// - sellers
+	/** - sellers
 	rt.Route("/v1/sellers", func(rt chi.Router) {
 		rt.Get("/", selhd.GetAll())
 
@@ -104,7 +104,7 @@ func (a *ServerChi) Run() (err error) {
 		rt.Patch("/{id}", selhd.Update())
 		rt.Delete("/{id}", selhd.Delete())
 
-	})
+	})**/
 
 	// - warehouses
 	rt.Route("/v1/warehouses", func(r chi.Router) {
@@ -125,7 +125,7 @@ func (a *ServerChi) Run() (err error) {
 		rt.Patch("/{id}", sechd.Update())
 	})*/
 
-	// - products
+	/** - products
 	rt.Route("/v1/products", func(rt chi.Router) {
 		rt.Get("/", prdhd.GetAll())
 		rt.Get("/{id}", prdhd.GetByID())
@@ -150,7 +150,7 @@ func (a *ServerChi) Run() (err error) {
 		rt.Post("/", buyhd.Create())
 		rt.Patch("/{id}", buyhd.Update())
 		rt.Delete("/{id}", buyhd.Delete())
-	})
+	})**/
 
 	// run
 	err = http.ListenAndServe(a.serverAddress, rt)

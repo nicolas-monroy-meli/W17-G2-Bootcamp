@@ -7,7 +7,6 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-
 var (
 	ErrRequestIdMustBeInt = errors.New("handler: id must be an integer")
 	ErrRequestNoBody      = errors.New("handler: request must have a body")
@@ -37,6 +36,14 @@ var (
 	ErrEmployeeRepositoryNotFound = errors.New("repository: employee not found")
 	// ErrEmployeeRepositoryDuplicated is returned when the employee already exists
 	ErrEmployeeRepositoryDuplicated = errors.New("repository: employee already exists")
+
+	//Inbound
+	ErrInboundOrderNotFound      = errors.New("inbound order not found")
+	ErrInboundOrderAlreadyExists = errors.New("inbound order with this ID already exists") // Si el ID fuera generado por la app y no AUTO_INCREMENT
+	ErrEmployeeInternal          = errors.New("internal server error for employee")
+	ErrInboundOrderInternal      = errors.New("internal server error for inbound order")
+	ErrEmployeeNotFound          = errors.New("employee not found")
+	ErrInboundOrderInvalidData   = errors.New("invalid inbound order data")
 
 	//Product
 	// ErrProductRepositoryNotFound is returned when the product is not found

@@ -47,14 +47,16 @@ func (d *SQLConfig) Run() (err error) {
 	// instancing repository layer
 	//buyRepo := repo.NewBuyerRepo(db)
 	empRepo := repo.NewEmployeeRepo(db)
+	inbRepo := repo.NewInboundRepo(db)
 	//prdRepo := repo.NewProductRepo(db)
-	secRepo := repo.NewEmployeeRepo(db)
+	//secRepo := repo.NewEmployeeRepo(db)
 	//selRepo := repo.NewSellerRepo(db)
 	//wrhRepo := repo.NewWarehouseRepo(db)
 
 	//instancing service layer
 	//buyServ := serv.NewBuyerService(buyRepo)
 	empServ := serv.NewEmployeeService(empRepo)
+	inbServ := serv.NewInboundService(inbRepo)
 	//prdServ := serv.NewProductService(prdRepo)
 	//secServ := serv.NewSectionService(secRepo)
 	//selServ := serv.NewSellerService(selRepo)
@@ -63,8 +65,9 @@ func (d *SQLConfig) Run() (err error) {
 	//instancing handler layer
 	//buyHand := hand.NewBuyerHandler(buyServ)
 	empHand := hand.NewEmployeeHandler(empServ)
+	inbHand := hand.NewInboundHandler(inbServ)
 	//prdHand := hand.NewProductHandler(prdServ)
-	secHand := hand.NewSectionHandler(secServ)
+	//secHand := hand.NewSectionHandler(secServ)
 	//selHand := hand.NewSellerHandler(selServ)
 	//wrhHand := hand.NewWarehouseHandler(wrhServ)
 
@@ -97,13 +100,13 @@ func (d *SQLConfig) Run() (err error) {
 	//})
 
 	// - sections
-	rt.Route("/v1/sections", func(rt chi.Router) {
-		rt.Get("/", secHand.GetAll())
-		rt.Get("/{id}", secHand.GetByID())
-		rt.Delete("/{id}", secHand.Delete())
-		rt.Post("/", secHand.Create())
-		rt.Patch("/{id}", secHand.Update())
-	})
+	//rt.Route("/v1/sections", func(rt chi.Router) {
+	//	rt.Get("/", secHand.GetAll())
+	//	rt.Get("/{id}", secHand.GetByID())
+	//	rt.Delete("/{id}", secHand.Delete())
+	//	rt.Post("/", secHand.Create())
+	//	rt.Patch("/{id}", secHand.Update())
+	//})
 
 	//// - products
 	//rt.Route("/v1/products", func(rt chi.Router) {
@@ -117,10 +120,15 @@ func (d *SQLConfig) Run() (err error) {
 	//// - employees
 	rt.Route("/v1/employees", func(rt chi.Router) {
 		rt.Get("/", empHand.GetAll())
+		rt.Get("/", inbHand.GetOrdersByEmployee())
 		rt.Get("/{id}", empHand.GetById())
 		rt.Post("/", empHand.Create())
 		rt.Patch("/{id}", empHand.Edit())
 		rt.Delete("/{id}", empHand.Delete())
+	})
+
+	rt.Route("/v1/inboundOrders", func(rt chi.Router) {
+		rt.Post("/", inbHand.Create())
 	})
 	//
 	//// - buyers
