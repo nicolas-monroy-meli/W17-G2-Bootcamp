@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
@@ -31,7 +32,7 @@ func (h *SectionHandler) GetAll() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusOK, "data retrieved successfully", result)
+		utils.GoodResponse(w, http.StatusOK, errors.DataRetrievedSuccess, result)
 	}
 }
 
@@ -59,7 +60,7 @@ func (h *SectionHandler) Create() http.HandlerFunc {
 
 		err := json.NewDecoder(r.Body).Decode(&model)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestFailedBody.Error())
 			return
 		}
 		validationErrors := errors.ValidateStruct(model)
@@ -86,23 +87,24 @@ func (h *SectionHandler) Update() http.HandlerFunc {
 		var model models.SectionPatch
 		id, err := common.IdRequests(r)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestIdMustBeInt.Error())
 			return
 		}
 		err = json.NewDecoder(r.Body).Decode(&model)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-		section, err := h.sv.FindByID(id)
-		if err != nil {
-			utils.BadResponse(w, http.StatusNotFound, err.Error())
+			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestFailedBody.Error())
 			return
 		}
 
-		section = common.PatchSection(model, section)
+		fields := common.PatchSection(model)
 
-		validationErrors := errors.ValidateStruct(section)
+		if len(fields) == 0 {
+			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestNoBody.Error())
+			return
+		}
+
+		validationErrors := errors.ValidateStruct(model)
+
 		if len(validationErrors) > 0 {
 			str := ""
 			for _, err := range validationErrors {
@@ -112,12 +114,13 @@ func (h *SectionHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		err = h.sv.Update(&section)
+		result, err := h.sv.Update(id, fields)
 		if err != nil {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusOK, errors.SectionUpdated, section)
+		utils.GoodResponse(w, http.StatusOK, errors.SectionUpdated, result)
+
 	}
 }
 
@@ -126,7 +129,7 @@ func (h *SectionHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := common.IdRequests(r)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestIdMustBeInt.Error())
 			return
 		}
 		err = h.sv.Delete(id)
@@ -135,5 +138,22 @@ func (h *SectionHandler) Delete() http.HandlerFunc {
 			return
 		}
 		utils.GoodResponse(w, http.StatusNoContent, errors.SectionDeleted, nil)
+	}
+}
+
+func (h *SectionHandler) ReportProducts() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		params := r.URL.Query().Get("ids")
+		ids, err := common.ParseIDs(params)
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestWrongBody.Error())
+			return
+		}
+		res, err := h.sv.ReportProducts(ids)
+		if err != nil {
+			utils.BadResponse(w, http.StatusInternalServerError, fmt.Sprintf("db error: %s", err.Error()))
+			return
+		}
+		utils.GoodResponse(w, http.StatusOK, errors.DataRetrievedSuccess, res)
 	}
 }
