@@ -47,8 +47,18 @@ var (
 	// Errores de Employee
 	ErrEmployeeRepositoryDuplicated = errors.New("repository: employee already exists")
 
-	// Errores de Product
-	ErrProductRepositoryNotFound   = errors.New("repository: product not found")
+	//Inbound
+	ErrInboundOrderNotFound      = errors.New("inbound order not found")
+	ErrInboundOrderAlreadyExists = errors.New("inbound order with this ID already exists") // Si el ID fuera generado por la app y no AUTO_INCREMENT
+	ErrEmployeeInternal          = errors.New("internal server error for employee")
+	ErrInboundOrderInternal      = errors.New("internal server error for inbound order")
+	ErrEmployeeNotFound          = errors.New("employee not found")
+	ErrInboundOrderInvalidData   = errors.New("invalid inbound order data")
+
+	//Product
+	// ErrProductRepositoryNotFound is returned when the product is not found
+	ErrProductRepositoryNotFound = errors.New("repository: product not found")
+	// ErrProductRepositoryDuplicated is returned when the product already exists
 	ErrProductRepositoryDuplicated = errors.New("repository: product already exists")
 	// ErrProductRecordRepositoryNotFound is returned when the product record is not found
 	ErrProductRecordRepositoryNotFound = errors.New("repository: product record not found")

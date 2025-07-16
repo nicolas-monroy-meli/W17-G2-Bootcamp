@@ -46,9 +46,11 @@ func (d *SQLConfig) Run() (err error) {
 		return
 	}
 	// instancing repository layer
+
 	buyRepo := repo.NewBuyerRepo(db)
 	purRepo := repo.NewPurchaseOrderRepo(db)
-	//empRepo := repo.NewEmployeeRepo(db)
+	empRepo := repo.NewEmployeeRepo(db)
+	inbRepo := repo.NewInboundRepo(db)
 	secRepo := repo.NewSectionRepo(db)
 	pbRepo := repo.NewProductBatchRepo(db)
 	prdRepo := repo.NewProductRepo(db)
@@ -61,7 +63,8 @@ func (d *SQLConfig) Run() (err error) {
 	//instancing service layer
 	buyServ := serv.NewBuyerService(buyRepo)
 	purServ := serv.NewPurchaseOrderService(purRepo)
-	//empServ := serv.NewEmployeeService(empRepo)
+  empServ := serv.NewEmployeeService(empRepo)
+	inbServ := serv.NewInboundService(inbRepo)
 	secServ := serv.NewSectionService(secRepo)
 	pbServ := serv.NewProductBatchRepository(pbRepo)
 	prdServ := serv.NewProductService(prdRepo)
@@ -74,8 +77,9 @@ func (d *SQLConfig) Run() (err error) {
 	//instancing handler layer
 	buyHand := hand.NewBuyerHandler(buyServ)
 	purHand := hand.NewPurchaseOrderHandler(purServ)
-	//empHand := hand.NewEmployeeHandler(empServ)
-	secHand := hand.NewSectionHandler(secServ)
+	empHand := hand.NewEmployeeHandler(empServ)
+	inbHand := hand.NewInboundHandler(inbServ)
+  secHand := hand.NewSectionHandler(secServ)
 	pbHand := hand.NewProductBatchHandler(pbServ)
 	prdHand := hand.NewProductHandler(prdServ)
 	prdRcHand := hand.NewProductRecordHandler(prdRcServ)
@@ -83,6 +87,7 @@ func (d *SQLConfig) Run() (err error) {
 	locHand := hand.NewLocalityHandler(locServ)
 	wrhHand := hand.NewWarehouseHandler(wrhServ)
 	carrHand := hand.NewCarryHandler(carrServ)
+
 
 	//routing
 
@@ -116,6 +121,7 @@ func (d *SQLConfig) Run() (err error) {
 	})
 
 	// - sections
+
 	rt.Route("/v1/sections", func(rt chi.Router) {
 		rt.Get("/", secHand.GetAll())
 		rt.Get("/{id}", secHand.GetByID())
@@ -154,13 +160,18 @@ func (d *SQLConfig) Run() (err error) {
 	})
 
 	//// - employees
-	//rt.Route("/v1/employees", func(rt chi.Router) {
-	//	rt.Get("/", empHand.GetAllEmployees())
-	//	rt.Get("/{id}", empHand.GetEmployeeById())
-	//	rt.Post("/", empHand.CreateEmployee())
-	//	rt.Patch("/{id}", empHand.EditEmployee())
-	//	rt.Delete("/{id}", empHand.DeleteEmployee())
-	//})
+	rt.Route("/v1/employees", func(rt chi.Router) {
+		rt.Get("/", empHand.GetAll())
+		rt.Get("/reportInboundOrders", inbHand.GetOrdersByEmployee())
+		rt.Get("/{id}", empHand.GetById())
+		rt.Post("/", empHand.Create())
+		rt.Patch("/{id}", empHand.Edit())
+		rt.Delete("/{id}", empHand.Delete())
+	})
+
+	rt.Route("/v1/inboundOrders", func(rt chi.Router) {
+		rt.Post("/", inbHand.Create())
+	})
 	//
 	//// - buyers
 	rt.Route("/v1/purchaseOrders", func(rt chi.Router) {
