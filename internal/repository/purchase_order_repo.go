@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/go-sql-driver/mysql"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
@@ -22,7 +23,18 @@ type PurchaseOrderDB struct {
 
 func (r *PurchaseOrderDB) Save(purchaseOrder *mod.PurchaseOrder) (err error) {
 
-	result, err := r.db.Exec(
+	tx, _ := r.db.Begin()
+
+	defer func() {
+		fmt.Println("errorl", err)
+		if err != nil {
+			tx.Rollback()
+		} else {
+			err = tx.Commit()
+		}
+	}()
+	fmt.Println("Ejecutado")
+	result, err := tx.Exec(
 		"INSERT INTO purchase_orders (order_number, order_date, tracking_code, buyer_id) "+
 			"VALUES (?, ?, ?, ?)",
 		(*purchaseOrder).OrderNumber, time.Time((*purchaseOrder).OrderDate),
@@ -47,7 +59,7 @@ func (r *PurchaseOrderDB) Save(purchaseOrder *mod.PurchaseOrder) (err error) {
 
 	for idx, od := range purchaseOrder.ProductsDetails {
 		od.PurchaseOrderId = int(lastInsertId)
-		err = r.insertOrderDetail(&od)
+		err = r.insertOrderDetail(tx, &od)
 		if err != nil {
 			break
 		}
@@ -63,8 +75,8 @@ func (r *PurchaseOrderDB) Save(purchaseOrder *mod.PurchaseOrder) (err error) {
 	return err
 }
 
-func (r *PurchaseOrderDB) insertOrderDetail(orderDetails *mod.OrderDetails) (err error) {
-	result, err := r.db.Exec(
+func (r *PurchaseOrderDB) insertOrderDetail(tx *sql.Tx, orderDetails *mod.OrderDetails) (err error) {
+	result, err := tx.Exec(
 		"INSERT INTO order_details (clean_liness_status, quantity, temperature, product_record_id, purchase_order_id) "+
 			"VALUES (?, ?, ?, ?, ?)",
 		(*orderDetails).CleanLinessStatus, (*orderDetails).Quantity, (*orderDetails).Temperature,
