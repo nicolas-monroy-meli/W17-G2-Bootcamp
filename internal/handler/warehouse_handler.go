@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"sort"
 	"strconv"
@@ -62,7 +61,7 @@ func (h *warehouseHandler) GetByID() http.HandlerFunc {
 			return
 		}
 
-		utils.GoodResponse(w, http.StatusOK, "", wh)
+		utils.GoodResponse(w, http.StatusOK, "success", wh)
 	}
 }
 
@@ -85,7 +84,7 @@ func (h *warehouseHandler) Create() http.HandlerFunc {
 			return
 		}
 
-		utils.GoodResponse(w, http.StatusCreated, "su", warehouse)
+		utils.GoodResponse(w, http.StatusCreated, "success", warehouse)
 	}
 }
 
@@ -107,7 +106,6 @@ func (h *warehouseHandler) Update() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusUnprocessableEntity, "Campos inválidos: "+err.Error())
 			return
 		}
-		fmt.Println(warehouse)
 
 		if err := common.ValidateWarehouseUpdate(warehouse); err != nil {
 			utils.BadResponse(w, http.StatusBadRequest, err.Error())
@@ -120,7 +118,7 @@ func (h *warehouseHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		utils.GoodResponse(w, http.StatusOK, "", warehouse)
+		utils.GoodResponse(w, http.StatusOK, "success", warehouse)
 	}
 }
 

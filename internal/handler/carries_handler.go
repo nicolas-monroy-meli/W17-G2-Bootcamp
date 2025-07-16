@@ -47,7 +47,7 @@ func (h *carryHandler) Create() http.HandlerFunc {
 			return
 		}
 
-		utils.GoodResponse(w, http.StatusCreated, "", carry)
+		utils.GoodResponse(w, http.StatusCreated, "Created", carry)
 	}
 }
 
@@ -61,7 +61,7 @@ func (h *carryHandler) GetReportByLocality() http.HandlerFunc {
 				utils.BadResponse(w, http.StatusInternalServerError, "Error al generar el reporte: "+err.Error())
 				return
 			}
-			utils.GoodResponse(w, http.StatusOK, "", report)
+			utils.GoodResponse(w, http.StatusOK, "success", report)
 			return
 
 		}
@@ -78,7 +78,7 @@ func (h *carryHandler) GetReportByLocality() http.HandlerFunc {
 			return
 		}
 
-		utils.GoodResponse(w, http.StatusOK, "", report)
-		return
+		utils.GoodResponse(w, http.StatusOK, "success", report)
+
 	}
 }
