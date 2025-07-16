@@ -20,11 +20,11 @@ CREATE TABLE inbound_orders(
                         id INT PRIMARY KEY AUTO_INCREMENT,
                         order_date DATE,
                         order_number VARCHAR(255) NOT NULL,
-                        employe_id INT  NOT NULL,
+                        employee_id INT  NOT NULL,
                         product_batch_id INT  NOT NULL,
                         wareHouse_id INT  NOT NULL,
 
-                        FOREIGN KEY(employe_id) REFERENCES employees(id),
+                        FOREIGN KEY(employee_id) REFERENCES employees(id),
                         --FOREIGN KEY(product_batch_id) REFERENCES product_batches(id),
                         --FOREIGN KEY(wareHouse_id) REFERENCES warehouse(id),
 

@@ -120,7 +120,7 @@ func (d *SQLConfig) Run() (err error) {
 	//// - employees
 	rt.Route("/v1/employees", func(rt chi.Router) {
 		rt.Get("/", empHand.GetAll())
-		rt.Get("/", inbHand.GetOrdersByEmployee())
+		rt.Get("/reportInboundOrders", inbHand.GetOrdersByEmployee())
 		rt.Get("/{id}", empHand.GetById())
 		rt.Post("/", empHand.Create())
 		rt.Patch("/{id}", empHand.Edit())

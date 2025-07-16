@@ -17,7 +17,7 @@ func NewInboundRepo(database *sql.DB) *InboundDB {
 	}
 }
 
-func (r *InboundDB) save(order *mod.InboundOrders) (*mod.InboundOrders, error) {
+func (r *InboundDB) Save(order *mod.InboundOrders) (*mod.InboundOrders, error) {
 	query := `INSERT INTO inbound_orders (order_date, order_number, employee_id, product_batch_id, warehouse_id)
 	          VALUES (?, ?, ?, ?, ?)`
 

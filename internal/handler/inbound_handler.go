@@ -28,7 +28,7 @@ func (h *InboundHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var inboundOrder mod.InboundOrders
 		if err := json.NewDecoder(r.Body).Decode(&inboundOrder); err != nil {
-			http.Error(w, "Invalid JSON format", http.StatusUnprocessableEntity)
+			utils.BadResponse(w, http.StatusUnprocessableEntity, "Invalid JSON format")
 			return
 		}
 
@@ -36,16 +36,16 @@ func (h *InboundHandler) Create() http.HandlerFunc {
 		if err != nil {
 			// Manejo de errores específicos
 			if errors.Is(err, e.ErrInboundOrderInvalidData) {
-				http.Error(w, err.Error(), http.StatusUnprocessableEntity) // 422
+				utils.BadResponse(w, http.StatusUnprocessableEntity, err.Error())
 				return
 			}
 			if err.Error() == "order number already exists" || err.Error() == "employee not found" {
-				http.Error(w, err.Error(), http.StatusConflict) // 409
+				utils.BadResponse(w, http.StatusConflict, err.Error())
 				return
 			}
 
 			// Error interno
-			http.Error(w, "Failed to create inbound order", http.StatusInternalServerError)
+			utils.BadResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 		utils.GoodResponse(w, http.StatusCreated, "succes", createdOrder)
@@ -61,19 +61,19 @@ func (h *InboundHandler) GetOrdersByEmployee() http.HandlerFunc {
 		if employeeIDStr != "" {
 			id, err := strconv.Atoi(employeeIDStr)
 			if err != nil {
-				http.Error(w, "Invalid employee ID format", http.StatusBadRequest)
+				utils.BadResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
 			employeeID = id
 		}
- 
+
 		report, err := h.sv.FindOrdersByEmployee(employeeID)
 		if err != nil {
 			if errors.Is(err, e.ErrEmployeeNotFound) {
-				http.Error(w, "Employee not found", http.StatusNotFound)
+				utils.BadResponse(w, http.StatusNotFound, err.Error())
 				return
 			}
-			http.Error(w, "Failed to get report", http.StatusInternalServerError)
+			utils.BadResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 		utils.GoodResponse(w, http.StatusCreated, "succes", report)

@@ -10,7 +10,7 @@ VALUES ('1001', 'Juan', 'Perez', 1),
        ('1009', 'Pablo', 'Torres', 1),
        ('1010', 'Elena', 'Diaz', 3);
 
-INSERT INTO inbound_orders (order_date, order_number, employe_id, product_batch_id, wareHouse_id)
+INSERT INTO inbound_orders (order_date, order_number, employee_id, product_batch_id, wareHouse_id)
 VALUES ('2023-01-15', 'ORD-2023-001', 1, 101, 1),
        ('2023-01-16', 'ORD-2023-002', 2, 102, 2),
        ('2023-01-17', 'ORD-2023-003', 3, 103, 1),
