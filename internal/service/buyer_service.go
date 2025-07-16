@@ -19,7 +19,7 @@ type BuyerService struct {
 }
 
 // FindAll returns all buyers
-func (s *BuyerService) FindAll() (buyers map[int]mod.Buyer, err error) {
+func (s *BuyerService) FindAll() (buyers []mod.Buyer, err error) {
 	return s.rp.FindAll()
 }
 
@@ -41,4 +41,8 @@ func (s *BuyerService) Update(buyer *mod.Buyer) (err error) {
 // Delete deletes a buyer
 func (s *BuyerService) Delete(id int) (err error) {
 	return s.rp.Delete(id)
+}
+
+func (s *BuyerService) GetPurchaseOrderReport(id *int) ([]mod.BuyerReportPO, error) {
+	return s.rp.GetPurchaseOrderReport(id)
 }

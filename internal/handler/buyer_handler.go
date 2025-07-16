@@ -9,6 +9,7 @@ import (
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
+	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -30,6 +31,7 @@ type BuyerHandler struct {
 // GetAll returns all buyers
 func (h *BuyerHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Print("Hola")
 		buyers, err := h.sv.FindAll()
 
 		if err != nil {
@@ -47,7 +49,7 @@ func (h *BuyerHandler) GetByID() http.HandlerFunc {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
 			return
 		}
 
@@ -55,7 +57,7 @@ func (h *BuyerHandler) GetByID() http.HandlerFunc {
 
 		if err != nil {
 			switch {
-			case errors.Is(err, utils.ErrBuyerRepositoryNotFound):
+			case errors.Is(err, e.ErrBuyerRepositoryNotFound):
 				utils.BadResponse(w, http.StatusNotFound, err.Error())
 			default:
 				utils.BadResponse(w, http.StatusBadRequest, err.Error())
@@ -63,8 +65,45 @@ func (h *BuyerHandler) GetByID() http.HandlerFunc {
 			return
 		}
 
-		utils.GoodResponse(w, http.StatusCreated, "Buyer obtenido con exito", buyer)
+		utils.GoodResponse(w, http.StatusOK, "Buyer obtenido con exito", buyer)
 		return
+	}
+}
+
+func (h *BuyerHandler) GetReport() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		var id *int
+		idQuery := r.URL.Query().Get("id")
+
+		if idQuery != "" {
+			idParsed, err := strconv.Atoi(idQuery)
+			if err != nil {
+				utils.BadResponse(w, http.StatusNotFound, e.ErrRequestIdMustBeInt.Error())
+			}
+			id = &idParsed
+		}
+
+		reports, err := h.sv.GetPurchaseOrderReport(id)
+		if err != nil {
+			switch {
+			case errors.Is(err, e.ErrBuyerRepositoryNotFound):
+				utils.BadResponse(w, http.StatusNotFound, err.Error())
+			default:
+				utils.BadResponse(w, http.StatusInternalServerError, "internal server error")
+			}
+			return
+		}
+
+		// response
+		// - serialize product to JSON
+
+		utils.GoodResponse(
+			w,
+			http.StatusOK,
+			"Reporte generado exitosamente",
+			reports,
+		)
 	}
 }
 
@@ -74,11 +113,11 @@ func (h *BuyerHandler) Create() http.HandlerFunc {
 		var newBuyer mod.Buyer
 
 		if err := json.NewDecoder(r.Body).Decode(&newBuyer); err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestFailedBody.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestFailedBody.Error())
 			return
 		}
 
-		errValidation := utils.ValidateStruct(newBuyer)
+		errValidation := e.ValidateStruct(newBuyer)
 
 		//validate := validator.New()
 		//err := validate.Struct(newBuyer)
@@ -90,7 +129,7 @@ func (h *BuyerHandler) Create() http.HandlerFunc {
 				str = append(str, err)
 			}
 
-			err := fmt.Errorf("%w: %v", utils.ErrRequestWrongBody, strings.Join(str, ", "))
+			err := fmt.Errorf("%w: %v", e.ErrRequestWrongBody, strings.Join(str, ", "))
 			utils.BadResponse(w, http.StatusUnprocessableEntity, err.Error())
 			return
 
@@ -100,7 +139,7 @@ func (h *BuyerHandler) Create() http.HandlerFunc {
 
 		if err != nil {
 			switch {
-			case errors.Is(err, utils.ErrBuyerRepositoryCardDuplicated):
+			case errors.Is(err, e.ErrBuyerRepositoryCardDuplicated):
 				utils.BadResponse(w, http.StatusConflict, err.Error())
 			default:
 				utils.BadResponse(w, http.StatusBadRequest, err.Error())
@@ -119,7 +158,7 @@ func (h *BuyerHandler) Update() http.HandlerFunc {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
 			return
 		}
 
@@ -127,7 +166,7 @@ func (h *BuyerHandler) Update() http.HandlerFunc {
 
 		if err != nil {
 			switch {
-			case errors.Is(err, utils.ErrBuyerRepositoryNotFound):
+			case errors.Is(err, e.ErrBuyerRepositoryNotFound):
 				utils.BadResponse(w, http.StatusNotFound, err.Error())
 			default:
 				utils.BadResponse(w, http.StatusBadRequest, err.Error())
@@ -138,13 +177,13 @@ func (h *BuyerHandler) Update() http.HandlerFunc {
 		var buyerPatch mod.BuyerPatch
 
 		if err := json.NewDecoder(r.Body).Decode(&buyerPatch); err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestFailedBody.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestFailedBody.Error())
 			return
 		}
 
-		common.ValidatePatchRequest(&buyer, buyerPatch)
+		buyerMapped := common.ValidatePatchRequest(buyer, buyerPatch)
 
-		errValidation := utils.ValidateStruct(buyer)
+		errValidation := e.ValidateStruct(buyerMapped)
 
 		if errValidation != nil {
 			str := make([]string, 0, len(errValidation))
@@ -152,16 +191,16 @@ func (h *BuyerHandler) Update() http.HandlerFunc {
 				str = append(str, err)
 			}
 
-			err := fmt.Errorf("%w: %v", utils.ErrRequestWrongBody, strings.Join(str, ", "))
+			err := fmt.Errorf("%w: %v", e.ErrRequestWrongBody, strings.Join(str, ", "))
 			utils.BadResponse(w, http.StatusUnprocessableEntity, err.Error())
 			return
 		}
 
-		err = h.sv.Update(&buyer)
+		err = h.sv.Update(&buyerMapped)
 
 		if err != nil {
 			switch {
-			case errors.Is(err, utils.ErrBuyerRepositoryCardDuplicated):
+			case errors.Is(err, e.ErrBuyerRepositoryCardDuplicated):
 				utils.BadResponse(w, http.StatusConflict, err.Error())
 			default:
 				utils.BadResponse(w, http.StatusBadRequest, err.Error())
@@ -169,7 +208,7 @@ func (h *BuyerHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		utils.GoodResponse(w, http.StatusCreated, "Buyer actualizado exitosamente", buyer)
+		utils.GoodResponse(w, http.StatusOK, "Buyer actualizado exitosamente", buyerMapped)
 		return
 	}
 }
@@ -180,14 +219,14 @@ func (h *BuyerHandler) Delete() http.HandlerFunc {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
 			return
 		}
 
-		if err := h.sv.Delete(id); err != nil {
+		if err = h.sv.Delete(id); err != nil {
 
 			switch {
-			case errors.Is(err, utils.ErrBuyerRepositoryNotFound):
+			case errors.Is(err, e.ErrBuyerRepositoryNotFound):
 				utils.BadResponse(w, http.StatusNotFound, err.Error())
 			default:
 				utils.BadResponse(w, http.StatusBadRequest, err.Error())
@@ -196,7 +235,7 @@ func (h *BuyerHandler) Delete() http.HandlerFunc {
 
 		}
 
-		utils.GoodResponse(w, http.StatusNoContent, "Buyer eliminado exitosamente", nil)
+		utils.GoodResponse(w, http.StatusNoContent, "", nil)
 		return
 	}
 }

@@ -1,24 +1,24 @@
 package repository
 
 import (
-	"database/sql"
-	"fmt"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/docs"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 	"strconv"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 )
 
 // NewSectionRepo creates a new instance of the Section repository
-func NewSectionRepo(db *sql.DB) *SectionDB {
+func NewSectionRepo(sections map[int]mod.Section) *SectionDB {
 	return &SectionDB{
-		db: db,
+		db: sections,
 	}
 }
 
 // SectionDB is the implementation of the Section database
 type SectionDB struct {
-	db *sql.DB
+	db map[int]mod.Section
 }
 
 // FindAll returns all sections from the database
@@ -68,7 +68,6 @@ func (r *SectionDB) FindByID(id int) (section mod.Section, err error) {
 
 	err = row.Scan(&section.ID, &section.SectionNumber, &section.CurrentTemperature, &section.MinimumTemperature, &section.CurrentCapacity, &section.MinimumCapacity, &section.MaximumCapacity, &section.WarehouseID, &section.ProductTypeID)
 	if err != nil {
-		fmt.Println(err.Error())
 		return mod.Section{}, errors.ErrSectionRepositoryNotFound
 	}
 	return section, nil
@@ -84,11 +83,8 @@ func (r *SectionDB) Save(section *mod.Section) (err error) {
 		(*section).SectionNumber, (*section).CurrentTemperature, (*section).MinimumTemperature, (*section).CurrentCapacity, (*section).MinimumCapacity, (*section).MaximumCapacity, (*section).WarehouseID, (*section).ProductTypeID,
 	)
 	if err != nil {
-		fmt.Println(err.Error())
 		return
-	}
-
-	// get the id of the inserted section
+// get the id of the inserted section
 	id, err := result.LastInsertId()
 	if err != nil {
 		return
@@ -101,7 +97,6 @@ func (r *SectionDB) Save(section *mod.Section) (err error) {
 }
 
 // Update updates a section in the database
-// send from here
 func (r *SectionDB) Update(id int, fields map[string]interface{}) (result *mod.Section, err error) {
 	//Build query
 	query, args := common.BuildPatchQuery("sections", fields, strconv.Itoa(id))
@@ -134,7 +129,9 @@ func (r *SectionDB) Delete(id int) (err error) {
 		fmt.Println(err.Error())
 		return
 	}
-	return
+	delete(r.db, id)
+	docs.WriterFile("sections.json", r.db)
+	return nil
 }
 
 func (r *SectionDB) ReportProducts(ids []int) ([]mod.ReportProductsResponse, error) {

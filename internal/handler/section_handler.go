@@ -3,12 +3,11 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
-	"net/http"
 )
 
 // NewSectionHandler creates a new instance of the section handler
@@ -49,7 +48,7 @@ func (h *SectionHandler) GetByID() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusOK, errors.DataRetrievedSuccess, result)
+		utils.GoodResponse(w, http.StatusOK, utils.DataRetrievedSuccess, result)
 	}
 }
 
@@ -63,7 +62,7 @@ func (h *SectionHandler) Create() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestFailedBody.Error())
 			return
 		}
-		validationErrors := errors.ValidateStruct(model)
+		validationErrors := utils.ValidateStruct(model)
 		if len(validationErrors) > 0 {
 			str := ""
 			for _, err := range validationErrors {
@@ -77,7 +76,7 @@ func (h *SectionHandler) Create() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusConflict, err.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusCreated, errors.SectionCreated, model)
+		utils.GoodResponse(w, http.StatusCreated, utils.SectionCreated, model)
 	}
 }
 
@@ -104,6 +103,7 @@ func (h *SectionHandler) Update() http.HandlerFunc {
 		}
 
 		validationErrors := errors.ValidateStruct(model)
+
 		if len(validationErrors) > 0 {
 			str := ""
 			for _, err := range validationErrors {
@@ -119,6 +119,7 @@ func (h *SectionHandler) Update() http.HandlerFunc {
 			return
 		}
 		utils.GoodResponse(w, http.StatusOK, errors.SectionUpdated, result)
+
 	}
 }
 
@@ -135,7 +136,7 @@ func (h *SectionHandler) Delete() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusNoContent, errors.SectionDeleted, nil)
+		utils.GoodResponse(w, http.StatusNoContent, utils.SectionDeleted, nil)
 	}
 }
 

@@ -1,30 +1,48 @@
 package repository
 
 import (
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/docs"
+	"database/sql"
+	"errors"
+	"fmt"
+	"github.com/go-sql-driver/mysql"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
+	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
+	//e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 )
 
 // NewBuyerRepo creates a new instance of the Buyer repository
-func NewBuyerRepo(buyers map[int]mod.Buyer) *BuyerDB {
+func NewBuyerRepo(db *sql.DB) *BuyerDB {
 	return &BuyerDB{
-		db: buyers,
+		db: db,
 	}
 }
 
 // BuyerDB is the implementation of the Buyer database
 type BuyerDB struct {
-	db map[int]mod.Buyer
+	db *sql.DB
 }
 
-var filePath = "/buyers.json"
-
 // FindAll returns all buyers from the database
-func (r *BuyerDB) FindAll() (buyers map[int]mod.Buyer, err error) {
-	buyers = r.db
-	if len(buyers) == 0 {
+func (r *BuyerDB) FindAll() (buyers []mod.Buyer, err error) {
+	rows, err := r.db.Query("SELECT `id`, `id_card_number`, `first_name`, `last_name` FROM buyers")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
 
+	// iterate over the rows
+	for rows.Next() {
+		var by mod.Buyer
+		// scan the row into the customer
+		err = rows.Scan(&by.ID, &by.CardNumberID, &by.FirstName, &by.LastName)
+		if err != nil {
+			return nil, err
+		}
+		buyers = append(buyers, by)
+	}
+	err = rows.Err()
+	if err != nil {
+		return
 	}
 
 	return
@@ -32,74 +50,153 @@ func (r *BuyerDB) FindAll() (buyers map[int]mod.Buyer, err error) {
 
 // FindByID returns a buyer from the database by its id
 func (r *BuyerDB) FindByID(id int) (buyer mod.Buyer, err error) {
-	_, ok := r.db[id]
+	row := r.db.QueryRow(""+
+		"SELECT "+
+		"`id`, `id_card_number`, `first_name`, `last_name` "+
+		"FROM buyers "+
+		"WHERE buyers.id = ?", id)
 
-	if !ok {
-		err = utils.ErrBuyerRepositoryNotFound
+	if err = row.Err(); err != nil {
+		fmt.Println("error", err)
 		return
 	}
 
-	return r.db[id], nil
+	err = row.Scan(
+		&buyer.ID,
+		&buyer.CardNumberID,
+		&buyer.FirstName,
+		&buyer.LastName,
+	)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			err = e.ErrBuyerRepositoryNotFound
+			return
+		}
+
+		return buyer, err
+	}
+
+	return buyer, nil
 }
 
 // Save saves the given buyer in the database
 func (r *BuyerDB) Save(buyer *mod.Buyer) (err error) {
-	_, ok := r.db[buyer.ID]
-	id := 1
+	result, err := r.db.Exec(
+		"INSERT INTO buyers (id_card_number, first_name, last_name) "+
+			"VALUES (?, ?, ?)",
+		(*buyer).CardNumberID, (*buyer).FirstName, (*buyer).LastName,
+	)
 
-	if ok {
-		err = utils.ErrBuyerRepositoryDuplicated
-		return
+	if err != nil {
+		var mysqlErr *mysql.MySQLError
+		if errors.As(err, &mysqlErr) {
+			switch mysqlErr.Number {
+			case 1062:
+				return e.ErrBuyerRepositoryCardDuplicated
+			default:
+				return err
+			}
+		}
 	}
 
-	for _, b := range r.db {
-		if b.CardNumberID == buyer.CardNumberID {
-			err = utils.ErrBuyerRepositoryCardDuplicated
-			return
-		}
-		if b.ID > id {
-			id = b.ID
-		}
+	lastInsertId, err := result.LastInsertId()
+	if err != nil {
+		return err
 	}
+	(*buyer).ID = int(lastInsertId)
 
-	(*buyer).ID = id + 1
-	r.db[buyer.ID] = *buyer
-	err = docs.WriterFile(filePath, r.db)
 	return
 }
 
 // Update updates the given buyer in the database
 func (r *BuyerDB) Update(buyer *mod.Buyer) (err error) {
-	id := buyer.ID
-	_, ok := r.db[id]
+	_, err = r.db.Exec(
+		"UPDATE buyers "+
+			"SET id_card_number=?, first_name=?, last_name=? WHERE id=?",
+		(*buyer).CardNumberID, (*buyer).FirstName, (*buyer).LastName, (*buyer).ID,
+	)
 
-	if !ok {
-		err = utils.ErrBuyerRepositoryNotFound
-		return
-	}
-
-	for _, b := range r.db {
-		if b.ID != buyer.ID && b.CardNumberID == buyer.CardNumberID {
-			err = utils.ErrBuyerRepositoryCardDuplicated
-			return
+	if err != nil {
+		var mysqlErr *mysql.MySQLError
+		if errors.As(err, &mysqlErr) {
+			switch mysqlErr.Number {
+			case 1062:
+				return e.ErrBuyerRepositoryCardDuplicated
+			default:
+				return err
+			}
 		}
 	}
 
-	r.db[id] = *buyer
-	err = docs.WriterFile(filePath, r.db)
-	return
+	return nil
 }
 
 // Delete deletes a buyer from the database by its id
 func (r *BuyerDB) Delete(id int) (err error) {
-	_, ok := r.db[id]
+	rows, err := r.db.Exec("DELETE FROM buyers WHERE id = ?", id)
+	if err != nil {
+		return err
+	}
 
-	if !ok {
-		err = utils.ErrBuyerRepositoryNotFound
+	result, _ := rows.RowsAffected()
+	if result == 0 {
+		return e.ErrBuyerRepositoryNotFound
+	}
+
+	return
+}
+
+func (r *BuyerDB) GetPurchaseOrderReport(id *int) (reports []mod.BuyerReportPO, err error) {
+	var rows *sql.Rows
+	query := "" +
+		"SELECT b.id, b.id_card_number, b.first_name, b.last_name, COUNT(p.buyer_id) as purchase_orders_count " +
+		"FROM buyers b " +
+		"INNER JOIN purchase_orders p " +
+		"ON p.buyer_id = b.id "
+
+	if id != nil {
+		query += "WHERE b.id = ? GROUP BY b.id"
+		rows, err = r.db.Query(query, *id)
+	} else {
+		query += "GROUP BY b.id"
+		rows, err = r.db.Query(query)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	found := false
+	for rows.Next() {
+		found = true
+		var report mod.BuyerReportPO
+		err = rows.Scan(
+			&report.ID,
+			&report.CardNumberID,
+			&report.FirstName,
+			&report.LastName,
+			&report.PurchaseOrderCount,
+		)
+
+		if err != nil {
+			return
+		}
+
+		reports = append(reports, report)
+	}
+
+	if err = rows.Err(); err != nil {
 		return
 	}
 
-	delete(r.db, id)
-	err = docs.WriterFile(filePath, r.db)
-	return
+	if !found && id != nil {
+		return nil, e.ErrBuyerRepositoryNotFound
+	}
+
+	return reports, nil
 }
