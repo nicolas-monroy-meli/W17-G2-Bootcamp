@@ -34,7 +34,7 @@ func (r *BuyerDB) FindAll() (buyers []mod.Buyer, err error) {
 	for rows.Next() {
 		var by mod.Buyer
 		// scan the row into the customer
-		err := rows.Scan(&by.ID, &by.CardNumberID, &by.FirstName, &by.LastName)
+		err = rows.Scan(&by.ID, &by.CardNumberID, &by.FirstName, &by.LastName)
 		if err != nil {
 			return nil, err
 		}
