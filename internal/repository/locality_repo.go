@@ -41,13 +41,13 @@ func (r *LocalityDB) FindAllLocalities() (result []models.Locality, err error) {
 func (r *LocalityDB) FindSellersByLocID(id int) (result []models.SelByLoc, err error) {
 	var rows *sql.Rows
 	if id == -1 {
-		rows, err = r.db.Query("SELECT l.id, l.locality_name, count(*) FROM localities AS l INNER JOIN sellers as s ON l.id=s.locality_id GROUP BY l.id")
+		rows, err = r.db.Query("SELECT l.id, l.locality_name, count(s.id) FROM localities AS l LEFT JOIN sellers as s ON l.id=s.locality_id GROUP BY l.id")
 		if err != nil {
 			return nil, e.ErrQueryError
 		}
 		defer rows.Close()
 	} else {
-		rows, err = r.db.Query("SELECT l.id, l.locality_name, count(*) FROM localities AS l INNER JOIN sellers as s ON l.id=s.locality_id GROUP BY l.id HAVING l.id= ?", id)
+		rows, err = r.db.Query("SELECT l.id, l.locality_name, count(s.id) FROM localities AS l LEFT JOIN sellers as s ON l.id=s.locality_id GROUP BY l.id HAVING l.id= ?", id)
 		if err != nil {
 			return nil, e.ErrQueryError
 		}

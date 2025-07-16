@@ -52,7 +52,7 @@ func (h *LocalityHandler) GetSelByLocID() http.HandlerFunc {
 			}
 		}
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeGte0.Error())
 			return
 		}
 		result, err := h.sv.FindSellersByLocID(id)
