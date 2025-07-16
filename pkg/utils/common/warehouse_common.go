@@ -7,7 +7,7 @@ import (
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 )
 
-// ValidateWarehouseUpdate valida que los campos requeridos estén presentes para el PUT
+// ValidateWarehouseUpdate valida que los campos requeridos estén presentes para el put
 func ValidateWarehouseUpdate(w models.Warehouse) error {
 	if strings.TrimSpace(w.Address) == "" {
 		return errors.New("el campo 'address' es requerido")
@@ -19,6 +19,7 @@ func ValidateWarehouseUpdate(w models.Warehouse) error {
 		return errors.New("el campo 'warehouse_code' es requerido")
 	}
 	if w.MinimumCapacity <= 0 {
+
 		return errors.New("el campo 'minimum_capacity' debe ser mayor a 0")
 	}
 	// Validamos temperatura real, no solo que no sea cero
