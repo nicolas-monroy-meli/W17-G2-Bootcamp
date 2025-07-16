@@ -45,7 +45,8 @@ func (d *SQLConfig) Run() (err error) {
 		return
 	}
 	// instancing repository layer
-	//buyRepo := repo.NewBuyerRepo(db)
+	buyRepo := repo.NewBuyerRepo(db)
+	purRepo := repo.NewPurchaseOrderRepo(db)
 	//empRepo := repo.NewEmployeeRepo(db)
 	//prdRepo := repo.NewProductRepo(db)
 	secRepo := repo.NewSectionRepo(db)
@@ -53,7 +54,8 @@ func (d *SQLConfig) Run() (err error) {
 	//wrhRepo := repo.NewWarehouseRepo(db)
 
 	//instancing service layer
-	//buyServ := serv.NewBuyerService(buyRepo)
+	buyServ := serv.NewBuyerService(buyRepo)
+	purServ := serv.NewPurchaseOrderService(purRepo)
 	//empServ := serv.NewEmployeeService(empRepo)
 	//prdServ := serv.NewProductService(prdRepo)
 	secServ := serv.NewSectionService(secRepo)
@@ -61,7 +63,8 @@ func (d *SQLConfig) Run() (err error) {
 	//wrhServ := serv.NewWarehouseService(wrhRepo)
 
 	//instancing handler layer
-	//buyHand := hand.NewBuyerHandler(buyServ)
+	buyHand := hand.NewBuyerHandler(buyServ)
+	purHand := hand.NewPurchaseOrderHandler(purServ)
 	//empHand := hand.NewEmployeeHandler(empServ)
 	//prdHand := hand.NewProductHandler(prdServ)
 	secHand := hand.NewSectionHandler(secServ)
@@ -124,13 +127,18 @@ func (d *SQLConfig) Run() (err error) {
 	//})
 	//
 	//// - buyers
-	//rt.Route("/v1/buyers", func(rt chi.Router) {
-	//	rt.Get("/", buyHand.GetAll())
-	//	rt.Get("/{id}", buyHand.GetByID())
-	//	rt.Post("/", buyHand.Create())
-	//	rt.Patch("/{id}", buyHand.Update())
-	//	rt.Delete("/{id}", buyHand.Delete())
-	//})
+	rt.Route("/api/v1/purchaseOrders", func(rt chi.Router) {
+		rt.Post("/", purHand.Create())
+	})
+
+	rt.Route("/api/v1/buyers", func(rt chi.Router) {
+		rt.Get("/", buyHand.GetAll())
+		rt.Get("/{id}", buyHand.GetByID())
+		rt.Get("/reportPurchaseOrders", buyHand.GetReport())
+		rt.Post("/", buyHand.Create())
+		rt.Patch("/{id}", buyHand.Update())
+		rt.Delete("/{id}", buyHand.Delete())
+	})
 
 	//run
 	err = http.ListenAndServe(d.Address, rt)
