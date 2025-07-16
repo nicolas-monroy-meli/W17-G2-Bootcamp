@@ -37,7 +37,7 @@ CREATE TABLE `order_details` (
     `purchase_order_id` int(10) unsigned DEFAULT NULL,
     PRIMARY KEY (`id`),
     #KEY `order_details_product_record_id_foreign` (`product_record_id`),
-    #CONSTRAINT `order_details_product_record_id_foreign` FOREIGN KEY (`product_record_id`) REFERENCES `product_records` (`id`)
+    #CONSTRAINT `order_details_product_record_id_foreign` FOREIGN KEY (`product_record_id`) REFERENCES `product_records` (`id`),
     KEY `order_details_purchase_order_id_foreign` (`purchase_order_id`),
     CONSTRAINT `order_details_purchase_order_id_foreign` FOREIGN KEY (`purchase_order_id`) REFERENCES `purchase_orders` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
