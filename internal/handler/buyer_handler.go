@@ -196,7 +196,7 @@ func (h *BuyerHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		err = h.sv.Update(&buyer)
+		err = h.sv.Update(&buyerMapped)
 
 		if err != nil {
 			switch {
@@ -208,7 +208,7 @@ func (h *BuyerHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		utils.GoodResponse(w, http.StatusCreated, "Buyer actualizado exitosamente", buyer)
+		utils.GoodResponse(w, http.StatusOK, "Buyer actualizado exitosamente", buyerMapped)
 		return
 	}
 }
