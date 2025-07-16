@@ -28,7 +28,7 @@ func (h *PurchaseOrderHandler) Create() http.HandlerFunc {
 		var newPurchaseOrder mod.PurchaseOrder
 
 		if err := json.NewDecoder(r.Body).Decode(&newPurchaseOrder); err != nil {
-			fmt.Println(err)
+
 			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestFailedBody.Error())
 			return
 		}
@@ -64,7 +64,7 @@ func (h *PurchaseOrderHandler) Create() http.HandlerFunc {
 
 		if err != nil {
 			switch {
-			case errors.Is(err, e.ErrPORepositoryOrderNumberDuplicated):
+			case errors.Is(err, e.ErrPORepositoryOrderNumberDuplicated) || errors.Is(err, e.ErrForeignKeyError):
 				utils.BadResponse(w, http.StatusConflict, err.Error())
 			case errors.Is(err, e.ErrBuyerRepositoryNotFound):
 				utils.BadResponse(w, http.StatusConflict, err.Error())
