@@ -63,7 +63,7 @@ func (d *SQLConfig) Run() (err error) {
 	//instancing service layer
 	buyServ := serv.NewBuyerService(buyRepo)
 	purServ := serv.NewPurchaseOrderService(purRepo)
-  empServ := serv.NewEmployeeService(empRepo)
+	empServ := serv.NewEmployeeService(empRepo)
 	inbServ := serv.NewInboundService(inbRepo)
 	secServ := serv.NewSectionService(secRepo)
 	pbServ := serv.NewProductBatchRepository(pbRepo)
@@ -79,7 +79,7 @@ func (d *SQLConfig) Run() (err error) {
 	purHand := hand.NewPurchaseOrderHandler(purServ)
 	empHand := hand.NewEmployeeHandler(empServ)
 	inbHand := hand.NewInboundHandler(inbServ)
-  secHand := hand.NewSectionHandler(secServ)
+	secHand := hand.NewSectionHandler(secServ)
 	pbHand := hand.NewProductBatchHandler(pbServ)
 	prdHand := hand.NewProductHandler(prdServ)
 	prdRcHand := hand.NewProductRecordHandler(prdRcServ)
@@ -87,7 +87,6 @@ func (d *SQLConfig) Run() (err error) {
 	locHand := hand.NewLocalityHandler(locServ)
 	wrhHand := hand.NewWarehouseHandler(wrhServ)
 	carrHand := hand.NewCarryHandler(carrServ)
-
 
 	//routing
 
@@ -141,6 +140,7 @@ func (d *SQLConfig) Run() (err error) {
 		rt.Post("/", locHand.Create())
 		rt.Get("/", locHand.GetSelByLoc())
 		rt.Get("/reportSellers", locHand.GetSelByLocID())
+		rt.Get("/reportCarries", carrHand.GetReportByLocality())
 
 	})
 

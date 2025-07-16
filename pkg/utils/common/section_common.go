@@ -2,12 +2,14 @@ package common
 
 import (
 	"errors"
-	"github.com/go-chi/chi/v5"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
-	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
+	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 )
 
 // IdRequests encapsulates the process of getting the id parameter and returns an int number and an error if necessary
