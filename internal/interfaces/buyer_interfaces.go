@@ -18,6 +18,8 @@ type BuyerRepository interface {
 	Update(buyer *mod.Buyer) error
 	// Delete deletes the buyer with the given ID
 	Delete(id int) error
+	//Get purchase orders report
+	GetPurchaseOrderReport(id *int) ([]mod.BuyerReportPO, error)
 }
 
 // BuyerService is an interface that contains the methods that the buyer service should support
@@ -32,6 +34,8 @@ type BuyerService interface {
 	Update(buyer *mod.Buyer) error
 	// Delete deletes the buyer with the given ID
 	Delete(id int) error
+	//Get purchase orders report
+	GetPurchaseOrderReport(id *int) ([]mod.BuyerReportPO, error)
 }
 
 // BuyerService is an interface that contains the methods that the buyer service should support
@@ -46,4 +50,6 @@ type BuyerHandler interface {
 	Update() http.HandlerFunc
 	// Delete deletes the buyer with the given ID
 	Delete() http.HandlerFunc
+	//Get purchase orders report
+	GetReport(id int) http.HandlerFunc
 }

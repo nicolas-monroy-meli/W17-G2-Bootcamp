@@ -1,10 +1,8 @@
 package service
 
 import (
-	"errors"
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
-	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 )
 
 // NewBuyerService creates a new instance of the buyer service
@@ -32,29 +30,19 @@ func (s *BuyerService) FindByID(id int) (buyer mod.Buyer, err error) {
 
 // Save creates a new buyer
 func (s *BuyerService) Save(buyer *mod.Buyer) (err error) {
-	existingBuyerByCardNumber, _ := s.rp.GetByCardNumber(buyer.CardNumberID)
-
-	if existingBuyerByCardNumber.ID > 0 {
-		return e.ErrPORepositoryOrderNumberDuplicated
-	}
 	return s.rp.Save(buyer)
 }
 
 // Update updates a buyer
 func (s *BuyerService) Update(buyer *mod.Buyer) (err error) {
-	existingBuyerByCardNumber, _ := s.rp.GetByCardNumber(buyer.CardNumberID)
-	if existingBuyerByCardNumber.ID > 0 && existingBuyerByCardNumber.ID != buyer.ID {
-		return e.ErrPORepositoryOrderNumberDuplicated
-	}
 	return s.rp.Update(buyer)
 }
 
 // Delete deletes a buyer
 func (s *BuyerService) Delete(id int) (err error) {
-	_, err = s.rp.FindByID(id)
-	if errors.Is(err, e.ErrBuyerRepositoryNotFound) {
-		return err
-	}
-
 	return s.rp.Delete(id)
+}
+
+func (s *BuyerService) GetPurchaseOrderReport(id *int) ([]mod.BuyerReportPO, error) {
+	return s.rp.GetPurchaseOrderReport(id)
 }

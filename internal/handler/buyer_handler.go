@@ -70,6 +70,43 @@ func (h *BuyerHandler) GetByID() http.HandlerFunc {
 	}
 }
 
+func (h *BuyerHandler) GetReport() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		var id *int
+		idQuery := r.URL.Query().Get("id")
+
+		if idQuery != "" {
+			idParsed, err := strconv.Atoi(idQuery)
+			if err != nil {
+				utils.BadResponse(w, http.StatusNotFound, e.ErrRequestIdMustBeInt.Error())
+			}
+			id = &idParsed
+		}
+
+		reports, err := h.sv.GetPurchaseOrderReport(id)
+		if err != nil {
+			switch {
+			case errors.Is(err, e.ErrBuyerRepositoryNotFound):
+				utils.BadResponse(w, http.StatusNotFound, err.Error())
+			default:
+				utils.BadResponse(w, http.StatusInternalServerError, "internal server error")
+			}
+			return
+		}
+
+		// response
+		// - serialize product to JSON
+
+		utils.GoodResponse(
+			w,
+			http.StatusOK,
+			"Reporte generado exitosamente",
+			reports,
+		)
+	}
+}
+
 // Create creates a new buyer
 func (h *BuyerHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

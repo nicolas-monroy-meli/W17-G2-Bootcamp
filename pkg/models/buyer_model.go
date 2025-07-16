@@ -17,3 +17,8 @@ type BuyerPatch struct {
 	FirstName    *string `json:"first_name,omitempty"`
 	LastName     *string `json:"last_name,omitempty"`
 }
+
+type BuyerReportPO struct {
+	Buyer
+	PurchaseOrderCount int `json:"purchase_orders_count"`
+}
