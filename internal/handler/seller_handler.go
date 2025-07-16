@@ -10,6 +10,7 @@ import (
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
+	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 )
 
 // NewSellerHandler creates a new instance of the seller handler
@@ -42,7 +43,7 @@ func (h *SellerHandler) GetByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		req, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
 			return
 		}
 		result, err := h.sv.FindByID(req)
@@ -60,11 +61,11 @@ func (h *SellerHandler) Create() http.HandlerFunc {
 		var req models.Seller
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestWrongBody.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestWrongBody.Error())
 			return
 		}
 
-		errValidate := utils.ValidateStruct(req)
+		errValidate := e.ValidateStruct(req)
 		if len(errValidate) > 0 {
 			str := ""
 			for _, err := range errValidate {
@@ -90,7 +91,7 @@ func (h *SellerHandler) Update() http.HandlerFunc {
 		var req models.SellerPatch
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
 			return
 		}
 
@@ -102,7 +103,7 @@ func (h *SellerHandler) Update() http.HandlerFunc {
 
 		err = json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestWrongBody.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestWrongBody.Error())
 			return
 		}
 		req.ID = id
@@ -112,7 +113,7 @@ func (h *SellerHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		errValidate := utils.ValidateStruct(seller)
+		errValidate := e.ValidateStruct(seller)
 		if len(errValidate) > 0 {
 			str := ""
 			for _, err := range errValidate {
@@ -137,7 +138,7 @@ func (h *SellerHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		req, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
 			return
 		}
 		err = h.sv.Delete(req)

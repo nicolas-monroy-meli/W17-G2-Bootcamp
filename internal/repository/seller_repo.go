@@ -3,11 +3,9 @@ package repository
 import (
 	"database/sql"
 	"errors"
-
 	"github.com/go-sql-driver/mysql"
-
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
+	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 )
 
 // NewSellerRepo creates a new instance of the Seller repository

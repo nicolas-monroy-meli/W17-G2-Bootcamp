@@ -112,10 +112,6 @@ func (d *SQLConfig) Run() (err error) {
 		r.Post("/", carrHand.Create()) // Crea un nuevo carry
 	})
 
-	rt.Route("/v1/localities", func(r chi.Router) {
-		r.Get("/reportCarries", carrHand.GetReportByLocality()) // Reporta carries por localidad
-	})
-
 	// - sections
 	// rt.Route("/v1/sections", func(rt chi.Router) {
 	// 	rt.Get("/", secHand.GetAll())
