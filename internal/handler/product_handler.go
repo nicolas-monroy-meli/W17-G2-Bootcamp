@@ -84,6 +84,11 @@ func (h *ProductHandler) Create() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusConflict, err.Error())
 			return
 		}
+		if errors.Is(err, e.ErrSellerRepositoryNotFound) {
+			utils.BadResponse(w, http.StatusNotFound, err.Error())
+			return
+
+		}
 		if err != nil {
 			utils.BadResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -132,6 +137,11 @@ func (h *ProductHandler) Update() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
+		if errors.Is(err, e.ErrSellerRepositoryNotFound) {
+			utils.BadResponse(w, http.StatusNotFound, err.Error())
+			return
+
+		}
 		if err != nil {
 			utils.BadResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -157,5 +167,6 @@ func (h *ProductHandler) Delete() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
+		utils.GoodResponse(w, http.StatusNoContent, "success", nil)
 	}
 }

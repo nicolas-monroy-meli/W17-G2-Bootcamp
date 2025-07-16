@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"strings"
 
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
@@ -80,6 +81,9 @@ func (r *ProductDB) Save(product *mod.Product) (err error) {
 		(*product).SellerID,
 	)
 	if err != nil {
+		if strings.Contains(err.Error(), "foreign key constraint fails") && strings.Contains(err.Error(), "products_ibfk_1") {
+			return e.ErrSellerRepositoryNotFound
+		}
 		return
 	}
 	id, err := result.LastInsertId()
@@ -92,9 +96,6 @@ func (r *ProductDB) Save(product *mod.Product) (err error) {
 
 // Update updates a product in the database
 func (r *ProductDB) Update(product *mod.Product) (err error) {
-	/* if _, exists := r.FindByID(product.ID); exists != nil {
-		return e.ErrProductRepositoryNotFound
-	} */
 	_, err = r.db.Exec("UPDATE fresco_db.products SET `product_code` = ?, `description` = ?, `height` = ?, `length` = ?, `width` = ?, `net_weight` = ?, `expiration_rate` = ?, `freezing_rate` = ?, `recommended_freezing_temperature` = ?, `product_type_id` = ?, `seller_id` = ? WHERE id = ?;",
 		(*product).ProductCode,
 		(*product).Description,
@@ -110,6 +111,9 @@ func (r *ProductDB) Update(product *mod.Product) (err error) {
 		(*product).ID,
 	)
 	if err != nil {
+		if strings.Contains(err.Error(), "foreign key constraint fails") && strings.Contains(err.Error(), "products_ibfk_1") {
+			return e.ErrSellerRepositoryNotFound
+		}
 		return
 	}
 	return
