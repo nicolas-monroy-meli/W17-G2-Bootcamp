@@ -154,11 +154,11 @@ func (d *SQLConfig) Run() (err error) {
 	//})
 	//
 	//// - buyers
-	rt.Route("/api/v1/purchaseOrders", func(rt chi.Router) {
+	rt.Route("/v1/purchaseOrders", func(rt chi.Router) {
 		rt.Post("/", purHand.Create())
 	})
 
-	rt.Route("/api/v1/buyers", func(rt chi.Router) {
+	rt.Route("/v1/buyers", func(rt chi.Router) {
 		rt.Get("/", buyHand.GetAll())
 		rt.Get("/{id}", buyHand.GetByID())
 		rt.Get("/reportPurchaseOrders", buyHand.GetReport())
