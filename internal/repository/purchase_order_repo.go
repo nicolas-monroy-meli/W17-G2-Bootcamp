@@ -3,7 +3,6 @@ package repository
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"github.com/go-sql-driver/mysql"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
@@ -37,7 +36,7 @@ func (r *PurchaseOrderDB) Save(purchaseOrder *mod.PurchaseOrder) (err error) {
 			case 1062:
 				return e.ErrPORepositoryOrderNumberDuplicated
 			case 1452:
-				return fmt.Errorf("Foreign key error: %w", err)
+				return e.ErrForeignKeyError
 			default:
 				return err
 			}
@@ -77,7 +76,7 @@ func (r *PurchaseOrderDB) insertOrderDetail(orderDetails *mod.OrderDetails) (err
 		if errors.As(err, &mysqlErr) {
 			switch mysqlErr.Number {
 			case 1452:
-				return fmt.Errorf("Foreign key error: %w", err)
+				return e.ErrForeignKeyError
 			default:
 				return err
 			}
