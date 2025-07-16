@@ -9,7 +9,7 @@ CREATE TABLE `buyers` (
     `last_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `buyer_card_number_unique` (`id_card_number`)
-) ENGINE=InnoDB AUTO_INCREMENT=149 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 DROP TABLE IF EXISTS `purchases_orders`;
 
