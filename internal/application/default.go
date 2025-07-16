@@ -51,7 +51,8 @@ func (d *SQLConfig) Run() (err error) {
 	prdRepo := repo.NewProductRepo(db)
 	prdRcRepo := repo.NewProductRecordRepo(db)
 	secRepo := repo.NewSectionRepo(db)
-	//selRepo := repo.NewSellerRepo(db)
+	selRepo := repo.NewSellerRepo(db)
+	locRepo := repo.NewLocalityRepo(db)
 	//wrhRepo := repo.NewWarehouseRepo(db)
 
 	//instancing service layer
@@ -60,7 +61,8 @@ func (d *SQLConfig) Run() (err error) {
 	prdServ := serv.NewProductService(prdRepo)
 	prdRcServ := serv.NewProductRecordService(prdRcRepo, prdRepo)
 	secServ := serv.NewSectionService(secRepo)
-	//selServ := serv.NewSellerService(selRepo)
+	selServ := serv.NewSellerService(selRepo)
+	locServ := serv.NewLocalityService(locRepo)
 	//wrhServ := serv.NewWarehouseService(wrhRepo)
 
 	//instancing handler layer
@@ -69,7 +71,8 @@ func (d *SQLConfig) Run() (err error) {
 	prdHand := hand.NewProductHandler(prdServ)
 	prdRcHand := hand.NewProductRecordHandler(prdRcServ)
 	secHand := hand.NewSectionHandler(secServ)
-	//selHand := hand.NewSellerHandler(selServ)
+	selHand := hand.NewSellerHandler(selServ)
+	locHand := hand.NewLocalityHandler(locServ)
 	//wrhHand := hand.NewWarehouseHandler(wrhServ)
 
 	//routing
@@ -81,15 +84,13 @@ func (d *SQLConfig) Run() (err error) {
 
 	//Routing
 	// - sellers
-	//rt.Route("/v1/sellers", func(rt chi.Router) {
-	//	rt.Get("/", selHand.GetAll())
-	//
-	//	rt.Get("/{id}", selHand.GetByID())
-	//	rt.Post("/", selHand.Create())
-	//	rt.Patch("/{id}", selHand.Update())
-	//	rt.Delete("/{id}", selHand.Delete())
-	//
-	//})
+	rt.Route("/v1/sellers", func(rt chi.Router) {
+		rt.Get("/", selHand.GetAll())
+		rt.Get("/{id}", selHand.GetByID())
+		rt.Post("/", selHand.Create())
+		rt.Patch("/{id}", selHand.Update())
+		rt.Delete("/{id}", selHand.Delete())
+	})
 	//
 	//// - warehouses
 	//rt.Route("/v1/warehouses", func(r chi.Router) {
@@ -108,6 +109,14 @@ func (d *SQLConfig) Run() (err error) {
 		rt.Post("/", secHand.Create())
 		rt.Patch("/{id}", secHand.Update())
 	})
+  
+  // - localities
+	rt.Route("/v1/localities", func(rt chi.Router) {
+		rt.Post("/", locHand.Create())
+		rt.Get("/", locHand.GetSelByLoc())
+		rt.Get("/reportSellers", locHand.GetSelByLocID())
+
+	})
 
 	// - products
 	rt.Route("/v1/products", func(rt chi.Router) {
@@ -123,7 +132,7 @@ func (d *SQLConfig) Run() (err error) {
 	rt.Route("/v1/productRecords", func(rt chi.Router) {
 		rt.Post("/", prdRcHand.CreateRecord())
 	})
-
+  
 	//// - employees
 	//rt.Route("/v1/employees", func(rt chi.Router) {
 	//	rt.Get("/", empHand.GetAllEmployees())

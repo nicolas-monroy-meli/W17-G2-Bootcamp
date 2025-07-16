@@ -8,10 +8,20 @@ import (
 )
 
 var (
-	ErrRequestIdMustBeInt = errors.New("handler: id must be an integer")
-	ErrRequestNoBody      = errors.New("handler: request must have a body")
-	ErrRequestWrongBody   = errors.New("handler: body does not meet requirements")
-	ErrRequestFailedBody  = errors.New("handler: failed to read body")
+	// Requests
+	ErrRequestIdMustBeInt  = errors.New("handler: id must be an integer")
+	ErrRequestIdMustBeGte0 = errors.New("handler: id must be greater than 0")
+	ErrRequestNoBody       = errors.New("handler: request must have a body")
+	ErrRequestWrongBody    = errors.New("handler: body does not meet requirements")
+	ErrRequestFailedBody   = errors.New("handler: failed to read body")
+
+	//Query
+	ErrQueryError   = errors.New("repository: unable to execute query")
+	ErrInsertError  = errors.New("repository: insert is returning an error")
+	ErrQueryIsEmpty = errors.New("repository: query returned no info")
+
+	//Insert
+	ErrForeignKeyError = errors.New("repository: unable to execute query due to foreign key error")
 
 	// EmptyParams string telling the parameters are empty
 	EmptyParams = "handler: empty parameters"
@@ -61,6 +71,10 @@ var (
 	ErrSellerRepositoryNotFound = errors.New("repository: seller not found")
 	// ErrSellerRepositoryDuplicated is returned when the seller already exists
 	ErrSellerRepositoryDuplicated = errors.New("repository: seller already exists")
+
+	//Locality
+	// ErrLocalityNotFound is returned when the locality is not found
+	ErrLocalityRepositoryNotFound = errors.New("repository: locality not found")
 
 	//Warehouse
 	// ErrWarehouseRepositoryNotFound is returned when the warehouse is not found

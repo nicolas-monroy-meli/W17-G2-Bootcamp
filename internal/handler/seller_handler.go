@@ -2,15 +2,12 @@ package handler
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
 	"strconv"
 
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
-
 	"github.com/go-chi/chi/v5"
-
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
 	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
@@ -34,7 +31,7 @@ func (h *SellerHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		result, err := h.sv.FindAll()
 		if err != nil {
-			utils.BadResponse(w, 400, "unable to get sellers")
+			utils.BadResponse(w, 400, err.Error())
 			return
 		}
 		utils.GoodResponse(w, 200, "succes", result)
@@ -64,13 +61,7 @@ func (h *SellerHandler) GetByID() http.HandlerFunc {
 func (h *SellerHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req models.Seller
-		body, err := io.ReadAll(r.Body)
-		if err != nil || body == nil {
-			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestFailedBody.Error())
-			return
-		}
-
-		err = json.Unmarshal(body, &req)
+		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestWrongBody.Error())
 			return
@@ -86,12 +77,12 @@ func (h *SellerHandler) Create() http.HandlerFunc {
 			return
 		}
 
-		err = h.sv.Save(&req)
+		id, err := h.sv.Save(&req)
 		if err != nil {
 			utils.BadResponse(w, http.StatusConflict, err.Error())
 			return
 		}
-		utils.GoodResponse(w, 201, "success", nil)
+		utils.GoodResponse(w, 201, "success", id)
 
 	}
 }
@@ -112,18 +103,12 @@ func (h *SellerHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		body, err := io.ReadAll(r.Body)
-		if err != nil || body == nil {
-			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestFailedBody.Error())
-			return
-		}
-
-		err = json.Unmarshal(body, &req)
+		err = json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestWrongBody.Error())
 			return
 		}
-
+		req.ID = id
 		seller, err := common.PatchSeller(currentSeller, req)
 		if err != nil {
 			utils.BadResponse(w, 407, err.Error())
@@ -140,7 +125,11 @@ func (h *SellerHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		h.sv.Update(seller)
+		err = h.sv.Update(seller)
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 		utils.GoodResponse(w, 200, "success", nil)
 
 	}
@@ -162,3 +151,4 @@ func (h *SellerHandler) Delete() http.HandlerFunc {
 		utils.GoodResponse(w, 204, "success", nil)
 	}
 }
+
