@@ -19,31 +19,31 @@ type EmployeeService struct {
 }
 
 // FindAll returns all employees
-func (s *EmployeeService) FindAllEmployees() (employees map[int]mod.Employee, err error) {
-	employees, err = s.rp.FindAllEmployees()
+func (s *EmployeeService) FindAll() (employees []mod.Employee, err error) {
+	employees, err = s.rp.FindAll()
 	return
 }
 
 // FindByID returns a employee
-func (s *EmployeeService) FindEmployeeByID(id int) (employee mod.Employee, err error) {
-	employee, err = s.rp.FindEmployeeByID(id)
+func (s *EmployeeService) FindByID(id int) (employee mod.Employee, err error) {
+	employee, err = s.rp.FindByID(id)
 	return
 }
 
 // Save creates a new employee
-func (s *EmployeeService) SaveEmployee(employee *mod.Employee) (err error) {
-	err = s.rp.SaveEmployee(employee)
+func (s *EmployeeService) Save(employee *mod.Employee) (err error) {
+	err = s.rp.Save(employee)
 	return
 }
 
 // Update updates a employee
-func (s *EmployeeService) UpdateEmployee(id int, employee *mod.Employee) (err error) {
-	err = s.rp.UpdateEmployee(id, employee)
+func (s *EmployeeService) Update(id int, employee *mod.Employee) (err error) {
+	err = s.rp.Update(id, employee)
 	return
 }
 
 // Delete deletes a employee
-func (s *EmployeeService) DeleteEmployee(id int) (err error) {
-	err = s.rp.DeleteEmployee(id)
+func (s *EmployeeService) Delete(id int) (err error) {
+	err = s.rp.Delete(id)
 	return
 }

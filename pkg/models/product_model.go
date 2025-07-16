@@ -30,7 +30,7 @@ type Product struct {
 
 type ProductPatch struct {
 	ID             *int     `json:"id,omitempty" validate:"omitempty,gte=0"`
-	ProductCode    *string  `json:"product_code,omitempty" validate:"omitempty,gte=0"`
+	ProductCode    *string  `json:"product_code,omitempty" validate:"omitempty"`
 	Description    *string  `json:"description,omitempty" validate:"omitempty"`
 	Height         *float64 `json:"height,omitempty" validate:"omitempty,gte=0"`
 	Length         *float64 `json:"length,omitempty" validate:"omitempty,gte=0"`

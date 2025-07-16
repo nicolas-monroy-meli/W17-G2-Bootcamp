@@ -2,10 +2,12 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 	"net/http"
 )
 
@@ -30,7 +32,7 @@ func (h *SectionHandler) GetAll() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusOK, "data retrieved successfully", result)
+		utils.GoodResponse(w, http.StatusOK, errors.DataRetrievedSuccess, result)
 	}
 }
 
@@ -47,7 +49,7 @@ func (h *SectionHandler) GetByID() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusOK, utils.DataRetrievedSuccess, result)
+		utils.GoodResponse(w, http.StatusOK, errors.DataRetrievedSuccess, result)
 	}
 }
 
@@ -58,10 +60,10 @@ func (h *SectionHandler) Create() http.HandlerFunc {
 
 		err := json.NewDecoder(r.Body).Decode(&model)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestFailedBody.Error())
 			return
 		}
-		validationErrors := utils.ValidateStruct(model)
+		validationErrors := errors.ValidateStruct(model)
 		if len(validationErrors) > 0 {
 			str := ""
 			for _, err := range validationErrors {
@@ -75,7 +77,7 @@ func (h *SectionHandler) Create() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusConflict, err.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusCreated, utils.SectionCreated, model)
+		utils.GoodResponse(w, http.StatusCreated, errors.SectionCreated, model)
 	}
 }
 
@@ -85,23 +87,24 @@ func (h *SectionHandler) Update() http.HandlerFunc {
 		var model models.SectionPatch
 		id, err := common.IdRequests(r)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestIdMustBeInt.Error())
 			return
 		}
 		err = json.NewDecoder(r.Body).Decode(&model)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-		section, err := h.sv.FindByID(id)
-		if err != nil {
-			utils.BadResponse(w, http.StatusNotFound, err.Error())
+			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestFailedBody.Error())
 			return
 		}
 
-		section = common.PatchSection(model, section)
+		fields := common.PatchSection(model)
 
-		validationErrors := utils.ValidateStruct(section)
+		if len(fields) == 0 {
+			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestNoBody.Error())
+			return
+		}
+
+		validationErrors := errors.ValidateStruct(model)
+
 		if len(validationErrors) > 0 {
 			str := ""
 			for _, err := range validationErrors {
@@ -111,12 +114,13 @@ func (h *SectionHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		err = h.sv.Update(&section)
+		result, err := h.sv.Update(id, fields)
 		if err != nil {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusOK, utils.SectionUpdated, section)
+		utils.GoodResponse(w, http.StatusOK, errors.SectionUpdated, result)
+
 	}
 }
 
@@ -125,7 +129,7 @@ func (h *SectionHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := common.IdRequests(r)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestIdMustBeInt.Error())
 			return
 		}
 		err = h.sv.Delete(id)
@@ -133,6 +137,23 @@ func (h *SectionHandler) Delete() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusNoContent, utils.SectionDeleted, nil)
+		utils.GoodResponse(w, http.StatusNoContent, errors.SectionDeleted, nil)
+	}
+}
+
+func (h *SectionHandler) ReportProducts() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		params := r.URL.Query().Get("ids")
+		ids, err := common.ParseIDs(params)
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestWrongBody.Error())
+			return
+		}
+		res, err := h.sv.ReportProducts(ids)
+		if err != nil {
+			utils.BadResponse(w, http.StatusInternalServerError, fmt.Sprintf("db error: %s", err.Error()))
+			return
+		}
+		utils.GoodResponse(w, http.StatusOK, errors.DataRetrievedSuccess, res)
 	}
 }

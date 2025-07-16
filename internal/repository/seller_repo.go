@@ -1,13 +1,15 @@
 package repository
 
 import (
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/docs"
+	"database/sql"
+	"errors"
+	"github.com/go-sql-driver/mysql"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
+	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 )
 
 // NewSellerRepo creates a new instance of the Seller repository
-func NewSellerRepo(sellers map[int]mod.Seller) *SellerDB {
+func NewSellerRepo(sellers *sql.DB) *SellerDB {
 	return &SellerDB{
 		db: sellers,
 	}
@@ -15,58 +17,96 @@ func NewSellerRepo(sellers map[int]mod.Seller) *SellerDB {
 
 // SellerDB is the implementation of the Seller database
 type SellerDB struct {
-	db map[int]mod.Seller
+	db *sql.DB
 }
 
 // FindAll returns all sellers from the database
-func (r *SellerDB) FindAll() (sellers map[int]mod.Seller, err error) {
-	result := r.db
-	if len(r.db) == 0 {
-		return nil, utils.ErrSellerRepositoryNotFound
+func (r *SellerDB) FindAll() (sellers []mod.Seller, err error) {
+	rows, err := r.db.Query("SELECT `id`, `cid`,`company_name`,`address`,`telephone`,`locality_id` FROM `sellers`")
+	if err != nil {
+		return nil, e.ErrInsertError
 	}
-	return result, nil
+	defer rows.Close()
+	for rows.Next() {
+		var seller mod.Seller
+		err = rows.Scan(&seller.ID, &seller.CID, &seller.CompanyName, &seller.Address, &seller.Telephone, &seller.Locality)
+		if err != nil {
+			return nil, e.ErrQueryIsEmpty
+		}
+		sellers = append(sellers, seller)
+	}
+	if len(sellers) == 0 {
+		return nil, e.ErrQueryIsEmpty
+	}
+	return
 }
 
 // FindByID returns a seller from the database by its id
 func (r *SellerDB) FindByID(id int) (seller mod.Seller, err error) {
-	val, ok := r.db[id]
-	if !ok {
-		return mod.Seller{}, utils.ErrSellerRepositoryNotFound
+	row := r.db.QueryRow("SELECT `id`, `cid`,`company_name`,`address`,`telephone`,`locality_id` FROM `sellers` WHERE `id` = ?", id)
+	err = row.Scan(&seller.ID, &seller.CID, &seller.CompanyName, &seller.Address, &seller.Telephone, &seller.Locality)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return mod.Seller{}, e.ErrSellerRepositoryNotFound
+		}
 	}
-	return val, nil
+	return seller, nil
+}
+
+// findByCID returns a seller from the database by its id
+func (r *SellerDB) findByCID(cid int) (err error) {
+	row := r.db.QueryRow("SELECT `cid` FROM `sellers` WHERE `cid` = ?", cid)
+	var result int
+	err = row.Scan(&result)
+	if errors.Is(err, sql.ErrNoRows) {
+		return e.ErrSellerRepositoryNotFound
+	}
+	return nil
 }
 
 // Save saves a seller into the database
-func (r *SellerDB) Save(seller *mod.Seller) (err error) {
-	maxi := 0
-	for ind, v := range r.db {
-		if v.CID == seller.CID {
-			return utils.ErrSellerRepositoryDuplicated
+func (r *SellerDB) Save(seller *mod.Seller) (id int, err error) {
+	result, err := r.db.Exec("INSERT INTO `sellers`(`cid`,`company_name`,`address`,`telephone`,`locality_id`) VALUES(?,?,?,?,?)", seller.CID, seller.CompanyName, seller.Address, seller.Telephone, seller.Locality)
+	if err != nil {
+		var mySQLErr *mysql.MySQLError
+		if errors.As(err, &mySQLErr) {
+			if mySQLErr.Number == 1062 {
+				return 0, e.ErrSellerRepositoryDuplicated
+			}
 		}
-		if maxi < ind {
-			maxi = ind
-		}
+		return 0, e.ErrForeignKeyError
 	}
-	seller.ID = maxi + 1
-	r.db[seller.ID] = *seller
-	docs.WriterFile("sellers.json", r.db)
-	return nil
+	id64, _ := result.LastInsertId()
+	id = int(id64)
+	return id, nil
 }
 
 // Update updates a seller in the database
 func (r *SellerDB) Update(seller *mod.Seller) (err error) {
-	r.db[seller.ID] = *seller
-	err = docs.WriterFile("sellers.json", r.db)
-	return err
+	_, err = r.db.Exec("UPDATE `sellers` SET `cid`=?,`company_name`=?,`address`=?,`telephone`=?,`locality_id`=? WHERE `id`= ?", seller.CID, seller.CompanyName, seller.Address, seller.Telephone, seller.Locality, seller.ID)
+	if err != nil {
+		var mySQLErr *mysql.MySQLError
+		if errors.As(err, &mySQLErr) {
+			if mySQLErr.Number == 1452 {
+				return e.ErrForeignKeyError
+			}
+			if mySQLErr.Number == 1062 {
+				return e.ErrSellerRepositoryDuplicated
+			}
+		}
+	}
+	return nil
 }
 
 // Delete deletes a seller from the database
 func (r *SellerDB) Delete(id int) (err error) {
-	_, exists := r.db[id]
-	if !exists {
-		return utils.ErrSellerRepositoryNotFound
+	rows, err := r.db.Exec("DELETE FROM `sellers` WHERE `id`=?", id)
+	if err != nil {
+		return err
 	}
-	delete(r.db, id)
-	docs.WriterFile("sellers.json", r.db)
-	return
+	result, _ := rows.RowsAffected()
+	if result == 0 {
+		return e.ErrSellerRepositoryNotFound
+	}
+	return nil
 }

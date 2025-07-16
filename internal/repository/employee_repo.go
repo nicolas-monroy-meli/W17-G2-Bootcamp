@@ -1,77 +1,104 @@
 package repository
 
 import (
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/docs"
+	"database/sql"
+	"errors"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
+	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 )
 
-// NewEmployeeRepo creates a new instance of the Employee repository
-func NewEmployeeRepo(employees map[int]mod.Employee) *EmployeeDB {
+type EmployeeDB struct {
+	db *sql.DB
+}
+
+func NewEmployeeRepo(database *sql.DB) *EmployeeDB {
 	return &EmployeeDB{
-		db: employees,
+		db: database,
 	}
 }
 
-// EmployeeDB is the implementation of the Employee database
-type EmployeeDB struct {
-	db map[int]mod.Employee
-}
-
 // FindAll returns all employees
-func (r *EmployeeDB) FindAllEmployees() (employees map[int]mod.Employee, err error) {
-	employees = r.db
-	if len(r.db) == 0 {
-		return nil, utils.ErrSellerRepositoryNotFound
+func (r *EmployeeDB) FindAll() ([]mod.Employee, error) {
+	var employees []mod.Employee
+	rows, err := r.db.Query("SELECT id,id_card_number,first_name,last_name, wareHouse_id FROM employees") // Adjust columns
+	if err != nil {
+		return nil, errors.New("failed to query employees") // Use custom error type
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+
+		var emp mod.Employee
+		if err := rows.Scan(&emp.ID, &emp.FirstName, &emp.LastName, &emp.CardNumberID, &emp.WarehouseID); err != nil { // Adjust fields
+			return nil, errors.New("failed to scan employee row")
+		}
+		employees = append(employees, emp)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, errors.New("error during row iteration")
+	}
+	if len(employees) == 0 {
+		return nil, e.ErrEmployeeRepositoryNotFound // Your custom error
 	}
 	return employees, nil
 }
 
-// FindByID returns a employee
-func (r *EmployeeDB) FindEmployeeByID(id int) (employee mod.Employee, err error) {
-	for _, e := range r.db {
-		if e.ID == id {
-			employee = e
-			break
+// FindById find 0ne employee by id
+func (r *EmployeeDB) FindByID(id int) (employee mod.Employee, err error) {
+	row := r.db.QueryRow("SELECT id,id_card_number,first_name,last_name, wareHouse_id  FROM employees WHERE id = ?", id) // Use appropriate placeholder for your DB
+	err = row.Scan(&employee.ID, &employee.CardNumberID, &employee.FirstName, &employee.LastName, &employee.WarehouseID) // Adjust fields
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return employee, e.ErrEmployeeRepositoryNotFound // Your custom error
 		}
-	}
-	if employee.ID == 0 {
-		return employee, utils.ErrProductRepositoryNotFound
+		return employee, errors.New("failed to scan employee by ID")
 	}
 	return employee, nil
 }
 
 // Save creates a new employee
-func (r *EmployeeDB) SaveEmployee(employee *mod.Employee) (err error) {
-	for _, e := range r.db {
-		if e.ID == employee.ID {
-			return utils.ErrEmployeeRepositoryDuplicated
-		}
+func (r *EmployeeDB) Save(employee *mod.Employee) (err error) {
+	res, err := r.db.Exec("INSERT INTO employees (id_card_number,first_name,last_name, wareHouse_id ) VALUES (?, ?,?,?)", employee.CardNumberID, employee.FirstName, employee.LastName, employee.WarehouseID) // Adjust fields
+	if err != nil {
+		return errors.New("failed to insert employee")
 	}
-	employee.ID = len(r.db) + 1
-	r.db[employee.ID] = *employee
-	docs.WriterFile("employees.json", r.db)
+	lastID, err := res.LastInsertId()
+	if err != nil {
+		return errors.New("failed to get last insert ID")
+	}
+	employee.ID = int(lastID) // Update the employee object with the new ID
 	return nil
 }
 
 // Update updates a employee
-func (r *EmployeeDB) UpdateEmployee(id int, employee *mod.Employee) (err error) {
-	r.db[id] = *employee
-	err = docs.WriterFile("employees.json", r.db)
+func (r *EmployeeDB) Update(id int, employee *mod.Employee) (err error) {
+	res, err := r.db.Exec("UPDATE employees SET id_card_number = ?, first_name = ?, last_name = ?, wareHouse_id = ? WHERE id = ?", employee.CardNumberID, employee.FirstName, employee.LastName, employee.WarehouseID, id) // Adjust fields
 	if err != nil {
-		return utils.ErrRequestWrongBody
+		return errors.New("failed to update employee")
+	}
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return errors.New("failed to get rows affected")
+	}
+	if rowsAffected == 0 {
+		return e.ErrEmployeeRepositoryNotFound // Or a more specific "not found for update" error
 	}
 	return nil
 }
 
 // Delete deletes a employee
-func (r *EmployeeDB) DeleteEmployee(id int) (err error) {
-	for _, e := range r.db {
-		if e.ID == id {
-			delete(r.db, id)
-			docs.WriterFile("employees.json", r.db)
-			return nil
-		}
+func (r *EmployeeDB) Delete(id int) (err error) {
+	res, err := r.db.Exec("DELETE FROM employees WHERE id = ?", id)
+	if err != nil {
+		return errors.New("failed to delete employee")
 	}
-	return utils.ErrEmployeeRepositoryNotFound
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return errors.New("failed to get rows affected after delete")
+	}
+	if rowsAffected == 0 {
+		return e.ErrEmployeeRepositoryNotFound
+	}
+	// docs.WriterFile("employees.json", r.db) // This line is for file-based storage, remove it
+	return nil
 }

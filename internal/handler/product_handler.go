@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"errors"
-	"io"
 	"net/http"
 	"strconv"
 
@@ -13,6 +12,7 @@ import (
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
+	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 )
 
 // NewProductHandler creates a new instance of the product handler
@@ -45,11 +45,11 @@ func (h *ProductHandler) GetByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
 			return
 		}
 		result, err := h.sv.FindByID(id)
-		if errors.Is(err, utils.ErrProductRepositoryNotFound) {
+		if errors.Is(err, e.ErrProductRepositoryNotFound) {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
@@ -65,29 +65,29 @@ func (h *ProductHandler) GetByID() http.HandlerFunc {
 func (h *ProductHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req models.Product
-		body, err := io.ReadAll(r.Body)
-		if err != nil || body == nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestFailedBody.Error())
-			return
-		}
 
-		err = json.Unmarshal(body, &req)
+		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestNoBody.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestNoBody.Error())
 			return
 		}
 
 		var validate = validator.New(validator.WithRequiredStructEnabled())
 		errValidate := validate.Struct(req)
 		if errValidate != nil {
-			utils.BadResponse(w, http.StatusUnprocessableEntity, utils.ErrRequestWrongBody.Error()+"\n"+errValidate.Error())
+			utils.BadResponse(w, http.StatusUnprocessableEntity, e.ErrRequestWrongBody.Error()+"\n"+errValidate.Error())
 			return
 		}
 
 		err = h.sv.Save(&req)
-		if errors.Is(err, utils.ErrBuyerRepositoryDuplicated) {
+		if errors.Is(err, e.ErrProductRepositoryDuplicated) {
 			utils.BadResponse(w, http.StatusConflict, err.Error())
 			return
+		}
+		if errors.Is(err, e.ErrSellerRepositoryNotFound) {
+			utils.BadResponse(w, http.StatusNotFound, err.Error())
+			return
+
 		}
 		if err != nil {
 			utils.BadResponse(w, http.StatusInternalServerError, err.Error())
@@ -104,12 +104,12 @@ func (h *ProductHandler) Update() http.HandlerFunc {
 
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
 			return
 		}
 
 		currentProduct, err := h.sv.FindByID(id)
-		if errors.Is(err, utils.ErrProductRepositoryNotFound) {
+		if errors.Is(err, e.ErrProductRepositoryNotFound) {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
@@ -118,30 +118,29 @@ func (h *ProductHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		body, err := io.ReadAll(r.Body)
-		if err != nil || body == nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestFailedBody.Error())
-			return
-		}
-
-		err = json.Unmarshal(body, &req)
+		err = json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestNoBody.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestNoBody.Error())
 			return
 		}
 
 		common.PatchProduct(&currentProduct, req)
 		var validate = validator.New(validator.WithRequiredStructEnabled())
-		errValidate := validate.Struct(currentProduct)
+		errValidate := validate.Struct(req)
 		if errValidate != nil {
 			utils.BadResponse(w, http.StatusUnprocessableEntity, errValidate.Error())
 			return
 		}
 
 		err = h.sv.Update(&currentProduct)
-		if errors.Is(err, utils.ErrProductRepositoryNotFound) {
+		if errors.Is(err, e.ErrProductRepositoryNotFound) {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
+		}
+		if errors.Is(err, e.ErrSellerRepositoryNotFound) {
+			utils.BadResponse(w, http.StatusNotFound, err.Error())
+			return
+
 		}
 		if err != nil {
 			utils.BadResponse(w, http.StatusInternalServerError, err.Error())
@@ -156,11 +155,11 @@ func (h *ProductHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
 			return
 		}
 		err = h.sv.Delete(id)
-		if errors.Is(err, utils.ErrProductRepositoryNotFound) {
+		if errors.Is(err, e.ErrProductRepositoryNotFound) {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
 		}

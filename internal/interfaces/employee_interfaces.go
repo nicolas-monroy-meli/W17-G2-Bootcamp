@@ -8,41 +8,41 @@ import (
 // EmployeeRepository is an interface that contains the methods that the employee repository should support
 type EmployeeRepository interface {
 	// FindAll returns all the employees
-	FindAllEmployees() (map[int]mod.Employee, error)
+	FindAll() ([]mod.Employee, error)
 	// FindByID returns the employee with the given ID
-	FindEmployeeByID(id int) (mod.Employee, error)
+	FindByID(id int) (employee mod.Employee, err error)
 	// Save saves the given employee
-	SaveEmployee(employee *mod.Employee) error
+	Save(employee *mod.Employee) error
 	// Update updates the given employee
-	UpdateEmployee(id int, employee *mod.Employee) error
+	Update(id int, employee *mod.Employee) error
 	// Delete deletes the employee with the given ID
-	DeleteEmployee(id int) error
+	Delete(id int) error
 }
 
 // EmployeeService is an interface that contains the methods that the employee service should support
 type EmployeeService interface {
 	// FindAll returns all the employees
-	FindAllEmployees() (map[int]mod.Employee, error)
+	FindAll() ([]mod.Employee, error)
 	// FindByID returns the employee with the given ID
-	FindEmployeeByID(id int) (mod.Employee, error)
+	FindByID(id int) (mod.Employee, error)
 	// Save saves the given employee
-	SaveEmployee(employee *mod.Employee) error
+	Save(employee *mod.Employee) error
 	// Update updates the given employee
-	UpdateEmployee(id int, employee *mod.Employee) error
+	Update(id int, employee *mod.Employee) error
 	// Delete deletes the employee with the given ID
-	DeleteEmployee(id int) error
+	Delete(id int) error
 }
 
 // EmployeeService is an interface that contains the methods that the buyer service should support
 type EmployeeHandler interface {
 	// FindAll returns all the buyers
-	GetAllEmployees() http.HandlerFunc
+	GetAll() http.HandlerFunc
 	// FindByID returns the buyer with the given ID
-	GetEmployeeById() http.HandlerFunc
+	GetById() http.HandlerFunc
 	// Save saves the given buyer
-	CreateEmployee() http.HandlerFunc
+	Create() http.HandlerFunc
 	// Update updates the given buyer
-	EditEmployee() http.HandlerFunc
+	Edit() http.HandlerFunc
 	// Delete deletes the buyer with the given ID
-	DeleteEmployee() http.HandlerFunc
+	Delete() http.HandlerFunc
 }

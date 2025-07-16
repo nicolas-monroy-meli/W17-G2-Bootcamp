@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
 	"strconv"
 
@@ -11,6 +10,7 @@ import (
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
+	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 )
 
 // NewSellerHandler creates a new instance of the seller handler
@@ -43,7 +43,7 @@ func (h *SellerHandler) GetByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		req, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
 			return
 		}
 		result, err := h.sv.FindByID(req)
@@ -59,19 +59,13 @@ func (h *SellerHandler) GetByID() http.HandlerFunc {
 func (h *SellerHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req models.Seller
-		body, err := io.ReadAll(r.Body)
-		if err != nil || body == nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestFailedBody.Error())
-			return
-		}
-
-		err = json.Unmarshal(body, &req)
+		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestWrongBody.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestWrongBody.Error())
 			return
 		}
 
-		errValidate := utils.ValidateStruct(req)
+		errValidate := e.ValidateStruct(req)
 		if len(errValidate) > 0 {
 			str := ""
 			for _, err := range errValidate {
@@ -81,12 +75,12 @@ func (h *SellerHandler) Create() http.HandlerFunc {
 			return
 		}
 
-		err = h.sv.Save(&req)
+		id, err := h.sv.Save(&req)
 		if err != nil {
 			utils.BadResponse(w, http.StatusConflict, err.Error())
 			return
 		}
-		utils.GoodResponse(w, 201, "success", nil)
+		utils.GoodResponse(w, 201, "success", id)
 	}
 }
 
@@ -96,7 +90,7 @@ func (h *SellerHandler) Update() http.HandlerFunc {
 		var req models.SellerPatch
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
 			return
 		}
 
@@ -106,25 +100,19 @@ func (h *SellerHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		body, err := io.ReadAll(r.Body)
-		if err != nil || body == nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestFailedBody.Error())
-			return
-		}
-
-		err = json.Unmarshal(body, &req)
+		err = json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestWrongBody.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestWrongBody.Error())
 			return
 		}
-
+		req.ID = id
 		seller, err := common.PatchSeller(currentSeller, req)
 		if err != nil {
 			utils.BadResponse(w, 407, err.Error())
 			return
 		}
 
-		errValidate := utils.ValidateStruct(seller)
+		errValidate := e.ValidateStruct(seller)
 		if len(errValidate) > 0 {
 			str := ""
 			for _, err := range errValidate {
@@ -134,7 +122,11 @@ func (h *SellerHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		h.sv.Update(seller)
+		err = h.sv.Update(seller)
+		if err != nil {
+			utils.BadResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 		utils.GoodResponse(w, 200, "success", nil)
 
 	}
@@ -145,7 +137,7 @@ func (h *SellerHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		req, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
 			return
 		}
 		err = h.sv.Delete(req)
