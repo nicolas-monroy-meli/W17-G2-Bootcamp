@@ -19,7 +19,7 @@ func main() {
 	cfg := &server.SQLConfig{
 		Database: mysql.Config{
 			User:      os.Getenv("DB_USER"),
-			Passwd:    "",
+			Passwd:    os.Getenv("DB_PASSWORD"),
 			Net:       "tcp",
 			Addr:      os.Getenv("DB_ADDRESS"),
 			DBName:    os.Getenv("DB_NAME"),

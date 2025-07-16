@@ -52,6 +52,10 @@ var (
 	ErrProductRepositoryNotFound = errors.New("repository: product not found")
 	// ErrProductRepositoryDuplicated is returned when the product already exists
 	ErrProductRepositoryDuplicated = errors.New("repository: product already exists")
+	// ErrProductRecordRepositoryNotFound is returned when the product record is not found
+	ErrProductRecordRepositoryNotFound = errors.New("repository: product record not found")
+	// ErrProductRecordRepositoryDuplicated is returned when the product record already exists
+	ErrProductRecordRepositoryDuplicated = errors.New("repository: product record already exists")
 
 	//Section
 

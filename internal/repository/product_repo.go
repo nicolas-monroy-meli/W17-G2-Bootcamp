@@ -1,76 +1,132 @@
 package repository
 
 import (
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/docs"
+	"database/sql"
+	"strings"
+
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
+	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 )
 
 // NewProductRepo creates a new instance of the Product repository
-func NewProductRepo(products map[int]mod.Product) *ProductDB {
+func NewProductRepo(db *sql.DB) *ProductDB {
 	return &ProductDB{
-		db: products,
+		db: db,
 	}
 }
 
 // ProductDB is the implementation of the Product database
 type ProductDB struct {
-	db map[int]mod.Product
+	db *sql.DB
 }
 
 // FindAll returns all products from the database
 func (r *ProductDB) FindAll() (products map[int]mod.Product, err error) {
-	result := r.db
-	if len(r.db) == 0 {
-		return nil, utils.ErrProductRepositoryNotFound
+	rows, err := r.db.Query("SELECT `id`, `product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id` FROM fresco_db.products;")
+	if err != nil {
+		return nil, e.ErrProductRepositoryNotFound
 	}
-	return result, nil
+	defer rows.Close()
+	for rows.Next() {
+		var product mod.Product
+		if err := rows.Scan(&product.ID, &product.ProductCode, &product.Description, &product.Height, &product.Length, &product.Width, &product.Weight, &product.ExpirationRate, &product.FreezingRate, &product.RecomFreezTemp, &product.ProductTypeID, &product.SellerID); err != nil {
+			return nil, e.ErrProductRepositoryNotFound
+		}
+		if products == nil {
+			products = make(map[int]mod.Product)
+		}
+		products[product.ID] = product
+	}
+	if err := rows.Err(); err != nil {
+		return nil, e.ErrProductRepositoryNotFound
+	}
+	if len(products) == 0 {
+		return nil, e.ErrProductRepositoryNotFound
+	}
+	return products, nil
 }
 
 // FindByID returns a product from the database by its id
 func (r *ProductDB) FindByID(id int) (product mod.Product, err error) {
-	val, ok := r.db[id]
-	if !ok {
-		return mod.Product{}, utils.ErrProductRepositoryNotFound
+	row := r.db.QueryRow("SELECT `id`, `product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id` FROM fresco_db.products WHERE id = ?;", id)
+	if err != nil {
+		return mod.Product{}, e.ErrProductRepositoryNotFound
 	}
-	return val, nil
+	if err := row.Scan(&product.ID, &product.ProductCode, &product.Description, &product.Height, &product.Length, &product.Width, &product.Weight, &product.ExpirationRate, &product.FreezingRate, &product.RecomFreezTemp, &product.ProductTypeID, &product.SellerID); err != nil {
+		return mod.Product{}, e.ErrProductRepositoryNotFound
+	}
+	if product.ID == 0 {
+		return mod.Product{}, e.ErrProductRepositoryNotFound
+	}
+	return product, nil
 }
 
 // Save saves a product into the database
 func (r *ProductDB) Save(product *mod.Product) (err error) {
-	for _, v := range r.db {
-		if v.ProductCode == product.ProductCode {
-			return utils.ErrProductRepositoryDuplicated
-		}
+	if _, exists := r.FindByID(product.ID); exists == nil {
+		err = e.ErrProductRepositoryDuplicated
+		return
 	}
-	product.ID = len(r.db) + 1
-	r.db[product.ID] = *product
-	docs.WriterFile("products.json", r.db)
-	return nil
+	result, err := r.db.Exec("INSERT INTO fresco_db.products (`product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+		(*product).ProductCode,
+		(*product).Description,
+		(*product).Height,
+		(*product).Length,
+		(*product).Width,
+		(*product).Weight,
+		(*product).ExpirationRate,
+		(*product).FreezingRate,
+		(*product).RecomFreezTemp,
+		(*product).ProductTypeID,
+		(*product).SellerID,
+	)
+	if err != nil {
+		if strings.Contains(err.Error(), "foreign key constraint fails") && strings.Contains(err.Error(), "products_ibfk_1") {
+			return e.ErrSellerRepositoryNotFound
+		}
+		return
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return
+	}
+	(*product).ID = int(id)
+	return
 }
 
 // Update updates a product in the database
 func (r *ProductDB) Update(product *mod.Product) (err error) {
-	// Check if the product exists
-	if _, exists := r.db[product.ID]; !exists {
-		return utils.ErrProductRepositoryNotFound
+	_, err = r.db.Exec("UPDATE fresco_db.products SET `product_code` = ?, `description` = ?, `height` = ?, `length` = ?, `width` = ?, `net_weight` = ?, `expiration_rate` = ?, `freezing_rate` = ?, `recommended_freezing_temperature` = ?, `product_type_id` = ?, `seller_id` = ? WHERE id = ?;",
+		(*product).ProductCode,
+		(*product).Description,
+		(*product).Height,
+		(*product).Length,
+		(*product).Width,
+		(*product).Weight,
+		(*product).ExpirationRate,
+		(*product).FreezingRate,
+		(*product).RecomFreezTemp,
+		(*product).ProductTypeID,
+		(*product).SellerID,
+		(*product).ID,
+	)
+	if err != nil {
+		if strings.Contains(err.Error(), "foreign key constraint fails") && strings.Contains(err.Error(), "products_ibfk_1") {
+			return e.ErrSellerRepositoryNotFound
+		}
+		return
 	}
-	// Update the product in the database
-	r.db[product.ID] = *product
-	docs.WriterFile("products.json", r.db)
-	// Return nil to indicate success
-	return nil
+	return
 }
 
 // Delete deletes a product from the database by its id
 func (r *ProductDB) Delete(id int) (err error) {
-	// Check if the product exists
-	if _, exists := r.db[id]; !exists {
-		return utils.ErrProductRepositoryNotFound
+	if _, exists := r.FindByID(id); exists != nil {
+		return e.ErrProductRepositoryNotFound
 	}
-	// Delete the product from the database
-	delete(r.db, id)
-	docs.WriterFile("products.json", r.db)
-	// Return nil to indicate success
+	_, err = r.db.Exec("DELETE FROM fresco_db.products WHERE id = ?;", id)
+	if err != nil {
+		return
+	}
 	return nil
 }

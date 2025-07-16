@@ -56,18 +56,30 @@ func (a *ServerChi) Run() (err error) {
 	// dependencies
 
 	// - database loaders
+	buyers := docs.ReadFileToMap[mod.Buyer](a.loaderFilePath + "buyers.json")
+	employees := docs.ReadFileToMap[mod.Employee](a.loaderFilePath + "employees.json")
+	//products := docs.ReadFileToMap[mod.Product](a.loaderFilePath + "products.json")
 	//sections := docs.ReadFileToMap[mod.Section](a.loaderFilePath + "sections.json")
 	sellers := docs.ReadFileToMap[mod.Seller](a.loaderFilePath + "sellers.json")
 
 	// - repositories
+	buyrp := repo.NewBuyerRepo(buyers)
+	emprp := repo.NewEmployeeRepo(employees)
+	//prdrp := repo.NewProductRepo(products)
 	//secrp := repo.NewSectionRepo(sections)
 	//selrp := repo.NewSellerRepo(sellers)
 
 	// - services
+	buysv := srv.NewBuyerService(buyrp)
+	empsv := srv.NewEmployeeService(emprp)
+	//prdsv := srv.NewProductService(prdrp)
 	//secsv := srv.NewSectionService(secrp)
 	//selsv := srv.NewSellerService(selrp)
 
 	// - handlers
+	buyhd := cont.NewBuyerHandler(buysv)
+	emphd := cont.NewEmployeeHandler(empsv)
+	//prdhd := cont.NewProductHandler(prdsv)
 	//sechd := cont.NewSectionHandler(secsv)
 	//selhd := cont.NewSellerHandler(selsv)
 
@@ -100,6 +112,7 @@ func (a *ServerChi) Run() (err error) {
 		rt.Post("/", sechd.Create())
 		rt.Patch("/{id}", sechd.Update())
 	})
+  */
 
 	// run
 	err = http.ListenAndServe(a.serverAddress, rt)
