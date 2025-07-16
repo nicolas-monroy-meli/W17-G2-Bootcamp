@@ -21,24 +21,19 @@ var (
 	ErrQueryIsEmpty = errors.New("repository: query returned no info")
 
 	//Insert
-	ErrForeignKeyError = errors.New("repository: unable to execute query due to foreign key error")
+	ErrForeignKeyError    = errors.New("repository: unable to execute query due to foreign key error")
+	ErrRepositoryDatabase = errors.New("repository: database operation failed")
 
-	// EmptyParams string telling the parameters are empty
-	EmptyParams = "handler: empty parameters"
-	// DataRetrievedSuccess string that tells the data was retrieved
+	// Mensajes exitosos
+	EmptyParams          = "handler: empty parameters"
 	DataRetrievedSuccess = "handler: data retrieved successfully"
-	// SectionDeleted string that tells the section was deleted successfully
-	SectionDeleted = "handler: section deleted successfully"
-	// SectionCreated string to show a successful creation
-	SectionCreated = "handler: section successfully created"
-	// SectionUpdated string to show a successful update
-	SectionUpdated = "handler: section successfully updated"
+	SectionDeleted       = "handler: section deleted successfully"
+	SectionCreated       = "handler: section successfully created"
+	SectionUpdated       = "handler: section successfully updated"
 
-	//Buyer
-	// ErrBuyerRepositoryNotFound is returned when the buyer is not found
-	ErrBuyerRepositoryNotFound = errors.New("repository: buyer not found")
-	// ErrBuyerRepositoryDuplicated is returned when the buyer already exists
-	ErrBuyerRepositoryDuplicated     = errors.New("repository: buyer already exists") // ErrBuyerRepositoryDuplicated is returned when the buyer already exists
+	// Errores de Buyer
+	ErrBuyerRepositoryNotFound       = errors.New("repository: buyer not found")
+	ErrBuyerRepositoryDuplicated     = errors.New("repository: buyer already exists")
 	ErrBuyerRepositoryCardDuplicated = errors.New("repository: Card id duplicated")
 
 	//PurchaseOrder
@@ -48,45 +43,41 @@ var (
 	// ErrEmployeeRepositoryNotFound is returned when the employee is not found
 	ErrEmployeeRepositoryNotFound = errors.New("repository: employee not found")
 	// ErrEmployeeRepositoryDuplicated is returned when the employee already exists
+	// Errores de Employee
 	ErrEmployeeRepositoryDuplicated = errors.New("repository: employee already exists")
 
-	//Product
-	// ErrProductRepositoryNotFound is returned when the product is not found
-	ErrProductRepositoryNotFound = errors.New("repository: product not found")
-	// ErrProductRepositoryDuplicated is returned when the product already exists
+	// Errores de Product
+	ErrProductRepositoryNotFound   = errors.New("repository: product not found")
 	ErrProductRepositoryDuplicated = errors.New("repository: product already exists")
 	// ErrProductRecordRepositoryNotFound is returned when the product record is not found
 	ErrProductRecordRepositoryNotFound = errors.New("repository: product record not found")
 	// ErrProductRecordRepositoryDuplicated is returned when the product record already exists
 	ErrProductRecordRepositoryDuplicated = errors.New("repository: product record already exists")
 
-	//Section
-
-	//ErrEmptySectionDB returned when there aren't any sections to show due db emptiness
-	ErrEmptySectionDB = errors.New("repository: empty DB")
-	// ErrSectionRepositoryNotFound is returned when the section is not found
-	ErrSectionRepositoryNotFound = errors.New("repository: section not found")
-	// ErrSectionRepositoryDuplicated is returned when the section already exists
+	// Errores de Section
+	ErrEmptySectionDB              = errors.New("repository: empty DB")
+	ErrSectionRepositoryNotFound   = errors.New("repository: section not found")
 	ErrSectionRepositoryDuplicated = errors.New("repository: section already exists")
 
-	//Seller
-	// ErrSellerRepositoryNotFound is returned when the seller is not found
-	ErrSellerRepositoryNotFound = errors.New("repository: seller not found")
-	// ErrSellerRepositoryDuplicated is returned when the seller already exists
+	// Errores de Seller
+	ErrSellerRepositoryNotFound   = errors.New("repository: seller not found")
 	ErrSellerRepositoryDuplicated = errors.New("repository: seller already exists")
 
 	//Locality
 	// ErrLocalityNotFound is returned when the locality is not found
 	ErrLocalityRepositoryNotFound = errors.New("repository: locality not found")
 
-	//Warehouse
-	// ErrWarehouseRepositoryNotFound is returned when the warehouse is not found
-	ErrWarehouseRepositoryNotFound = errors.New("repository: warehouse not found")
-	// ErrWarehouseRepositoryDuplicated is returned when the warehouse already exists
+	// Errores de Warehouse
+	ErrWarehouseRepositoryNotFound   = errors.New("repository: warehouse not found")
 	ErrWarehouseRepositoryDuplicated = errors.New("repository: warehouse already exists")
+
+	// Errores de Carry (Nuevos)
+	ErrCarryRepositoryNotFound         = errors.New("repository: carry not found")
+	ErrCarryRepositoryDuplicated       = errors.New("repository: carry already exists")
+	ErrCarryRepositoryLocalityNotFound = errors.New("repository: locality not found for carry")
 )
 
-// ValidateStruct returns a string map of formatted errors
+// ValidateStruct retorna un mapa de errores de validación
 func ValidateStruct(s interface{}) map[string]string {
 	v := validator.New()
 	errorsList := make(map[string]string)
@@ -95,9 +86,11 @@ func ValidateStruct(s interface{}) map[string]string {
 	if err == nil {
 		return nil
 	}
+
 	for _, err := range err.(validator.ValidationErrors) {
 		customMsg := "unexpected error"
 		field := err.Field()
+
 		switch err.Tag() {
 		case "required":
 			customMsg = fmt.Sprintf("%s is required", field)
@@ -120,6 +113,7 @@ func ValidateStruct(s interface{}) map[string]string {
 		default:
 			customMsg = fmt.Sprintf("%s failed on %s validation", field, err.Tag())
 		}
+
 		errorsList[field] = customMsg
 	}
 	return errorsList
