@@ -54,30 +54,45 @@ func PatchSection(request models.SectionPatch) map[string]interface{} {
 }
 
 func GetQueryReport(ids []int) (string, []interface{}) {
-	placeholders := make([]string, len(ids))
-	args := make([]interface{}, len(ids))
-
-	for i, id := range ids {
-		placeholders[i] = "?"
-		args[i] = id
-	}
-
-	query := fmt.Sprintf(`
+	// Common SQL
+	base := `
         SELECT 
             s.id, 
             s.section_number, 
             COUNT(p.id) as product_count
         FROM sections s
         LEFT JOIN products p ON p.id = s.product_type_id
-        WHERE s.id IN (%s)
+    `
+	whereClause := ""
+	args := []interface{}{}
+
+	// If ID list is provided, filter, else show all
+	if len(ids) > 0 {
+		placeholders := make([]string, len(ids))
+		for i := range ids {
+			placeholders[i] = "?"
+		}
+		whereClause = fmt.Sprintf("WHERE s.id IN (%s)", strings.Join(placeholders, ","))
+		for _, id := range ids {
+			args = append(args, id)
+		}
+	}
+
+	sql := fmt.Sprintf(`
+        %s
+        %s
         GROUP BY s.id, s.section_number
         ORDER BY s.id
-    `, strings.Join(placeholders, ","))
-
-	return query, args
+    `, base, whereClause)
+	return sql, args
 }
 
-func ParseWarehouseIDs(param string) ([]int, error) {
+func ParseIDs(param string) ([]int, error) {
+	param = strings.TrimSpace(param)
+	if param == "" {
+		// No ids provided, means "select all"
+		return []int{}, nil
+	}
 	idStrings := strings.Split(param, ",")
 	ids := make([]int, 0, len(idStrings))
 
@@ -86,22 +101,15 @@ func ParseWarehouseIDs(param string) ([]int, error) {
 		if idStr == "" {
 			continue
 		}
-
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
 			return nil, fmt.Errorf("'%s' is not a valid integer", idStr)
 		}
-
 		if id <= 0 {
 			return nil, fmt.Errorf("section ID must be positive, got %d", id)
 		}
-
 		ids = append(ids, id)
 	}
-
-	if len(ids) == 0 {
-		return nil, fmt.Errorf("no valid warehouse IDs provided")
-	}
-
+	// Do not error if ids are empty: caller interprets [] as "fetch all"
 	return ids, nil
 }

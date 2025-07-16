@@ -144,6 +144,7 @@ func (r *SectionDB) ReportProducts(ids []int) ([]mod.ReportProductsResponse, err
 		return nil, err
 	}
 	defer rows.Close()
+
 	results := make([]mod.ReportProductsResponse, 0)
 	foundIDs := make(map[int]bool)
 
@@ -157,14 +158,18 @@ func (r *SectionDB) ReportProducts(ids []int) ([]mod.ReportProductsResponse, err
 		foundIDs[result.SectionId] = true
 	}
 
-	for _, id := range ids {
-		if !foundIDs[id] {
-			results = append(results, mod.ReportProductsResponse{
-				SectionId:     id,
-				SectionNumber: 0,
-				ProductsCount: 0,
-			})
+	// If filtering by IDs, ensure missing sections are added
+	if len(ids) > 0 {
+		for _, id := range ids {
+			if !foundIDs[id] {
+				results = append(results, mod.ReportProductsResponse{
+					SectionId:     id,
+					SectionNumber: 0,
+					ProductsCount: 0,
+				})
+			}
 		}
 	}
+
 	return results, nil
 }

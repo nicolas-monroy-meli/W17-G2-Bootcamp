@@ -142,12 +142,7 @@ func (h *SectionHandler) Delete() http.HandlerFunc {
 func (h *SectionHandler) ReportProducts() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		params := r.URL.Query().Get("ids")
-		fmt.Printf("p: %s", params)
-		if params == "" {
-			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestWrongBody.Error())
-			return
-		}
-		ids, err := common.ParseWarehouseIDs(params)
+		ids, err := common.ParseIDs(params)
 		if err != nil {
 			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestWrongBody.Error())
 			return
