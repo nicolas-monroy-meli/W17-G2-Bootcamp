@@ -6,14 +6,14 @@ import (
 
 type ProductBatch struct {
 	ID                 int       `json:"id,omitempty"`
-	BatchNumber        int       `json:"batchNumber" validate:"required,gt=0"`
-	CurrentQuantity    int       `json:"currentQuantity" validate:"required,gtefield=InitialQuantity"`
-	InitialQuantity    int       `json:"initialQuantity" validate:"required,gt=0"`
-	CurrentTemperature int       `json:"currentTemperature" validate:"required,gtefield=MinimumTemperature"`
-	MinimumTemperature int       `json:"minimumTemperature" validate:"required"`
-	DueDate            time.Time `json:"dueDate" validate:"required"`
-	ManufacturingDate  time.Time `json:"manufacturingDate" validate:"required"`
-	ManufacturingHour  string    `json:"manufacturingHour" validate:"required,hhmmss"`
-	ProductId          int       `json:"productId" validate:"required,gt=0"`
-	SectionId          int       `json:"sectionId" validate:"required,gt=0"`
+	BatchNumber        int       `json:"batch_number" validate:"required,gt=0"`
+	CurrentQuantity    int       `json:"current_quantity" validate:"required,gtefield=InitialQuantity"`
+	InitialQuantity    int       `json:"initial_quantity" validate:"required,gt=0"`
+	CurrentTemperature int       `json:"current_temperature" validate:"required,gtefield=MinimumTemperature"`
+	MinimumTemperature int       `json:"minimum_temperature" validate:"required"`
+	DueDate            time.Time `json:"due_date" validate:"required"`
+	ManufacturingDate  time.Time `json:"manufacturing_date" validate:"required"`
+	ManufacturingHour  string    `json:"manufacturing_hour" validate:"required,hhmmss"`
+	ProductId          int       `json:"product_id" validate:"required,gt=0"`
+	SectionId          int       `json:"section_id" validate:"required,gt=0"`
 }

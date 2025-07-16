@@ -7,7 +7,7 @@ type Section struct {
 	// SectionNumber is the number of the section
 	SectionNumber int `json:"section_number" validate:"required,gt=0"`
 	// CurrentTemperature is the current temperature of the section
-	CurrentTemperature float64 `json:"" validate:"gtefield=MinimumTemperature"`
+	CurrentTemperature float64 `json:"current_temperature" validate:"gtefield=MinimumTemperature"`
 	// MinimumTemperature is the minimum temperature that can be maintained in the section
 	MinimumTemperature float64 `json:"minimum_temperature" validate:"required,ltefield=CurrentTemperature"`
 	// CurrentCapacity is the current capacity of the section
