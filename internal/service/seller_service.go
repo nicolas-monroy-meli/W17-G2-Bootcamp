@@ -19,7 +19,7 @@ type SellerService struct {
 }
 
 // FindAll returns all sellers
-func (s *SellerService) FindAll() (sellers map[int]mod.Seller, err error) {
+func (s *SellerService) FindAll() (sellers []mod.Seller, err error) {
 	return s.rp.FindAll()
 }
 
@@ -29,9 +29,10 @@ func (s *SellerService) FindByID(id int) (seller mod.Seller, err error) {
 }
 
 // Save creates a new seller
-func (s *SellerService) Save(seller *mod.Seller) (err error) {
+func (s *SellerService) Save(seller *mod.Seller) (id int, err error) {
 	return s.rp.Save(seller)
 }
+
 
 // Update updates a seller
 func (s *SellerService) Update(seller *mod.Seller) (err error) {

@@ -12,14 +12,14 @@ import (
 )
 
 func main() {
-	err := godotenv.Load("dev.env.example")
+	err := godotenv.Load("dev.env")
 	if err != nil {
 		log.Println("No .env found!")
 	}
 	cfg := &server.SQLConfig{
 		Database: mysql.Config{
 			User:      os.Getenv("DB_USER"),
-			Passwd:    os.Getenv("PASSWD"),
+			Passwd:    os.Getenv("DB_PASSWORD"),
 			Net:       "tcp",
 			Addr:      os.Getenv("DB_ADDRESS"),
 			DBName:    os.Getenv("DB_NAME"),
