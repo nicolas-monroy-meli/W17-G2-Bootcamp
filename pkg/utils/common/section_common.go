@@ -2,7 +2,6 @@ package common
 
 import (
 	"errors"
-	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"

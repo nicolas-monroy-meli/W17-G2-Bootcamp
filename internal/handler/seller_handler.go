@@ -81,7 +81,6 @@ func (h *SellerHandler) Create() http.HandlerFunc {
 			return
 		}
 		utils.GoodResponse(w, 201, "success", id)
-
 	}
 }
 
