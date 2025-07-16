@@ -22,7 +22,7 @@ type ProductDB struct {
 
 // FindAll returns all products from the database
 func (r *ProductDB) FindAll() (products map[int]mod.Product, err error) {
-	rows, err := r.db.Query("SELECT `id`, `product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id` FROM fresco_db.products;")
+	rows, err := r.db.Query("SELECT `id`, `product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id` FROM frescos_db.products;")
 	if err != nil {
 		return nil, e.ErrProductRepositoryNotFound
 	}
@@ -48,7 +48,7 @@ func (r *ProductDB) FindAll() (products map[int]mod.Product, err error) {
 
 // FindByID returns a product from the database by its id
 func (r *ProductDB) FindByID(id int) (product mod.Product, err error) {
-	row := r.db.QueryRow("SELECT `id`, `product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id` FROM fresco_db.products WHERE id = ?;", id)
+	row := r.db.QueryRow("SELECT `id`, `product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id` FROM frescos_db.products WHERE id = ?;", id)
 	if err != nil {
 		return mod.Product{}, e.ErrProductRepositoryNotFound
 	}
@@ -67,7 +67,7 @@ func (r *ProductDB) Save(product *mod.Product) (err error) {
 		err = e.ErrProductRepositoryDuplicated
 		return
 	}
-	result, err := r.db.Exec("INSERT INTO fresco_db.products (`product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+	result, err := r.db.Exec("INSERT INTO frescos_db.products (`product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
 		(*product).ProductCode,
 		(*product).Description,
 		(*product).Height,
@@ -96,7 +96,7 @@ func (r *ProductDB) Save(product *mod.Product) (err error) {
 
 // Update updates a product in the database
 func (r *ProductDB) Update(product *mod.Product) (err error) {
-	_, err = r.db.Exec("UPDATE fresco_db.products SET `product_code` = ?, `description` = ?, `height` = ?, `length` = ?, `width` = ?, `net_weight` = ?, `expiration_rate` = ?, `freezing_rate` = ?, `recommended_freezing_temperature` = ?, `product_type_id` = ?, `seller_id` = ? WHERE id = ?;",
+	_, err = r.db.Exec("UPDATE frescos_db.products SET `product_code` = ?, `description` = ?, `height` = ?, `length` = ?, `width` = ?, `net_weight` = ?, `expiration_rate` = ?, `freezing_rate` = ?, `recommended_freezing_temperature` = ?, `product_type_id` = ?, `seller_id` = ? WHERE id = ?;",
 		(*product).ProductCode,
 		(*product).Description,
 		(*product).Height,
@@ -124,7 +124,7 @@ func (r *ProductDB) Delete(id int) (err error) {
 	if _, exists := r.FindByID(id); exists != nil {
 		return e.ErrProductRepositoryNotFound
 	}
-	_, err = r.db.Exec("DELETE FROM fresco_db.products WHERE id = ?;", id)
+	_, err = r.db.Exec("DELETE FROM frescos_db.products WHERE id = ?;", id)
 	if err != nil {
 		return
 	}

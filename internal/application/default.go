@@ -141,7 +141,6 @@ func (d *SQLConfig) Run() (err error) {
 		rt.Get("/", locHand.GetSelByLoc())
 		rt.Get("/reportSellers", locHand.GetSelByLocID())
 		rt.Get("/reportCarries", carrHand.GetReportByLocality())
-
 	})
 
 	// - products

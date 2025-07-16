@@ -21,7 +21,7 @@ type ProductRecordDB struct {
 
 // FindAllPR returns all product records from the database
 func (r *ProductRecordDB) FindAllPR() (productRecords map[int]mod.ProductRecord, err error) {
-	rows, err := r.db.Query("SELECT `id`, `last_update_date`, `purchase_price`, `sale_price`, `product_id` FROM fresco_db.product_records;")
+	rows, err := r.db.Query("SELECT `id`, `last_update_date`, `purchase_price`, `sale_price`, `product_id` FROM frescos_db.product_records;")
 	if err != nil {
 		return nil, e.ErrProductRepositoryNotFound
 	}
@@ -47,7 +47,7 @@ func (r *ProductRecordDB) FindAllPR() (productRecords map[int]mod.ProductRecord,
 
 // FindAllByProductIDPR returns all product records from the database by product id
 func (r *ProductRecordDB) FindAllByProductIDPR(productID int) (productRecords map[int]mod.ProductRecord, err error) {
-	rows, err := r.db.Query("SELECT `id`, `last_update_date`, `purchase_price`, `sale_price`, `product_id` FROM fresco_db.product_records WHERE product_id = ?;", productID)
+	rows, err := r.db.Query("SELECT `id`, `last_update_date`, `purchase_price`, `sale_price`, `product_id` FROM frescos_db.product_records WHERE product_id = ?;", productID)
 	if err != nil {
 		return
 	}
@@ -73,7 +73,7 @@ func (r *ProductRecordDB) FindAllByProductIDPR(productID int) (productRecords ma
 
 // SavePR saves a product record into the database
 func (r *ProductRecordDB) SavePR(productRecord *mod.ProductRecord) (err error) {
-	result, err := r.db.Exec("INSERT INTO fresco_db.product_records (`last_update_date`, `purchase_price`, `sale_price`, `product_id`) VALUES(?, ?, ?, ?);",
+	result, err := r.db.Exec("INSERT INTO frescos_db.product_records (`last_update_date`, `purchase_price`, `sale_price`, `product_id`) VALUES(?, ?, ?, ?);",
 		(*productRecord).LastUpdateDate,
 		(*productRecord).PurchasePrice,
 		(*productRecord).SalePrice,
