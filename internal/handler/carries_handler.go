@@ -10,6 +10,7 @@ import (
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
+	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 )
 
 type carryHandler struct {
@@ -33,7 +34,7 @@ func (h *carryHandler) Create() http.HandlerFunc {
 
 		if err := json.NewDecoder(r.Body).Decode(&carry); err != nil {
 			fmt.Println(err.Error())
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestWrongBody.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestWrongBody.Error())
 			return
 		}
 
@@ -68,7 +69,7 @@ func (h *carryHandler) GetReportByLocality() http.HandlerFunc {
 
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
 			return
 		}
 

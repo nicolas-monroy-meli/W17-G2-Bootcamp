@@ -3,7 +3,7 @@ package service
 import (
 	internal "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/interfaces"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
+	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 )
 
 type warehouseService struct {
@@ -30,7 +30,7 @@ func (s *warehouseService) Save(w *mod.Warehouse) error {
 		return err
 	}
 	if exists {
-		return utils.ErrWarehouseRepositoryDuplicated // Usamos el error definido
+		return e.ErrWarehouseRepositoryDuplicated // Usamos el error definido
 	}
 
 	return s.repo.Save(w)
@@ -45,12 +45,12 @@ func (s *warehouseService) Update(w *mod.Warehouse) error {
 
 	// Verificamos si el nuevo código ya existe en otro registro
 	existingWarehouse, err := s.repo.GetByWarehouseCode(w.WarehouseCode)
-	if err != nil && err != utils.ErrWarehouseRepositoryNotFound {
+	if err != nil && err != e.ErrWarehouseRepositoryNotFound {
 		return err
 	}
 
 	if existingWarehouse.ID != 0 && existingWarehouse.ID != w.ID {
-		return utils.ErrWarehouseRepositoryDuplicated
+		return e.ErrWarehouseRepositoryDuplicated
 	}
 
 	return s.repo.Update(w)

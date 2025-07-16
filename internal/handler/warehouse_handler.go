@@ -12,6 +12,7 @@ import (
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
+	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 )
 
 type warehouseHandler struct {
@@ -51,13 +52,13 @@ func (h *warehouseHandler) GetByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
 			return
 		}
 
 		wh, err := h.sv.FindByID(id)
 		if err != nil {
-			utils.BadResponse(w, http.StatusNotFound, utils.ErrWarehouseRepositoryNotFound.Error())
+			utils.BadResponse(w, http.StatusNotFound, e.ErrWarehouseRepositoryNotFound.Error())
 			return
 		}
 
@@ -70,7 +71,7 @@ func (h *warehouseHandler) Create() http.HandlerFunc {
 		var warehouse models.Warehouse
 
 		if err := json.NewDecoder(r.Body).Decode(&warehouse); err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestWrongBody.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestWrongBody.Error())
 			return
 		}
 
@@ -80,7 +81,7 @@ func (h *warehouseHandler) Create() http.HandlerFunc {
 		}
 
 		if err := h.sv.Save(&warehouse); err != nil {
-			utils.BadResponse(w, http.StatusConflict, utils.ErrWarehouseRepositoryDuplicated.Error())
+			utils.BadResponse(w, http.StatusConflict, e.ErrWarehouseRepositoryDuplicated.Error())
 			return
 		}
 
@@ -92,13 +93,13 @@ func (h *warehouseHandler) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
 			return
 		}
 
 		var warehouse models.Warehouse
 		if err := json.NewDecoder(r.Body).Decode(&warehouse); err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestWrongBody.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestWrongBody.Error())
 			return
 		}
 
@@ -114,7 +115,7 @@ func (h *warehouseHandler) Update() http.HandlerFunc {
 
 		warehouse.ID = id
 		if err := h.sv.Update(&warehouse); err != nil {
-			utils.BadResponse(w, http.StatusNotFound, utils.ErrWarehouseRepositoryNotFound.Error())
+			utils.BadResponse(w, http.StatusNotFound, e.ErrWarehouseRepositoryNotFound.Error())
 			return
 		}
 
@@ -126,12 +127,12 @@ func (h *warehouseHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, utils.ErrRequestIdMustBeInt.Error())
+			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
 			return
 		}
 
 		if err := h.sv.Delete(id); err != nil {
-			utils.BadResponse(w, http.StatusNotFound, utils.ErrWarehouseRepositoryNotFound.Error())
+			utils.BadResponse(w, http.StatusNotFound, e.ErrWarehouseRepositoryNotFound.Error())
 			return
 		}
 

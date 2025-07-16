@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
+	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 )
 
 type carryRepository struct {
@@ -24,7 +24,7 @@ func (r *carryRepository) GetAll() ([]models.Carry, error) {
 
 	rows, err := r.db.Query(query) // Query sin contexto
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return nil, fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 	defer rows.Close()
 
@@ -39,13 +39,13 @@ func (r *carryRepository) GetAll() ([]models.Carry, error) {
 			&c.Address,
 			&c.Telephone,
 		); err != nil {
-			return nil, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+			return nil, fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 		}
 		carries = append(carries, c)
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return nil, fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 
 	return carries, nil
@@ -71,9 +71,9 @@ func (r *carryRepository) GetByID(id int) (models.Carry, error) {
 
 	switch {
 	case err == sql.ErrNoRows:
-		return models.Carry{}, utils.ErrCarryRepositoryNotFound
+		return models.Carry{}, e.ErrCarryRepositoryNotFound
 	case err != nil:
-		return models.Carry{}, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return models.Carry{}, fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 
 	return c, nil
@@ -95,12 +95,12 @@ func (r *carryRepository) Save(c *models.Carry) error {
 		c.Telephone,
 	)
 	if err != nil {
-		return fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 
 	id, err := result.LastInsertId()
 	if err != nil {
-		return fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 
 	c.ID = int(id)
@@ -110,12 +110,12 @@ func (r *carryRepository) Save(c *models.Carry) error {
 // Update
 func (r *carryRepository) Update(c *models.Carry) error {
 	existingCarry, err := r.GetByCID(c.CID)
-	if err != nil && err != utils.ErrCarryRepositoryNotFound {
+	if err != nil && err != e.ErrCarryRepositoryNotFound {
 		return fmt.Errorf("error checking CID: %w", err)
 	}
 
 	if existingCarry.ID != 0 && existingCarry.ID != c.ID {
-		return utils.ErrCarryRepositoryDuplicated
+		return e.ErrCarryRepositoryDuplicated
 	}
 
 	query := `
@@ -138,12 +138,12 @@ func (r *carryRepository) Update(c *models.Carry) error {
 		c.ID,
 	)
 	if err != nil {
-		return fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
-		return utils.ErrCarryRepositoryNotFound
+		return e.ErrCarryRepositoryNotFound
 	}
 
 	return nil
@@ -153,12 +153,12 @@ func (r *carryRepository) Delete(id int) error {
 	query := `DELETE FROM carries WHERE id = ?`
 	result, err := r.db.Exec(query, id)
 	if err != nil {
-		return fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
-		return utils.ErrCarryRepositoryNotFound
+		return e.ErrCarryRepositoryNotFound
 	}
 
 	return nil
@@ -179,7 +179,7 @@ func (r *carryRepository) GetReportByLocality(localityID int) ([]models.Locality
 
 	rows, err := r.db.Query(query, localityID) // Query
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return nil, fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 	defer rows.Close()
 
@@ -191,13 +191,13 @@ func (r *carryRepository) GetReportByLocality(localityID int) ([]models.Locality
 			&report.LocalityName,
 			&report.CarriesCount,
 		); err != nil {
-			return nil, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+			return nil, fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 		}
 		reports = append(reports, report)
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return nil, fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 
 	return reports, nil
@@ -216,7 +216,7 @@ func (r *carryRepository) GetReportByLocalityAll() ([]models.LocalityCarryReport
 
 	rows, err := r.db.Query(query) // Query
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return nil, fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 	defer rows.Close()
 
@@ -228,13 +228,13 @@ func (r *carryRepository) GetReportByLocalityAll() ([]models.LocalityCarryReport
 			&report.LocalityName,
 			&report.CarriesCount,
 		); err != nil {
-			return nil, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+			return nil, fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 		}
 		reports = append(reports, report)
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return nil, fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 
 	return reports, nil
@@ -245,7 +245,7 @@ func (r *carryRepository) ExistsLocality(localityID int) (bool, error) {
 	query := `SELECT EXISTS(SELECT 1 FROM localities WHERE id = ?)`
 	err := r.db.QueryRow(query, localityID).Scan(&exists)
 	if err != nil {
-		return false, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return false, fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 	return exists, nil
 }
@@ -256,7 +256,7 @@ func (r *carryRepository) ExistsCID(cid string) (bool, error) {
 	query := `SELECT EXISTS(SELECT 1 FROM carries WHERE cid = ?)`
 	err := r.db.QueryRow(query, cid).Scan(&exists) // QueryRow
 	if err != nil {
-		return false, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return false, fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 	return exists, nil
 }
@@ -281,9 +281,9 @@ func (r *carryRepository) GetByCID(cid string) (models.Carry, error) {
 
 	switch {
 	case err == sql.ErrNoRows:
-		return models.Carry{}, utils.ErrCarryRepositoryNotFound
+		return models.Carry{}, e.ErrCarryRepositoryNotFound
 	case err != nil:
-		return models.Carry{}, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return models.Carry{}, fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 
 	return c, nil

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
+	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 )
 
 type warehouseRepository struct {
@@ -25,7 +25,7 @@ func (r *warehouseRepository) GetAll() ([]models.Warehouse, error) {
 
 	rows, err := r.db.Query(query)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return nil, fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 	defer rows.Close()
 
@@ -40,13 +40,13 @@ func (r *warehouseRepository) GetAll() ([]models.Warehouse, error) {
 			&wh.MinimumCapacity,
 			&wh.MinimumTemperature,
 		); err != nil {
-			return nil, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+			return nil, fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 		}
 		warehouses = append(warehouses, wh)
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return nil, fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 
 	return warehouses, nil
@@ -72,9 +72,9 @@ func (r *warehouseRepository) GetByID(id int) (models.Warehouse, error) {
 
 	switch {
 	case err == sql.ErrNoRows:
-		return models.Warehouse{}, utils.ErrWarehouseRepositoryNotFound
+		return models.Warehouse{}, e.ErrWarehouseRepositoryNotFound
 	case err != nil:
-		return models.Warehouse{}, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return models.Warehouse{}, fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 
 	return wh, nil
@@ -87,7 +87,7 @@ func (r *warehouseRepository) Save(wh *models.Warehouse) error {
 		return err
 	}
 	if exists {
-		return utils.ErrWarehouseRepositoryDuplicated
+		return e.ErrWarehouseRepositoryDuplicated
 	}
 
 	query := `
@@ -104,12 +104,12 @@ func (r *warehouseRepository) Save(wh *models.Warehouse) error {
 		wh.MinimumTemperature,
 	)
 	if err != nil {
-		return fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 
 	id, err := result.LastInsertId()
 	if err != nil {
-		return fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 
 	wh.ID = int(id)
@@ -138,12 +138,12 @@ func (r *warehouseRepository) Update(wh *models.Warehouse) error {
 		wh.ID,
 	)
 	if err != nil {
-		return fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
-		return utils.ErrWarehouseRepositoryNotFound
+		return e.ErrWarehouseRepositoryNotFound
 	}
 
 	return nil
@@ -154,12 +154,12 @@ func (r *warehouseRepository) Delete(id int) error {
 	query := `DELETE FROM warehouses WHERE id = ?`
 	result, err := r.db.Exec(query, id)
 	if err != nil {
-		return fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
-		return utils.ErrWarehouseRepositoryNotFound
+		return e.ErrWarehouseRepositoryNotFound
 	}
 
 	return nil
@@ -171,7 +171,7 @@ func (r *warehouseRepository) ExistsWarehouseCode(code string) (bool, error) {
 	query := `SELECT EXISTS(SELECT 1 FROM warehouses WHERE warehouse_code = ?)`
 	err := r.db.QueryRow(query, code).Scan(&exists)
 	if err != nil {
-		return false, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return false, fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 	return exists, nil
 }
@@ -194,9 +194,9 @@ func (r *warehouseRepository) GetByWarehouseCode(code string) (models.Warehouse,
 
 	switch {
 	case err == sql.ErrNoRows:
-		return models.Warehouse{}, utils.ErrWarehouseRepositoryNotFound
+		return models.Warehouse{}, e.ErrWarehouseRepositoryNotFound
 	case err != nil:
-		return models.Warehouse{}, fmt.Errorf("%w: %v", utils.ErrRepositoryDatabase, err)
+		return models.Warehouse{}, fmt.Errorf("%w: %v", e.ErrRepositoryDatabase, err)
 	}
 
 	return wh, nil
