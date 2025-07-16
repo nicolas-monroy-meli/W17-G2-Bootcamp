@@ -8,10 +8,10 @@ import (
 
 type PurchaseOrder struct {
 	ID              int            `json:"id"`
-	OrderNumber     string         `json:"order_number" validate:"min=1"`
+	OrderNumber     string         `json:"order_number" validate:"required"`
 	OrderDate       Date           `json:"order_date" validate:"required"`
-	TrackingCode    string         `json:"tracking_code" validate:"min=1"`
-	BuyerId         int            `json:"buyer_id" validate:"min=1"`
+	TrackingCode    string         `json:"tracking_code" validate:"required"`
+	BuyerId         int            `json:"buyer_id" validate:"required"`
 	ProductsDetails []OrderDetails `json:"products_details" validate:"min=1"`
 }
 
