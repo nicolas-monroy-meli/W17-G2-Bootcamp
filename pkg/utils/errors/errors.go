@@ -3,11 +3,15 @@ package errors
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 )
 
 var (
+
+	NoRowsAffected = errors.New("repository: no rows were affected")
+	// DataRetrievedSuccess string that tells the data was retrieved
 	// Requests
 	ErrRequestIdMustBeInt  = errors.New("handler: id must be an integer")
 	ErrRequestIdMustBeGte0 = errors.New("handler: id must be greater than 0")
@@ -25,7 +29,6 @@ var (
 	ErrRepositoryDatabase = errors.New("repository: database operation failed")
 
 	// Mensajes exitosos
-	EmptyParams          = "handler: empty parameters"
 	DataRetrievedSuccess = "handler: data retrieved successfully"
 	SectionDeleted       = "handler: section deleted successfully"
 	SectionCreated       = "handler: section successfully created"
@@ -59,8 +62,14 @@ var (
 	ErrSectionRepositoryNotFound   = errors.New("repository: section not found")
 	ErrSectionRepositoryDuplicated = errors.New("repository: section already exists")
 
-	// Errores de Seller
-	ErrSellerRepositoryNotFound   = errors.New("repository: seller not found")
+	ErrProductBatchNotFound   = errors.New("repository: Product Batch not found")
+	ErrProductBatchDuplicated = errors.New("repository: Product Batch already exists")
+
+	//Seller
+	// ErrSellerRepositoryNotFound is returned when the seller is not found
+	ErrSellerRepositoryNotFound = errors.New("repository: seller not found")
+	// ErrSellerRepositoryDuplicated is returned when the seller already exists
+
 	ErrSellerRepositoryDuplicated = errors.New("repository: seller already exists")
 
 	//Locality
@@ -77,9 +86,15 @@ var (
 	ErrCarryRepositoryLocalityNotFound = errors.New("repository: locality not found for carry")
 )
 
-// ValidateStruct retorna un mapa de errores de validación
+func validTime(fl validator.FieldLevel) bool {
+	_, err := time.Parse("15:04:05", fl.Field().String())
+	return err == nil
+}
+
+// ValidateStruct returns a string map of formatted errors
 func ValidateStruct(s interface{}) map[string]string {
 	v := validator.New()
+	v.RegisterValidation("hhmmss", validTime)
 	errorsList := make(map[string]string)
 
 	err := v.Struct(s)
@@ -110,6 +125,8 @@ func ValidateStruct(s interface{}) map[string]string {
 			customMsg = fmt.Sprintf("%s must be less than or equal to %s", field, err.Param())
 		case "ltfield":
 			customMsg = fmt.Sprintf("%s must be less than %s", field, err.Param())
+		case "hhmmss":
+			customMsg = fmt.Sprintf("%s must follow HH:MM:SS format", field)
 		default:
 			customMsg = fmt.Sprintf("%s failed on %s validation", field, err.Tag())
 		}
@@ -118,3 +135,5 @@ func ValidateStruct(s interface{}) map[string]string {
 	}
 	return errorsList
 }
+
+//tablas dependencias inexistentes

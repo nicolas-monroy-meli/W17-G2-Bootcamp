@@ -3,6 +3,9 @@ package repository
 import (
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/docs"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
+	"strconv"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 )
 
@@ -19,58 +22,151 @@ type SectionDB struct {
 }
 
 // FindAll returns all sections from the database
-func (r *SectionDB) FindAll() (sections map[int]mod.Section, err error) {
-	if len(r.db) == 0 {
-		return nil, utils.ErrEmptySectionDB
+func (r *SectionDB) FindAll() (sections []mod.Section, err error) {
+	rows, err := r.db.Query("SELECT `id`, `section_number`,`current_temperature`,`minimum_temperature`,`current_capacity`, `minimum_capacity`,`maximum_capacity`,`warehouse_id`,`product_type_id` FROM `sections`")
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil, err
 	}
-	return r.db, nil
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var section mod.Section
+		err = rows.Scan(&section.ID, &section.SectionNumber, &section.CurrentTemperature, &section.MinimumTemperature, &section.CurrentCapacity, &section.MinimumCapacity, &section.MaximumCapacity, &section.WarehouseID, &section.ProductTypeID)
+		if err != nil {
+			return nil, err
+		}
+		sections = append(sections, section)
+	}
+
+	if len(sections) == 0 {
+		return nil, errors.ErrEmptySectionDB
+	}
+	return sections, nil
 }
 
 // SectionExists returns a boolean that verifies if a section is in the db through its id
-func (r *SectionDB) SectionExists(id int) bool {
-	_, exists := r.db[id]
-	return exists
+func (r *SectionDB) SectionExists(id int, sectionNumber *int) (res bool, err error) {
+	var exists bool
+	if sectionNumber != nil {
+		query := `SELECT EXISTS (SELECT 1 FROM sections WHERE id = ? or section_number=?)`
+		err = r.db.QueryRow(query, id, *sectionNumber).Scan(&exists)
+	} else {
+		query := `SELECT EXISTS (SELECT 1 FROM sections WHERE id = ?)`
+		err = r.db.QueryRow(query, id).Scan(&exists)
+	}
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
 }
 
 // FindByID returns a section from the database by its id
 func (r *SectionDB) FindByID(id int) (section mod.Section, err error) {
-	if !r.SectionExists(id) {
-		return mod.Section{}, utils.ErrSectionRepositoryNotFound
+	row := r.db.QueryRow("SELECT `id`, `section_number`,`current_temperature`,`minimum_temperature`,`current_capacity`, `minimum_capacity`,`maximum_capacity`,`warehouse_id`,`product_type_id`  FROM `sections` WHERE `id`=?", id)
+
+	err = row.Scan(&section.ID, &section.SectionNumber, &section.CurrentTemperature, &section.MinimumTemperature, &section.CurrentCapacity, &section.MinimumCapacity, &section.MaximumCapacity, &section.WarehouseID, &section.ProductTypeID)
+	if err != nil {
+		return mod.Section{}, errors.ErrSectionRepositoryNotFound
 	}
-	return r.db[id], nil
+	return section, nil
 }
 
 // Save saves a section into the database
 func (r *SectionDB) Save(section *mod.Section) (err error) {
-	if r.SectionExists(section.SectionNumber) {
-		return utils.ErrSectionRepositoryDuplicated
+	if exists, _ := r.SectionExists(section.ID, &section.SectionNumber); exists {
+		return errors.ErrSectionRepositoryDuplicated
 	}
-	for _, sect := range r.db {
-		if sect.SectionNumber == section.SectionNumber {
-			return utils.ErrSectionRepositoryDuplicated
-		}
+	result, err := r.db.Exec(
+		"INSERT INTO `sections` (`section_number`, `current_temperature`, `minimum_temperature`, `current_capacity`, `minimum_capacity`, `maximum_capacity`, `warehouse_id`, `product_type_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+		(*section).SectionNumber, (*section).CurrentTemperature, (*section).MinimumTemperature, (*section).CurrentCapacity, (*section).MinimumCapacity, (*section).MaximumCapacity, (*section).WarehouseID, (*section).ProductTypeID,
+	)
+	if err != nil {
+		return
+// get the id of the inserted section
+	id, err := result.LastInsertId()
+	if err != nil {
+		return
 	}
-	r.db[section.ID] = *section
-	docs.WriterFile("sections.json", r.db)
-	return nil
+
+	// set the id of the section
+	(*section).ID = int(id)
+
+	return
 }
 
 // Update updates a section in the database
-func (r *SectionDB) Update(section *mod.Section) (err error) {
-	if r.SectionExists(section.SectionNumber) {
-		return utils.ErrSectionRepositoryNotFound
+func (r *SectionDB) Update(id int, fields map[string]interface{}) (result *mod.Section, err error) {
+	//Build query
+	query, args := common.BuildPatchQuery("sections", fields, strconv.Itoa(id))
+	// execute the query
+	res, err := r.db.Exec(query, args...)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
 	}
-	r.db[section.ID] = *section
-	docs.WriterFile("sections.json", r.db)
-	return nil
+
+	sec, err := r.FindByID(id)
+	if err != nil {
+		return nil, errors.ErrSectionRepositoryNotFound
+	}
+	rowsAffected, _ := res.RowsAffected()
+	if int(rowsAffected) == 0 {
+		return nil, errors.NoRowsAffected
+	}
+	return &sec, nil
 }
 
 // Delete deletes a section from the database by its id
 func (r *SectionDB) Delete(id int) (err error) {
-	if !r.SectionExists(id) {
-		return utils.ErrSectionRepositoryNotFound
+	if exists, _ := r.SectionExists(id, nil); !exists {
+		return errors.ErrSectionRepositoryNotFound
+	}
+	// execute the query
+	_, err = r.db.Exec("DELETE FROM `sections` WHERE `id` = ?", id)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
 	}
 	delete(r.db, id)
 	docs.WriterFile("sections.json", r.db)
 	return nil
+}
+
+func (r *SectionDB) ReportProducts(ids []int) ([]mod.ReportProductsResponse, error) {
+	query, args := common.GetQueryReport(ids)
+	rows, err := r.db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	results := make([]mod.ReportProductsResponse, 0)
+	foundIDs := make(map[int]bool)
+
+	for rows.Next() {
+		var result mod.ReportProductsResponse
+		err := rows.Scan(&result.SectionId, &result.SectionNumber, &result.ProductsCount)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, result)
+		foundIDs[result.SectionId] = true
+	}
+
+	// If filtering by IDs, ensure missing sections are added
+	if len(ids) > 0 {
+		for _, id := range ids {
+			if !foundIDs[id] {
+				results = append(results, mod.ReportProductsResponse{
+					SectionId:     id,
+					SectionNumber: 0,
+					ProductsCount: 0,
+				})
+			}
+		}
+	}
+
+	return results, nil
 }

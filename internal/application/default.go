@@ -49,21 +49,24 @@ func (d *SQLConfig) Run() (err error) {
 	buyRepo := repo.NewBuyerRepo(db)
 	purRepo := repo.NewPurchaseOrderRepo(db)
 	//empRepo := repo.NewEmployeeRepo(db)
+	secRepo := repo.NewSectionRepo(db)
+	pbRepo := repo.NewProductBatchRepo(db)
 	prdRepo := repo.NewProductRepo(db)
 	prdRcRepo := repo.NewProductRecordRepo(db)
-	//secRepo := repo.NewSectionRepo(db)
 	selRepo := repo.NewSellerRepo(db)
 	locRepo := repo.NewLocalityRepo(db)
 	wrhRepo := repo.NewWarehouseRepository(db)
 	carrRepo := repo.NewCarryRepository(db)
 
+
 	//instancing service layer
 	buyServ := serv.NewBuyerService(buyRepo)
 	purServ := serv.NewPurchaseOrderService(purRepo)
 	//empServ := serv.NewEmployeeService(empRepo)
+	secServ := serv.NewSectionService(secRepo)
+	pbServ := serv.NewProductBatchRepository(pbRepo)
 	prdServ := serv.NewProductService(prdRepo)
 	prdRcServ := serv.NewProductRecordService(prdRcRepo, prdRepo)
-	//secServ := serv.NewSectionService(secRepo)
 	selServ := serv.NewSellerService(selRepo)
 	locServ := serv.NewLocalityService(locRepo)
 	wrhServ := serv.NewWarehouseService(wrhRepo)
@@ -73,13 +76,15 @@ func (d *SQLConfig) Run() (err error) {
 	buyHand := hand.NewBuyerHandler(buyServ)
 	purHand := hand.NewPurchaseOrderHandler(purServ)
 	//empHand := hand.NewEmployeeHandler(empServ)
+	secHand := hand.NewSectionHandler(secServ)
+	pbHand := hand.NewProductBatchHandler(pbServ)
 	prdHand := hand.NewProductHandler(prdServ)
 	prdRcHand := hand.NewProductRecordHandler(prdRcServ)
-	//secHand := hand.NewSectionHandler(secServ)
 	selHand := hand.NewSellerHandler(selServ)
 	locHand := hand.NewLocalityHandler(locServ)
 	wrhHand := hand.NewWarehouseHandler(wrhServ)
 	carrHand := hand.NewCarryHandler(carrServ)
+
 
 	//routing
 
@@ -113,13 +118,18 @@ func (d *SQLConfig) Run() (err error) {
 	})
 
 	// - sections
-	// rt.Route("/v1/sections", func(rt chi.Router) {
-	// 	rt.Get("/", secHand.GetAll())
-	// 	rt.Get("/{id}", secHand.GetByID())
-	// 	rt.Delete("/{id}", secHand.Delete())
-	// 	rt.Post("/", secHand.Create())
-	// 	rt.Patch("/{id}", secHand.Update())
-	// })
+	rt.Route("/v1/sections", func(rt chi.Router) {
+		rt.Get("/", secHand.GetAll())
+		rt.Get("/{id}", secHand.GetByID())
+		rt.Delete("/{id}", secHand.Delete())
+		rt.Post("/", secHand.Create())
+		rt.Patch("/{id}", secHand.Update())
+		rt.Get("/reportProducts", secHand.ReportProducts())
+	})
+
+	rt.Route("/v1/productBatches", func(rt chi.Router) {
+		rt.Get("/", pbHand.GetAll())
+		rt.Post("/", pbHand.Create())
 
 	// - localities
 	rt.Route("/v1/localities", func(rt chi.Router) {

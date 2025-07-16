@@ -35,11 +35,15 @@ func (s *SectionService) Save(section *mod.Section) (err error) {
 }
 
 // Update updates a section
-func (s *SectionService) Update(section *mod.Section) (err error) {
-	return s.rp.Update(section)
+func (s *SectionService) Update(id int, fields map[string]interface{}) (section *mod.Section, err error) {
+	return s.rp.Update(id, fields)
 }
 
 // Delete deletes a section
 func (s *SectionService) Delete(id int) (err error) {
 	return s.rp.Delete(id)
+}
+
+func (s *SectionService) ReportProducts(ids []int) ([]mod.ReportProductsResponse, error) {
+	return s.rp.ReportProducts(ids)
 }
