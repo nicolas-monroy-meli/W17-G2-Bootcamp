@@ -8,7 +8,7 @@ INSERT INTO localities (locality_name, province_name, country_name) VALUES
 
 
 DELETE FROM sellers;
-IINSERT INTO sellers (id, cid, company_name, address, telephone, locality_id) VALUES
+INSERT INTO sellers (id, cid, company_name, address, telephone, locality_id) VALUES
 (1, 1001, 'Alpha Traders Inc.', '123 Alpha St, New York, NY', '+1-212-555-0101', 1),
 (2, 1008, 'Omicron Ventures', '888 Omicron Dr, San Francisco, CA', '+1-415-555-0110', 2),
 (3, 1002, 'Beta Logistics Ltd.', '456 Beta Blvd, Chicago, IL', '+1-312-555-0102', 1),

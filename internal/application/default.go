@@ -2,13 +2,14 @@ package server
 
 import (
 	"database/sql"
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-sql-driver/mysql"
 	hand "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/handler"
 	repo "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/repository"
 	serv "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/service"
-	"net/http"
 )
 
 type SQLConfig struct {
@@ -48,27 +49,33 @@ func (d *SQLConfig) Run() (err error) {
 	buyRepo := repo.NewBuyerRepo(db)
 	purRepo := repo.NewPurchaseOrderRepo(db)
 	//empRepo := repo.NewEmployeeRepo(db)
-	//prdRepo := repo.NewProductRepo(db)
+	prdRepo := repo.NewProductRepo(db)
+	prdRcRepo := repo.NewProductRecordRepo(db)
 	secRepo := repo.NewSectionRepo(db)
-	//selRepo := repo.NewSellerRepo(db)
+	selRepo := repo.NewSellerRepo(db)
+	locRepo := repo.NewLocalityRepo(db)
 	//wrhRepo := repo.NewWarehouseRepo(db)
 
 	//instancing service layer
 	buyServ := serv.NewBuyerService(buyRepo)
 	purServ := serv.NewPurchaseOrderService(purRepo)
 	//empServ := serv.NewEmployeeService(empRepo)
-	//prdServ := serv.NewProductService(prdRepo)
+	prdServ := serv.NewProductService(prdRepo)
+	prdRcServ := serv.NewProductRecordService(prdRcRepo, prdRepo)
 	secServ := serv.NewSectionService(secRepo)
-	//selServ := serv.NewSellerService(selRepo)
+	selServ := serv.NewSellerService(selRepo)
+	locServ := serv.NewLocalityService(locRepo)
 	//wrhServ := serv.NewWarehouseService(wrhRepo)
 
 	//instancing handler layer
 	buyHand := hand.NewBuyerHandler(buyServ)
 	purHand := hand.NewPurchaseOrderHandler(purServ)
 	//empHand := hand.NewEmployeeHandler(empServ)
-	//prdHand := hand.NewProductHandler(prdServ)
+	prdHand := hand.NewProductHandler(prdServ)
+	prdRcHand := hand.NewProductRecordHandler(prdRcServ)
 	secHand := hand.NewSectionHandler(secServ)
-	//selHand := hand.NewSellerHandler(selServ)
+	selHand := hand.NewSellerHandler(selServ)
+	locHand := hand.NewLocalityHandler(locServ)
 	//wrhHand := hand.NewWarehouseHandler(wrhServ)
 
 	//routing
@@ -80,15 +87,13 @@ func (d *SQLConfig) Run() (err error) {
 
 	//Routing
 	// - sellers
-	//rt.Route("/v1/sellers", func(rt chi.Router) {
-	//	rt.Get("/", selHand.GetAll())
-	//
-	//	rt.Get("/{id}", selHand.GetByID())
-	//	rt.Post("/", selHand.Create())
-	//	rt.Patch("/{id}", selHand.Update())
-	//	rt.Delete("/{id}", selHand.Delete())
-	//
-	//})
+	rt.Route("/v1/sellers", func(rt chi.Router) {
+		rt.Get("/", selHand.GetAll())
+		rt.Get("/{id}", selHand.GetByID())
+		rt.Post("/", selHand.Create())
+		rt.Patch("/{id}", selHand.Update())
+		rt.Delete("/{id}", selHand.Delete())
+	})
 	//
 	//// - warehouses
 	//rt.Route("/v1/warehouses", func(r chi.Router) {
@@ -107,16 +112,30 @@ func (d *SQLConfig) Run() (err error) {
 		rt.Post("/", secHand.Create())
 		rt.Patch("/{id}", secHand.Update())
 	})
+  
+  // - localities
+	rt.Route("/v1/localities", func(rt chi.Router) {
+		rt.Post("/", locHand.Create())
+		rt.Get("/", locHand.GetSelByLoc())
+		rt.Get("/reportSellers", locHand.GetSelByLocID())
 
-	//// - products
-	//rt.Route("/v1/products", func(rt chi.Router) {
-	//	rt.Get("/", prdHand.GetAll())
-	//	rt.Get("/{id}", prdHand.GetByID())
-	//	rt.Post("/", prdHand.Create())
-	//	rt.Patch("/{id}", prdHand.Update())
-	//	rt.Delete("/{id}", prdHand.Delete())
-	//})
-	//
+	})
+
+	// - products
+	rt.Route("/v1/products", func(rt chi.Router) {
+		rt.Get("/", prdHand.GetAll())
+		rt.Get("/{id}", prdHand.GetByID())
+		rt.Post("/", prdHand.Create())
+		rt.Patch("/{id}", prdHand.Update())
+		rt.Delete("/{id}", prdHand.Delete())
+		rt.Get("/reportRecords", prdRcHand.GetRecords())
+	})
+
+	// - product records
+	rt.Route("/v1/productRecords", func(rt chi.Router) {
+		rt.Post("/", prdRcHand.CreateRecord())
+	})
+  
 	//// - employees
 	//rt.Route("/v1/employees", func(rt chi.Router) {
 	//	rt.Get("/", empHand.GetAllEmployees())
