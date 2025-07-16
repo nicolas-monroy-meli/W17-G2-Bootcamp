@@ -9,7 +9,6 @@ import (
 
 var (
 	// Requests
-	// Errores generales
 	ErrRequestIdMustBeInt  = errors.New("handler: id must be an integer")
 	ErrRequestIdMustBeGte0 = errors.New("handler: id must be greater than 0")
 	ErrRequestNoBody       = errors.New("handler: request must have a body")
@@ -37,13 +36,23 @@ var (
 	ErrBuyerRepositoryDuplicated     = errors.New("repository: buyer already exists")
 	ErrBuyerRepositoryCardDuplicated = errors.New("repository: Card id duplicated")
 
+	//PurchaseOrder
+	ErrPORepositoryOrderNumberDuplicated = errors.New("repository: Order number duplicated")
+
+	//Employee
+	// ErrEmployeeRepositoryNotFound is returned when the employee is not found
+	ErrEmployeeRepositoryNotFound = errors.New("repository: employee not found")
+	// ErrEmployeeRepositoryDuplicated is returned when the employee already exists
 	// Errores de Employee
-	ErrEmployeeRepositoryNotFound   = errors.New("repository: employee not found")
 	ErrEmployeeRepositoryDuplicated = errors.New("repository: employee already exists")
 
 	// Errores de Product
 	ErrProductRepositoryNotFound   = errors.New("repository: product not found")
 	ErrProductRepositoryDuplicated = errors.New("repository: product already exists")
+	// ErrProductRecordRepositoryNotFound is returned when the product record is not found
+	ErrProductRecordRepositoryNotFound = errors.New("repository: product record not found")
+	// ErrProductRecordRepositoryDuplicated is returned when the product record already exists
+	ErrProductRecordRepositoryDuplicated = errors.New("repository: product record already exists")
 
 	// Errores de Section
 	ErrEmptySectionDB              = errors.New("repository: empty DB")
@@ -89,9 +98,17 @@ func ValidateStruct(s interface{}) map[string]string {
 			customMsg = fmt.Sprintf("%s must be greater than or equal to %s", field, err.Param())
 		case "gt":
 			customMsg = fmt.Sprintf("%s must be greater than %s", field, err.Param())
+		case "gtefield":
+			customMsg = fmt.Sprintf("%s must be greater than or equal to %s", field, err.Param())
+		case "gtfield":
+			customMsg = fmt.Sprintf("%s must be greater than %s", field, err.Param())
 		case "lte":
 			customMsg = fmt.Sprintf("%s must be less than or equal to %s", field, err.Param())
 		case "lt":
+			customMsg = fmt.Sprintf("%s must be less than %s", field, err.Param())
+		case "ltefield":
+			customMsg = fmt.Sprintf("%s must be less than or equal to %s", field, err.Param())
+		case "ltfield":
 			customMsg = fmt.Sprintf("%s must be less than %s", field, err.Param())
 		default:
 			customMsg = fmt.Sprintf("%s failed on %s validation", field, err.Tag())
