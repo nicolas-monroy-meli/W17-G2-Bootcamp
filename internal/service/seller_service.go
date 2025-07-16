@@ -33,7 +33,6 @@ func (s *SellerService) Save(seller *mod.Seller) (id int, err error) {
 	return s.rp.Save(seller)
 }
 
-
 // Update updates a seller
 func (s *SellerService) Update(seller *mod.Seller) (err error) {
 	return s.rp.Update(seller)

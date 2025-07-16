@@ -151,4 +151,3 @@ func (h *SellerHandler) Delete() http.HandlerFunc {
 		utils.GoodResponse(w, 204, "success", nil)
 	}
 }
-

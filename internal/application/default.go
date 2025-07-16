@@ -112,8 +112,8 @@ func (d *SQLConfig) Run() (err error) {
 		rt.Post("/", secHand.Create())
 		rt.Patch("/{id}", secHand.Update())
 	})
-  
-  // - localities
+
+	// - localities
 	rt.Route("/v1/localities", func(rt chi.Router) {
 		rt.Post("/", locHand.Create())
 		rt.Get("/", locHand.GetSelByLoc())
@@ -135,7 +135,7 @@ func (d *SQLConfig) Run() (err error) {
 	rt.Route("/v1/productRecords", func(rt chi.Router) {
 		rt.Post("/", prdRcHand.CreateRecord())
 	})
-  
+
 	//// - employees
 	//rt.Route("/v1/employees", func(rt chi.Router) {
 	//	rt.Get("/", empHand.GetAllEmployees())
