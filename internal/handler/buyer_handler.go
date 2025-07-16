@@ -65,7 +65,7 @@ func (h *BuyerHandler) GetByID() http.HandlerFunc {
 			return
 		}
 
-		utils.GoodResponse(w, http.StatusCreated, "Buyer obtenido con exito", buyer)
+		utils.GoodResponse(w, http.StatusOK, "Buyer obtenido con exito", buyer)
 		return
 	}
 }
@@ -181,9 +181,9 @@ func (h *BuyerHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		common.ValidatePatchRequest(&buyer, buyerPatch)
+		buyerMapped := common.ValidatePatchRequest(buyer, buyerPatch)
 
-		errValidation := e.ValidateStruct(buyer)
+		errValidation := e.ValidateStruct(buyerMapped)
 
 		if errValidation != nil {
 			str := make([]string, 0, len(errValidation))
@@ -223,7 +223,7 @@ func (h *BuyerHandler) Delete() http.HandlerFunc {
 			return
 		}
 
-		if err := h.sv.Delete(id); err != nil {
+		if err = h.sv.Delete(id); err != nil {
 
 			switch {
 			case errors.Is(err, e.ErrBuyerRepositoryNotFound):
@@ -235,7 +235,7 @@ func (h *BuyerHandler) Delete() http.HandlerFunc {
 
 		}
 
-		utils.GoodResponse(w, http.StatusNoContent, "Buyer eliminado exitosamente", nil)
+		utils.GoodResponse(w, http.StatusNoContent, "", nil)
 		return
 	}
 }
