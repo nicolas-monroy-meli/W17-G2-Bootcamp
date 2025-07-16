@@ -1,24 +1,24 @@
 package repository
 
 import (
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/docs"
+	"database/sql"
+	"fmt"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 	"strconv"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils"
 )
 
 // NewSectionRepo creates a new instance of the Section repository
-func NewSectionRepo(sections map[int]mod.Section) *SectionDB {
+func NewSectionRepo(db *sql.DB) *SectionDB {
 	return &SectionDB{
-		db: sections,
+		db: db,
 	}
 }
 
 // SectionDB is the implementation of the Section database
 type SectionDB struct {
-	db map[int]mod.Section
+	db *sql.DB
 }
 
 // FindAll returns all sections from the database
@@ -84,7 +84,8 @@ func (r *SectionDB) Save(section *mod.Section) (err error) {
 	)
 	if err != nil {
 		return
-// get the id of the inserted section
+	}
+	// get the id of the inserted section
 	id, err := result.LastInsertId()
 	if err != nil {
 		return
@@ -129,8 +130,6 @@ func (r *SectionDB) Delete(id int) (err error) {
 		fmt.Println(err.Error())
 		return
 	}
-	delete(r.db, id)
-	docs.WriterFile("sections.json", r.db)
 	return nil
 }
 

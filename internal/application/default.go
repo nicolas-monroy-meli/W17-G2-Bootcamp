@@ -58,7 +58,6 @@ func (d *SQLConfig) Run() (err error) {
 	wrhRepo := repo.NewWarehouseRepository(db)
 	carrRepo := repo.NewCarryRepository(db)
 
-
 	//instancing service layer
 	buyServ := serv.NewBuyerService(buyRepo)
 	purServ := serv.NewPurchaseOrderService(purRepo)
@@ -84,7 +83,6 @@ func (d *SQLConfig) Run() (err error) {
 	locHand := hand.NewLocalityHandler(locServ)
 	wrhHand := hand.NewWarehouseHandler(wrhServ)
 	carrHand := hand.NewCarryHandler(carrServ)
-
 
 	//routing
 
@@ -130,6 +128,7 @@ func (d *SQLConfig) Run() (err error) {
 	rt.Route("/v1/productBatches", func(rt chi.Router) {
 		rt.Get("/", pbHand.GetAll())
 		rt.Post("/", pbHand.Create())
+	})
 
 	// - localities
 	rt.Route("/v1/localities", func(rt chi.Router) {

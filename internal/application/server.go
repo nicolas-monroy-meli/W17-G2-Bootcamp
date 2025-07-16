@@ -112,8 +112,8 @@ func (a *ServerChi) Run() (err error) {
 		rt.Post("/", sechd.Create())
 		rt.Patch("/{id}", sechd.Update())
 	})
-  */
-
+*/
+/*
 	// run
 	err = http.ListenAndServe(a.serverAddress, rt)
 	return
