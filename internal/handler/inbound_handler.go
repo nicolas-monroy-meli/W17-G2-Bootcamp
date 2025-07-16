@@ -48,7 +48,7 @@ func (h *InboundHandler) Create() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusCreated, "succes", createdOrder)
+		utils.GoodResponse(w, http.StatusCreated, e.DataRetrievedSuccess, createdOrder)
 
 	}
 }
@@ -76,6 +76,6 @@ func (h *InboundHandler) GetOrdersByEmployee() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusCreated, "succes", report)
+		utils.GoodResponse(w, http.StatusCreated, e.DataRetrievedSuccess, report)
 	}
 }

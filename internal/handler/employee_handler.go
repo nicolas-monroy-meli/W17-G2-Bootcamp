@@ -33,7 +33,7 @@ func (h *EmployeeHandler) GetAll() http.HandlerFunc {
 			utils.BadResponse(w, 400, err.Error())
 			return
 		}
-		utils.GoodResponse(w, 200, "succes", result)
+		utils.GoodResponse(w, 200, e.DataRetrievedSuccess, result)
 	}
 }
 
@@ -55,7 +55,7 @@ func (h *EmployeeHandler) GetById() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusOK, "succes", result)
+		utils.GoodResponse(w, http.StatusOK, e.DataRetrievedSuccess, result)
 	}
 }
 
@@ -82,7 +82,7 @@ func (h *EmployeeHandler) Create() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusUnprocessableEntity, e.ErrEmployeeRepositoryDuplicated.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusCreated, "succes", employee)
+		utils.GoodResponse(w, http.StatusCreated, e.DataRetrievedSuccess, employee)
 	}
 }
 
@@ -117,7 +117,7 @@ func (h *EmployeeHandler) Edit() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusConflict, err.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusOK, "succes", employee)
+		utils.GoodResponse(w, http.StatusOK, e.DataRetrievedSuccess, employee)
 	}
 }
 
@@ -139,7 +139,7 @@ func (h *EmployeeHandler) Delete() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusNoContent, "succes", nil)
+		utils.GoodResponse(w, http.StatusNoContent, e.DataRetrievedSuccess, nil)
 
 	}
 }
