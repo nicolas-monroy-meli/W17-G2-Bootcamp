@@ -168,13 +168,13 @@ func (r *carryRepository) Delete(id int) error {
 func (r *carryRepository) GetReportByLocality(localityID int) ([]models.LocalityCarryReport, error) {
 	query := `
 		SELECT 
-			l.id AS locality_id, 
-			l.name AS locality_name, 
+			l.id, 
+			l.locality_name, 
 			COUNT(c.id) AS carries_count
 		FROM localities l
 		LEFT JOIN carries c ON l.id = c.locality_id
 		WHERE l.id = ?
-		GROUP BY l.id, l.name;
+		GROUP BY l.id, l.locality_name;
 	`
 
 	rows, err := r.db.Query(query, localityID) // Query
@@ -206,12 +206,12 @@ func (r *carryRepository) GetReportByLocality(localityID int) ([]models.Locality
 func (r *carryRepository) GetReportByLocalityAll() ([]models.LocalityCarryReport, error) {
 	query := `
 		SELECT 
-			l.id AS locality_id, 
-			l.name AS locality_name, 
+			l.id, 
+			l.locality_name, 
 			COUNT(c.id) AS carries_count
 		FROM localities l
 		LEFT JOIN carries c ON l.id = c.locality_id
-		GROUP BY l.id, l.name;
+		GROUP BY l.id, l.locality_name;
 	`
 
 	rows, err := r.db.Query(query) // Query
