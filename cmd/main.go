@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"os"
 
 	"github.com/go-sql-driver/mysql"
@@ -12,9 +10,10 @@ import (
 )
 
 func main() {
+	//load .env
 	err := godotenv.Load("dev.env")
 	if err != nil {
-		log.Println("No .env found!")
+		panic("No .env found!")
 	}
 	cfg := &server.SQLConfig{
 		Database: mysql.Config{
@@ -30,7 +29,6 @@ func main() {
 	app := server.NewSQLConfig(cfg)
 	// - run
 	if err := app.Run(); err != nil {
-		fmt.Println(err)
-		return
+		panic(err)
 	}
 }

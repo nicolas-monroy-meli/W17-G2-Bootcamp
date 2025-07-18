@@ -3,7 +3,7 @@ package models
 // Section is a struct that contains the section's information
 type Section struct {
 	// ID is the unique identifier of the section
-	ID int `json:"id,omitempty"`
+	ID uint `json:"id,omitempty" gorm:"primaryKey"`
 	// SectionNumber is the number of the section
 	SectionNumber int `json:"section_number" validate:"required,gt=0"`
 	// CurrentTemperature is the current temperature of the section

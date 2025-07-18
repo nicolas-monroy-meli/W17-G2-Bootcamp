@@ -5,7 +5,7 @@ import (
 )
 
 type ProductBatch struct {
-	ID                 int       `json:"id,omitempty"`
+	ID                 uint      `json:"id,omitempty" gorm:"primaryKey"`
 	BatchNumber        int       `json:"batch_number" validate:"required,gt=0"`
 	CurrentQuantity    int       `json:"current_quantity" validate:"required,gtefield=InitialQuantity"`
 	InitialQuantity    int       `json:"initial_quantity" validate:"required,gt=0"`
