@@ -3,7 +3,7 @@ package models
 // Product is a struct that contains the product's information
 type Product struct {
 	// ID is the unique identifier of the product
-	ID int `json:"id"`
+	ID int `json:"id" gorm:"primaryKey"`
 	// ProductCode is the unique code of the product
 	ProductCode string `json:"product_code" validate:"required,gte=0"`
 	// Description is the description of the product

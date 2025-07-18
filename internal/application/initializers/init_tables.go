@@ -6,7 +6,7 @@ import (
 )
 
 func CreateTables(db *gorm.DB) {
-	err := db.AutoMigrate(&mod.Section{}, &mod.ProductBatch{})
+	err := db.AutoMigrate(&mod.Section{}, &mod.ProductBatch{}, &mod.Product{})
 	if err != nil {
 		panic(err)
 		return

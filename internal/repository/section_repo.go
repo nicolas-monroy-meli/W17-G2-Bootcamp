@@ -76,9 +76,11 @@ func (r *SectionDB) Update(id int, fields map[string]interface{}) (res *mod.Sect
 
 // Delete deletes a section from the database by its id
 func (r *SectionDB) Delete(id int) (err error) {
-	result := r.db.Delete(id)
+	result := r.db.Delete(&mod.Section{}, id)
 
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+	fmt.Println(result)
+
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) || result.RowsAffected == 0 {
 		return e.ErrSectionRepositoryNotFound
 	} else if result.Error != nil {
 		return fmt.Errorf("%w: %w", e.ErrRepositoryDatabase, result.Error)
@@ -88,7 +90,7 @@ func (r *SectionDB) Delete(id int) (err error) {
 }
 
 func (r *SectionDB) ReportProducts(ids []int) ([]mod.ReportProductsResponse, error) {
-	rows, err := r.db.Table("sections").Select("sections.id,sections.section_number").Joins("LEFT JOIN products p ON p.id = s.product_type_id").Rows()
+	rows, err := r.db.Table("sections s").Select("s.id,s.section_number").Joins("LEFT JOIN products p ON p.id = s.product_type_id").Rows()
 	if err != nil {
 		return nil, err
 	}
