@@ -9,7 +9,6 @@ import (
 )
 
 var (
-	NoRowsAffected = errors.New("repository: no rows were affected")
 	// DataRetrievedSuccess string that tells the data was retrieved
 	// Requests
 	ErrRequestIdMustBeInt  = errors.New("handler: id must be an integer")

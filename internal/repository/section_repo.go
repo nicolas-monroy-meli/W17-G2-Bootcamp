@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
 	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 	"gorm.io/gorm"
 )
@@ -50,10 +51,8 @@ func (r *SectionDB) FindByID(id int) (section mod.Section, err error) {
 // Save saves a section into the database
 func (r *SectionDB) Save(section *mod.Section) (err error) {
 	result := r.db.Create(&section)
-	if errors.Is(result.Error, gorm.ErrDuplicatedKey) {
-		return e.ErrSectionRepositoryDuplicated
-	} else if result.Error != nil {
-		return fmt.Errorf("%w: %w", e.ErrRepositoryDatabase, result.Error)
+	if result.Error != nil {
+		return common.ErrorHandlerCreation(result.Error)
 	}
 	return
 }
@@ -62,10 +61,8 @@ func (r *SectionDB) Save(section *mod.Section) (err error) {
 func (r *SectionDB) Update(id int, fields map[string]interface{}) (res *mod.Section, err error) {
 	result := r.db.Model(&mod.Section{}).Where("id = ?", id).Updates(fields)
 
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return nil, e.ErrSectionRepositoryNotFound
-	} else if result.Error != nil {
-		return nil, fmt.Errorf("%w: %w", e.ErrRepositoryDatabase, result.Error)
+	if result.Error != nil {
+		return nil, common.ErrorHandlerCreation(result.Error)
 	}
 	sec, err := r.FindByID(id)
 	if err != nil {

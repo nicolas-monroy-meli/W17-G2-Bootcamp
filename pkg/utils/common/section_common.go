@@ -3,6 +3,7 @@ package common
 import (
 	"errors"
 	"fmt"
+	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 	"strings"
@@ -20,9 +21,18 @@ func IdRequests(r *http.Request) (int, error) {
 	}
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return 0, errors.New(fmt.Sprintf("unexpected: %s", err.Error()))
+		return 0, e.ErrRequestIdMustBeInt
 	}
 	return id, nil
+}
+
+func ErrorHandlerCreation(res error) error {
+	if errors.Is(res, gorm.ErrRecordNotFound) {
+		return e.ErrSectionRepositoryNotFound
+	} else if errors.Is(res, gorm.ErrForeignKeyViolated) {
+		return e.ErrForeignKeyError
+	}
+	return fmt.Errorf("%w: %w", e.ErrRepositoryDatabase, res)
 }
 
 func PatchSection(request models.SectionPatch) map[string]interface{} {
