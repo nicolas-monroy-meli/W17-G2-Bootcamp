@@ -1,11 +1,9 @@
-USE `frescos_db`;
-
 DROP TABLE IF EXISTS sections;
 DROP TABLE IF EXISTS product_batches;
 
 CREATE TABLE `sections` (
                             `id` INT AUTO_INCREMENT PRIMARY KEY,
-                            `section_number` INT NOT NULL CHECK (section_number > 0),
+                            `section_number` INT unique NOT NULL CHECK (section_number > 0),
                             `current_temperature` DOUBLE NOT NULL,
                             `minimum_temperature` DOUBLE NOT NULL,
                             `current_capacity` INT NOT NULL,
@@ -18,19 +16,15 @@ CREATE TABLE `sections` (
                             CHECK (current_temperature >= minimum_temperature),
                             CHECK (current_capacity >= minimum_capacity AND current_capacity <= maximum_capacity),
                             CHECK (maximum_capacity > minimum_capacity)
-
-    -- Add FOREIGN KEY lines if you have the referenced tables:
     -- ,FOREIGN KEY (warehouse_id) REFERENCES Warehouse(id)
     -- ,FOREIGN KEY (product_type_id) REFERENCES ProductType(id)
 );
-
--- Optional: add indexes if you'll filter/search by fields like warehouseID/productTypeID
 -- CREATE INDEX idx_section_warehouse ON Section (warehouseID);
 -- CREATE INDEX idx_section_product_type ON Section (productTypeID);
 
 CREATE TABLE `product_batches` (
                                    `id` int NOT NULL AUTO_INCREMENT,
-                                   `batch_number` int NOT NULL,
+                                   `batch_number` int unique NOT NULL,
                                    `current_quantity` int NOT NULL,
                                    `initial_quantity` int NOT NULL,
                                    `current_temperature` int NOT NULL,

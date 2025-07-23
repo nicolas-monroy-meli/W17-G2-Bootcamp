@@ -10,8 +10,6 @@ import (
 type SectionRepository interface {
 	// FindAll returns all the sections
 	FindAll() ([]mod.Section, error)
-	//SectionExists returns a boolean that verifies if a section is in the db through its id
-	SectionExists(id int, sectionNumber *int) (res bool, err error)
 	// FindByID returns the section with the given ID
 	FindByID(id int) (mod.Section, error)
 	// Save saves the given section
