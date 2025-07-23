@@ -146,7 +146,7 @@ func (h *SectionHandler) ReportProducts() http.HandlerFunc {
 		params := r.URL.Query().Get("ids")
 		ids, err := common.ParseIDs(params)
 		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestWrongBody.Error())
+			utils.BadResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 		res, err := h.sv.ReportProducts(ids)

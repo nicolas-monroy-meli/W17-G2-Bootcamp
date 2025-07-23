@@ -2,10 +2,12 @@ package repository
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
+	"github.com/go-sql-driver/mysql"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
+	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 	"strconv"
 )
 
@@ -41,25 +43,9 @@ func (r *SectionDB) FindAll() (sections []mod.Section, err error) {
 	}
 
 	if len(sections) == 0 {
-		return nil, errors.ErrEmptySectionDB
+		return nil, e.ErrEmptySectionDB
 	}
 	return sections, nil
-}
-
-// SectionExists returns a boolean that verifies if a section is in the db through its id
-func (r *SectionDB) SectionExists(id int, sectionNumber *int) (res bool, err error) {
-	var exists bool
-	if sectionNumber != nil {
-		query := `SELECT EXISTS (SELECT 1 FROM sections WHERE id = ? or section_number=?)`
-		err = r.db.QueryRow(query, id, *sectionNumber).Scan(&exists)
-	} else {
-		query := `SELECT EXISTS (SELECT 1 FROM sections WHERE id = ?)`
-		err = r.db.QueryRow(query, id).Scan(&exists)
-	}
-	if err != nil {
-		return false, err
-	}
-	return exists, nil
 }
 
 // FindByID returns a section from the database by its id
@@ -68,22 +54,27 @@ func (r *SectionDB) FindByID(id int) (section mod.Section, err error) {
 
 	err = row.Scan(&section.ID, &section.SectionNumber, &section.CurrentTemperature, &section.MinimumTemperature, &section.CurrentCapacity, &section.MinimumCapacity, &section.MaximumCapacity, &section.WarehouseID, &section.ProductTypeID)
 	if err != nil {
-		return mod.Section{}, errors.ErrSectionRepositoryNotFound
+		return mod.Section{}, e.ErrSectionRepositoryNotFound
 	}
 	return section, nil
 }
 
 // Save saves a section into the database
 func (r *SectionDB) Save(section *mod.Section) (err error) {
-	if exists, _ := r.SectionExists(section.ID, &section.SectionNumber); exists {
-		return errors.ErrSectionRepositoryDuplicated
-	}
 	result, err := r.db.Exec(
 		"INSERT INTO `sections` (`section_number`, `current_temperature`, `minimum_temperature`, `current_capacity`, `minimum_capacity`, `maximum_capacity`, `warehouse_id`, `product_type_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
 		(*section).SectionNumber, (*section).CurrentTemperature, (*section).MinimumTemperature, (*section).CurrentCapacity, (*section).MinimumCapacity, (*section).MaximumCapacity, (*section).WarehouseID, (*section).ProductTypeID,
 	)
 	if err != nil {
-		return
+		var mySQLErr *mysql.MySQLError
+		if errors.As(err, &mySQLErr) {
+			if mySQLErr.Number == 1452 {
+				return e.ErrForeignKeyError
+			}
+			if mySQLErr.Number == 1062 {
+				return e.ErrSectionRepositoryDuplicated
+			}
+		}
 	}
 	// get the id of the inserted section
 	id, err := result.LastInsertId()
@@ -104,31 +95,34 @@ func (r *SectionDB) Update(id int, fields map[string]interface{}) (result *mod.S
 	// execute the query
 	res, err := r.db.Exec(query, args...)
 	if err != nil {
-		fmt.Println(err.Error())
+		var mySQLErr *mysql.MySQLError
+		if errors.As(err, &mySQLErr) {
+			if mySQLErr.Number == 1452 {
+				return nil, e.ErrForeignKeyError
+			}
+			if mySQLErr.Number == 1062 {
+				return nil, e.ErrSectionRepositoryDuplicated
+			}
+		}
 		return
 	}
 
 	sec, err := r.FindByID(id)
 	if err != nil {
-		return nil, errors.ErrSectionRepositoryNotFound
+		return nil, e.ErrSectionRepositoryNotFound
 	}
 	rowsAffected, _ := res.RowsAffected()
 	if int(rowsAffected) == 0 {
-		return nil, errors.NoRowsAffected
+		return nil, e.NoRowsAffected
 	}
 	return &sec, nil
 }
 
 // Delete deletes a section from the database by its id
-func (r *SectionDB) Delete(id int) (err error) {
-	if exists, _ := r.SectionExists(id, nil); !exists {
-		return errors.ErrSectionRepositoryNotFound
-	}
-	// execute the query
+func (r *SectionDB) Delete(id int) (err error) { // execute the query
 	_, err = r.db.Exec("DELETE FROM `sections` WHERE `id` = ?", id)
 	if err != nil {
-		fmt.Println(err.Error())
-		return
+		return e.ErrSectionRepositoryNotFound
 	}
 	return nil
 }

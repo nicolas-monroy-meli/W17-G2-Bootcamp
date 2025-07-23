@@ -8,7 +8,6 @@ import (
 type ProductBatchRepository interface {
 	FindAll() (batches []mod.ProductBatch, err error)
 	Save(batch *mod.ProductBatch) error
-	BatchExists(id int, batchNumber *int) (res bool, err error)
 }
 
 type ProductBatchService interface {
