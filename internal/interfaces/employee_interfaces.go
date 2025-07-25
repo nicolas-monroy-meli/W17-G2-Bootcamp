@@ -24,7 +24,7 @@ type EmployeeService interface {
 	// FindAll returns all the employees
 	FindAll() ([]mod.Employee, error)
 	// FindByID returns the employee with the given ID
-	FindByID(id int) (mod.Employee, error)
+	FindByID(id int) (*mod.Employee, error)
 	// Save saves the given employee
 	Save(employee *mod.Employee) error
 	// Update updates the given employee
