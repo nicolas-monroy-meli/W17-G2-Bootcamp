@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"errors"
+
 	"github.com/go-sql-driver/mysql"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
@@ -24,14 +25,14 @@ type SellerDB struct {
 func (r *SellerDB) FindAll() (sellers []mod.Seller, err error) {
 	rows, err := r.db.Query("SELECT `id`, `cid`,`company_name`,`address`,`telephone`,`locality_id` FROM `sellers`")
 	if err != nil {
-		return nil, e.ErrInsertError
+		return nil, e.ErrQueryError
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var seller mod.Seller
 		err = rows.Scan(&seller.ID, &seller.CID, &seller.CompanyName, &seller.Address, &seller.Telephone, &seller.Locality)
 		if err != nil {
-			return nil, e.ErrQueryIsEmpty
+			return nil, e.ErrParseError
 		}
 		sellers = append(sellers, seller)
 	}

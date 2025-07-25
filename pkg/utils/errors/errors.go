@@ -19,6 +19,7 @@ var (
 	ErrRequestFailedBody   = errors.New("handler: failed to read body")
 	//Query
 	ErrQueryError   = errors.New("repository: unable to execute query")
+	ErrParseError   = errors.New("repository: unable to parse row")
 	ErrInsertError  = errors.New("repository: insert is returning an error")
 	ErrQueryIsEmpty = errors.New("repository: query returned no info")
 
