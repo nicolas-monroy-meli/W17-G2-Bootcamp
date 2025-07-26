@@ -99,7 +99,7 @@ func (h *SectionHandler) Update() http.HandlerFunc {
 		fields := common.PatchSection(model)
 
 		if len(fields) == 0 {
-			utils.BadResponse(w, http.StatusBadRequest, errors.ErrRequestNoBody.Error())
+			utils.BadResponse(w, http.StatusBadRequest, errors.ErrNothingToUpdate.Error())
 			return
 		}
 

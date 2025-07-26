@@ -2,14 +2,13 @@ package server
 
 import (
 	"database/sql"
-	"net/http"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-sql-driver/mysql"
 	hand "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/handler"
 	repo "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/repository"
 	serv "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/service"
+	"net/http"
 )
 
 type SQLConfig struct {
