@@ -21,7 +21,7 @@ type SellerDB struct {
 	db *sql.DB
 }
 
-// FindAll returns all sellers from the database
+// FindAll returns all sellers from the database -TESTED
 func (r *SellerDB) FindAll() (sellers []mod.Seller, err error) {
 	rows, err := r.db.Query("SELECT `id`, `cid`,`company_name`,`address`,`telephone`,`locality_id` FROM `sellers`")
 	if err != nil {
@@ -42,7 +42,7 @@ func (r *SellerDB) FindAll() (sellers []mod.Seller, err error) {
 	return
 }
 
-// FindByID returns a seller from the database by its id
+// FindByID returns a seller from the database by its id -TESTED
 func (r *SellerDB) FindByID(id int) (seller mod.Seller, err error) {
 	row := r.db.QueryRow("SELECT `id`, `cid`,`company_name`,`address`,`telephone`,`locality_id` FROM `sellers` WHERE `id` = ?", id)
 	err = row.Scan(&seller.ID, &seller.CID, &seller.CompanyName, &seller.Address, &seller.Telephone, &seller.Locality)
@@ -50,22 +50,12 @@ func (r *SellerDB) FindByID(id int) (seller mod.Seller, err error) {
 		if errors.Is(err, sql.ErrNoRows) {
 			return mod.Seller{}, e.ErrSellerRepositoryNotFound
 		}
+		return mod.Seller{}, errors.Join(e.ErrParseError, err)
 	}
 	return seller, nil
 }
 
-// findByCID returns a seller from the database by its id
-func (r *SellerDB) findByCID(cid int) (err error) {
-	row := r.db.QueryRow("SELECT `cid` FROM `sellers` WHERE `cid` = ?", cid)
-	var result int
-	err = row.Scan(&result)
-	if errors.Is(err, sql.ErrNoRows) {
-		return e.ErrSellerRepositoryNotFound
-	}
-	return nil
-}
-
-// Save saves a seller into the database
+// Save saves a seller into the database -TESTED
 func (r *SellerDB) Save(seller *mod.Seller) (id int, err error) {
 	result, err := r.db.Exec("INSERT INTO `sellers`(`cid`,`company_name`,`address`,`telephone`,`locality_id`) VALUES(?,?,?,?,?)", seller.CID, seller.CompanyName, seller.Address, seller.Telephone, seller.Locality)
 	if err != nil {
@@ -74,15 +64,18 @@ func (r *SellerDB) Save(seller *mod.Seller) (id int, err error) {
 			if mySQLErr.Number == 1062 {
 				return 0, e.ErrSellerRepositoryDuplicated
 			}
+			if mySQLErr.Number == 1452 {
+				return 0, e.ErrForeignKeyError
+			}
 		}
-		return 0, e.ErrForeignKeyError
+		return 0, errors.Join(e.ErrInsertError, err)
 	}
 	id64, _ := result.LastInsertId()
 	id = int(id64)
 	return id, nil
 }
 
-// Update updates a seller in the database
+// Update updates a seller in the database -TESTED
 func (r *SellerDB) Update(seller *mod.Seller) (err error) {
 	_, err = r.db.Exec("UPDATE `sellers` SET `cid`=?,`company_name`=?,`address`=?,`telephone`=?,`locality_id`=? WHERE `id`= ?", seller.CID, seller.CompanyName, seller.Address, seller.Telephone, seller.Locality, seller.ID)
 	if err != nil {
@@ -95,15 +88,16 @@ func (r *SellerDB) Update(seller *mod.Seller) (err error) {
 				return e.ErrSellerRepositoryDuplicated
 			}
 		}
+		return errors.Join(e.ErrRepositoryDatabase, err)
 	}
 	return nil
 }
 
-// Delete deletes a seller from the database
+// Delete deletes a seller from the database -TESTED
 func (r *SellerDB) Delete(id int) (err error) {
 	rows, err := r.db.Exec("DELETE FROM `sellers` WHERE `id`=?", id)
 	if err != nil {
-		return err
+		return errors.Join(e.ErrRepositoryDatabase, err)
 	}
 	result, _ := rows.RowsAffected()
 	if result == 0 {
