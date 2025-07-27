@@ -9,17 +9,25 @@ import (
 	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 	dt "github.com/smartineztri_meli/W17-G2-Bootcamp/tests/data"
 	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 )
 
-func TestSellers_GetAll(t *testing.T) {
+type SellerRepoTestSuite struct {
+	dt.TestSuite
+	repo *repository.SellerDB
+}
+
+func (suite *SellerRepoTestSuite) TestSellers_GetAll() {
+	t := suite.T()
 	t.Run("#1 - Success", func(t *testing.T) {
 		// given
-		repo := repository.NewSellerRepo(dt.SellerTestDb)
-		dt.SellerMockDb.ExpectQuery("SELECT `id`, `cid`,`company_name`,`address`,`telephone`,`locality_id` FROM `sellers`").
-			WillReturnRows(dt.RebuildSellers())
+		suite.SetupTest("sellers")
+		suite.MockDb.ExpectQuery("SELECT `id`, `cid`,`company_name`,`address`,`telephone`,`locality_id` FROM `sellers`").
+			WillReturnRows(suite.TestTable)
+		suite.repo = repository.NewSellerRepo(suite.TestDb)
 
 		// When
-		result, err := repo.FindAll()
+		result, err := suite.repo.FindAll()
 
 		// then
 		expected := []mod.Seller{
@@ -31,41 +39,46 @@ func TestSellers_GetAll(t *testing.T) {
 		require.Len(t, result, 3)
 		require.Equal(t, expected, result)
 	})
+
 	t.Run("#2 - Unable to parse DB info", func(t *testing.T) {
 		// given
-		repo := repository.NewSellerRepo(dt.SellerTestDb)
-		dt.SellerMockDb.ExpectQuery("SELECT `id`, `cid`,`company_name`,`address`,`telephone`,`locality_id` FROM `sellers`").
-			WillReturnRows(dt.RebuildSellers().AddRow(1, 1001, "Alpha Traders Inc.", "123 Alpha St, New York, NY", "+1-212-555-0101", nil))
+		suite.SetupTest("sellers")
+		suite.MockDb.ExpectQuery("SELECT `id`, `cid`,`company_name`,`address`,`telephone`,`locality_id` FROM `sellers`").
+			WillReturnRows(suite.TestTable.AddRow(1, 1001, "Alpha Traders Inc.", "123 Alpha St, New York, NY", "+1-212-555-0101", nil))
+		suite.repo = repository.NewSellerRepo(suite.TestDb)
 
 		// When
-		_, err := repo.FindAll()
+		_, err := suite.repo.FindAll()
 
 		// then
 		expected := e.ErrParseError
 		require.ErrorIs(t, err, expected)
 	})
+
 	t.Run("#3 - Query is malformed", func(t *testing.T) {
 		// given
-		dt.SellerTestTable = dt.RebuildSellers()
-		repo := repository.NewSellerRepo(dt.SellerTestDb)
-		dt.SellerMockDb.ExpectQuery("SELECT `id`, `cid`,`company_name`,`address`,`telephone`,`locality_id` FROM `sellers`").WillReturnError(e.ErrQueryError)
+		suite.SetupTest("sellers")
+		suite.MockDb.ExpectQuery("SELECT `id`, `cid`,`company_name`,`address`,`telephone`,`locality_id` FROM `sellers`").
+			WillReturnError(e.ErrQueryError)
+		suite.repo = repository.NewSellerRepo(suite.TestDb)
 
 		// When
-		_, err := repo.FindAll()
+		_, err := suite.repo.FindAll()
 
 		// then
 		expected := e.ErrQueryError
 		require.ErrorIs(t, err, expected)
 	})
+
 	t.Run("#4 - Query is empty", func(t *testing.T) {
 		// given
-		dt.SellerTestTable = dt.RebuildSellers()
-		repo := repository.NewSellerRepo(dt.SellerTestDb)
-		dt.SellerMockDb.ExpectQuery("SELECT `id`, `cid`,`company_name`,`address`,`telephone`,`locality_id` FROM `sellers`").
-			WillReturnRows(sqlmock.NewRows(dt.SellerColumns))
+		suite.SetupTest("sellers")
+		suite.MockDb.ExpectQuery("SELECT `id`, `cid`,`company_name`,`address`,`telephone`,`locality_id` FROM `sellers`").
+			WillReturnRows(sqlmock.NewRows([]string{"id", "cid", "company_name", "address", "telephone", "locality_id"}))
+		suite.repo = repository.NewSellerRepo(suite.TestDb)
 
 		// When
-		_, err := repo.FindAll()
+		_, err := suite.repo.FindAll()
 
 		// then
 		expected := e.ErrQueryIsEmpty
@@ -73,5 +86,6 @@ func TestSellers_GetAll(t *testing.T) {
 	})
 }
 
-func TestSellerCreate_HappyPath(t *testing.T) {
+func TestSellerRepoTestSuite(t *testing.T) {
+	suite.Run(t, new(SellerRepoTestSuite))
 }
