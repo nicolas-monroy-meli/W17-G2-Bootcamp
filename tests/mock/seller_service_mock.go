@@ -14,21 +14,21 @@ func (m *MockSellerService) FindAll() ([]mod.Seller, error) {
 	return args.Get(0).([]mod.Seller), args.Error(1)
 }
 
-func (m *MockSellerService) FindByID(id int) (*mod.Seller, error) {
+func (m *MockSellerService) FindByID(id int) (mod.Seller, error) {
 	args := m.Called(id)
 	if args.Get(0) == nil {
-		return nil, args.Error(1)
+		return mod.Seller{}, args.Error(1)
 	}
-	return args.Get(0).(*mod.Seller), args.Error(1)
+	return args.Get(0).(mod.Seller), args.Error(1)
 }
 
-func (m *MockSellerService) Save(seller *mod.Seller) error {
+func (m *MockSellerService) Save(seller *mod.Seller) (int, error) {
 	args := m.Called(seller)
-	return args.Error(0)
+	return args.Get(0).(int), args.Error(1)
 }
 
-func (m *MockSellerService) Update(id int, seller *mod.Seller) error {
-	args := m.Called(id, seller)
+func (m *MockSellerService) Update(seller *mod.Seller) error {
+	args := m.Called(seller)
 	return args.Error(0)
 }
 
