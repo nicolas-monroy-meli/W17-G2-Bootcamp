@@ -1,28 +1,28 @@
-# This command will run the product_batch for the project
-.PHONY tests:
-tests:
-	go test -v ./...
+# Packages to test (excluding those under /test directories)
+PKGS := $(shell go list ./... | grep -vE '/(test|docs)')
 
-# This command will generate a coverage report for the project
-.PHONY: coverage
+# Run unit tests with verbose output
+test:
+	go test -v $(PKGS)
+
+# Generate test coverage profile
 coverage:
-	go test -cover -coverprofile=coverage.out ./...
+	go test -cover -coverprofile=coverage.out $(PKGS)
 
-# This command will display the coverage report in an HTML file
-.PHONY: coverage-html
+# Generate HTML report from coverage
 coverage-html: coverage
-	go tool cover -html="coverage.out"
+	go tool cover -html=coverage.out
 
-# This command will display the coverage report in the terminal
-.PHONY: coverage-total
+# Show total coverage in terminal
 coverage-total: coverage
-	go tool cover -func="coverage.out"
+	go tool cover -func=coverage.out | grep total | awk '{print "total coverage: " $$3}'
 
-# This command will run the linter for the project
-.PHONY: linter
-linter:
+# Run static analysis (linter)
+lint:
 	staticcheck ./...
 
-.PHONY: clean
+# Clean up generated files
 clean:
-	rm coverage.out
+	rm -f coverage.out coverage.html
+
+.PHONY: test coverage coverage-html coverage-total lint clean
