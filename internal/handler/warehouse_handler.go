@@ -31,7 +31,7 @@ func (h *warehouseHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		warehousesMap, err := h.sv.FindAll()
 		if err != nil {
-			utils.BadResponse(w, http.StatusInternalServerError, "Error al obtener los almacenes")
+			utils.BadResponse(w, http.StatusNotFound, "Error al obtener los almacenes")
 			return
 		}
 
