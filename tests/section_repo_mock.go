@@ -26,8 +26,8 @@ var SectionSelectWhereExpectedQuery = "SELECT `id`, `section_number`,`current_te
 
 type MockSectionService struct {
 	MockFindAll        func() ([]mod.Section, error)
-	MockFindById       func(id int) (mod.Section, error)
-	MockCreate         func(section *mod.Section) error
+	MockFindByID       func(id int) (mod.Section, error)
+	MockSave           func(section *mod.Section) error
 	MockDelete         func(id int) error
 	MockUpdate         func(id int, fields map[string]interface{}) (*mod.Section, error)
 	MockReportProducts func(ids []int) ([]mod.ReportProductsResponse, error)
@@ -38,7 +38,7 @@ func (m *MockSectionService) FindAll() ([]mod.Section, error) {
 }
 
 func (m *MockSectionService) FindByID(id int) (mod.Section, error) {
-	return m.MockFindById(id)
+	return m.MockFindByID(id)
 }
 func (m *MockSectionService) Delete(id int) error {
 	return m.MockDelete(id)
@@ -51,5 +51,5 @@ func (m *MockSectionService) ReportProducts(ids []int) ([]mod.ReportProductsResp
 }
 
 func (m *MockSectionService) Save(section *mod.Section) error {
-	return m.MockCreate(section)
+	return m.MockSave(section)
 }
