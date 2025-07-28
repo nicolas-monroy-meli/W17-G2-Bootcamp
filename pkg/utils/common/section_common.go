@@ -65,7 +65,7 @@ func GetQueryReport(ids []int) (string, []interface{}) {
         LEFT JOIN products p ON p.id = s.product_type_id
     `
 	whereClause := ""
-	args := []interface{}{}
+	var args []interface{}
 
 	// If ID list is provided, filter, else show all
 	if len(ids) > 0 {

@@ -9,11 +9,11 @@ type Section struct {
 	// CurrentTemperature is the current temperature of the section
 	CurrentTemperature float64 `json:"current_temperature" validate:"gtefield=MinimumTemperature"`
 	// MinimumTemperature is the minimum temperature that can be maintained in the section
-	MinimumTemperature float64 `json:"minimum_temperature" validate:"required,ltefield=CurrentTemperature"`
+	MinimumTemperature float64 `json:"minimum_temperature" validate:"ltefield=CurrentTemperature"`
 	// CurrentCapacity is the current capacity of the section
 	CurrentCapacity int `json:"current_capacity" validate:"required,gtefield=MinimumCapacity,ltefield=MaximumCapacity"`
 	// MinimumCapacity is the minimum capacity of the section
-	MinimumCapacity int `json:"minimum_capacity" validate:"required,gt=0"`
+	MinimumCapacity int `json:"minimum_capacity" validate:"gt=0"`
 	// MaximumCapacity is the maximum capacity of the section
 	MaximumCapacity int `json:"maximum_capacity" validate:"required,gtfield=MinimumCapacity"`
 	// WarehouseID is the unique identifier of the warehouse to which the section belongs

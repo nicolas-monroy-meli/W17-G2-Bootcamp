@@ -3,7 +3,6 @@ package repository
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"github.com/go-sql-driver/mysql"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
@@ -27,8 +26,7 @@ type SectionDB struct {
 func (r *SectionDB) FindAll() (sections []mod.Section, err error) {
 	rows, err := r.db.Query("SELECT `id`, `section_number`,`current_temperature`,`minimum_temperature`,`current_capacity`, `minimum_capacity`,`maximum_capacity`,`warehouse_id`,`product_type_id` FROM `sections`")
 	if err != nil {
-		fmt.Println(err.Error())
-		return nil, err
+		return nil, e.ErrQueryError
 	}
 
 	defer rows.Close()
@@ -43,7 +41,7 @@ func (r *SectionDB) FindAll() (sections []mod.Section, err error) {
 	}
 
 	if len(sections) == 0 {
-		return nil, e.ErrEmptySectionDB
+		return nil, e.ErrEmptyDB
 	}
 	return sections, nil
 }
@@ -79,7 +77,7 @@ func (r *SectionDB) Save(section *mod.Section) (err error) {
 	// get the id of the inserted section
 	id, err := result.LastInsertId()
 	if err != nil {
-		return
+		return e.ErrSectionRepositoryNotFound
 	}
 
 	// set the id of the section
@@ -91,7 +89,7 @@ func (r *SectionDB) Save(section *mod.Section) (err error) {
 // Update updates a section in the database
 func (r *SectionDB) Update(id int, fields map[string]interface{}) (result *mod.Section, err error) {
 	//Build query
-	query, args := common.BuildPatchQuery("sections", fields, strconv.Itoa(id))
+	query, args := common.BuildPatchQuery("sections", fields, strconv.Itoa(id), nil)
 	// execute the query
 	res, err := r.db.Exec(query, args...)
 	if err != nil {
@@ -113,15 +111,19 @@ func (r *SectionDB) Update(id int, fields map[string]interface{}) (result *mod.S
 	}
 	rowsAffected, _ := res.RowsAffected()
 	if int(rowsAffected) == 0 {
-		return nil, e.NoRowsAffected
+		return nil, e.ErrNoRowsAffected
 	}
 	return &sec, nil
 }
 
 // Delete deletes a section from the database by its id
 func (r *SectionDB) Delete(id int) (err error) { // execute the query
-	_, err = r.db.Exec("DELETE FROM `sections` WHERE `id` = ?", id)
+	res, err := r.db.Exec("DELETE FROM `sections` WHERE `id` = ?", id)
 	if err != nil {
+		return e.ErrQueryError
+	}
+	rowsAffected, err := res.RowsAffected()
+	if rowsAffected == 0 {
 		return e.ErrSectionRepositoryNotFound
 	}
 	return nil
@@ -148,15 +150,10 @@ func (r *SectionDB) ReportProducts(ids []int) ([]mod.ReportProductsResponse, err
 		foundIDs[result.SectionId] = true
 	}
 
-	// If filtering by IDs, ensure missing sections are added
 	if len(ids) > 0 {
 		for _, id := range ids {
 			if !foundIDs[id] {
-				results = append(results, mod.ReportProductsResponse{
-					SectionId:     id,
-					SectionNumber: 0,
-					ProductsCount: 0,
-				})
+				return nil, e.ErrSectionRepositoryNotFound
 			}
 		}
 	}
