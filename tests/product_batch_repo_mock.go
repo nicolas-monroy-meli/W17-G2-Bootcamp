@@ -2,6 +2,7 @@ package tests
 
 import (
 	"database/sql/driver"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	"time"
 )
 
@@ -17,3 +18,15 @@ var ProductBatchDataValuesSelect = [][]driver.Value{
 }
 
 var ProductBatchSelectExpectedQuery = "SELECT `id`,`batch_number`, `current_quantity`, `initial_quantity`, `current_temperature`, `minimum_temperature`, `due_date`, `manufacturing_date`, `manufacturing_hour`, `product_id`, `section_id` FROM `product_batches` "
+
+type MockProductBatchService struct {
+	MockFindAll func() ([]models.ProductBatch, error)
+	MockSave    func(*models.ProductBatch) error
+}
+
+func (m *MockProductBatchService) FindAll() ([]models.ProductBatch, error) {
+	return m.MockFindAll()
+}
+func (m *MockProductBatchService) Save(pb *models.ProductBatch) error {
+	return m.MockSave(pb)
+}
