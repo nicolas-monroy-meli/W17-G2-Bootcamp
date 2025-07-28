@@ -137,7 +137,7 @@ func (d *SQLConfig) Run() (err error) {
 	// - localities
 	rt.Route("/v1/localities", func(rt chi.Router) {
 		rt.Post("/", locHand.Create())
-		rt.Get("/", locHand.GetSelByLoc())
+		rt.Get("/", locHand.GetAll())
 		rt.Get("/reportSellers", locHand.GetSelByLocID())
 		rt.Get("/reportCarries", carrHand.GetReportByLocality())
 	})
