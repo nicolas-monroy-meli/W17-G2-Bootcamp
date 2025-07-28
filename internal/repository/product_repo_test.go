@@ -25,7 +25,7 @@ func (suite *ProductRepoTestSuite) TestProducts_FindAll() {
 	t.Run("#1 - All Success", func(t *testing.T) {
 		// given
 		suite.SetupTest("products")
-		suite.MockDb.ExpectQuery("SELECT `id`, `product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id` FROM products;").
+		suite.MockDb.ExpectQuery("SELECT `id`, `product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id` FROM frescos_db.products;").
 			WillReturnRows(suite.TestTable)
 		suite.repo = repository.NewProductRepo(suite.TestDb)
 
@@ -46,7 +46,7 @@ func (suite *ProductRepoTestSuite) TestProducts_FindAll() {
 	t.Run("#2 - Unable to parse DB info", func(t *testing.T) {
 		// given
 		suite.SetupTest("products")
-		suite.MockDb.ExpectQuery("SELECT `id`, `product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id` FROM products;").
+		suite.MockDb.ExpectQuery("SELECT `id`, `product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id` FROM frescos_db.products;").
 			WillReturnRows(suite.TestTable.AddRow(1, "P001", "Product 1", 10.0, 20.0, 5.0, 2.0, 0.1, 0.05, -18.0, 1, nil))
 		suite.repo = repository.NewProductRepo(suite.TestDb)
 
@@ -61,7 +61,7 @@ func (suite *ProductRepoTestSuite) TestProducts_FindAll() {
 	t.Run("#3 - All Query is malformed", func(t *testing.T) {
 		// given
 		suite.SetupTest("products")
-		suite.MockDb.ExpectQuery("SELECT `id`, `product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id` FROM products;").
+		suite.MockDb.ExpectQuery("SELECT `id`, `product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id` FROM frescos_db.products;").
 			WillReturnError(e.ErrQueryError)
 		suite.repo = repository.NewProductRepo(suite.TestDb)
 
@@ -83,7 +83,7 @@ func (suite *ProductRepoTestSuite) TestProducts_FindAll() {
 		}).AddRow(1, "P001", "Product 1", 10.0, 20.0, 5.0, 2.0, 0.1, 0.05, -18.0, 1, 101)
 		// Simula error en rows.Err()
 		mockRows.RowError(0, e.ErrQueryError)
-		suite.MockDb.ExpectQuery("SELECT `id`, `product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id` FROM products;").
+		suite.MockDb.ExpectQuery("SELECT `id`, `product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id` FROM frescos_db.products;").
 			WillReturnRows(mockRows)
 		suite.repo = repository.NewProductRepo(suite.TestDb)
 
@@ -103,7 +103,7 @@ func (suite *ProductRepoTestSuite) TestProducts_FindAll() {
 			"expiration_rate", "freezing_rate", "recommended_freezing_temperature",
 			"product_type_id", "seller_id",
 		})
-		suite.MockDb.ExpectQuery("SELECT `id`, `product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id` FROM products;").
+		suite.MockDb.ExpectQuery("SELECT `id`, `product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id` FROM frescos_db.products;").
 			WillReturnRows(emptyRows)
 		suite.repo = repository.NewProductRepo(suite.TestDb)
 
@@ -399,14 +399,14 @@ func (suite *ProductRepoTestSuite) TestProducts_Delete() {
 		// Simula error en el delete
 		suite.MockDb.ExpectExec(regexp.QuoteMeta("DELETE FROM frescos_db.products WHERE id = ?;")).
 			WithArgs(id).
-			WillReturnError(fmt.Errorf("error en delete"))
+			WillReturnError(e.ErrProductRepositoryNotFound)
 		suite.repo = repository.NewProductRepo(suite.TestDb)
 
 		// when
 		err := suite.repo.Delete(id)
 
 		// then
-		require.ErrorContains(t, err, "error en delete")
+		require.ErrorContains(t, err, e.ErrProductRepositoryNotFound.Error())
 	})
 
 	t.Run("#3 - Eliminación exitosa", func(t *testing.T) {

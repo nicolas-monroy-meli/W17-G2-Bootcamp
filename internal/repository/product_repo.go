@@ -22,7 +22,7 @@ type ProductDB struct {
 
 // FindAll returns all products from the database - TESTED
 func (r *ProductDB) FindAll() (products []mod.Product, err error) {
-	rows, err := r.db.Query("SELECT `id`, `product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id` FROM products;")
+	rows, err := r.db.Query("SELECT `id`, `product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id` FROM frescos_db.products;")
 	if err != nil {
 		return nil, e.ErrProductRepositoryNotFound
 	}
@@ -115,12 +115,13 @@ func (r *ProductDB) Update(product *mod.Product) (err error) {
 
 // Delete deletes a product from the database by its id
 func (r *ProductDB) Delete(id int) (err error) {
-	if _, exists := r.FindByID(id); exists != nil {
+	_, findErr := r.FindByID(id)
+	if findErr == e.ErrProductRepositoryNotFound {
 		return e.ErrProductRepositoryNotFound
 	}
 	_, err = r.db.Exec("DELETE FROM frescos_db.products WHERE id = ?;", id)
 	if err != nil {
-		return
+		return err
 	}
 	return nil
 }
