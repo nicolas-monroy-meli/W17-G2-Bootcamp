@@ -83,7 +83,8 @@ var (
 
 	//Locality
 	// ErrLocalityNotFound is returned when the locality is not found
-	ErrLocalityRepositoryNotFound = errors.New("repository: locality not found")
+	ErrLocalityRepositoryNotFound   = errors.New("repository: locality not found")
+	ErrLocalityRepositoryDuplicated = errors.New("repository: locality already exists")
 
 	// Errores de Warehouse
 	ErrWarehouseRepositoryNotFound   = errors.New("repository: warehouse not found")

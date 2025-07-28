@@ -78,7 +78,7 @@ func (suite *SellerRepoTestSuite) TestSellers_FindAll() {
 		// given
 		suite.SetupTest("sellers")
 		suite.MockDb.ExpectQuery("SELECT `id`, `cid`,`company_name`,`address`,`telephone`,`locality_id` FROM `sellers`").
-			WillReturnRows(sqlmock.NewRows([]string{"id", "cid", "company_name", "address", "telephone", "locality_id"}))
+			WillReturnRows(sqlmock.NewRows(suite.TestColumns))
 		suite.repo = repository.NewSellerRepo(suite.TestDb)
 
 		// When

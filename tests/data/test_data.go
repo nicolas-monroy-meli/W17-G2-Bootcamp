@@ -27,7 +27,7 @@ func (suite *TestSuite) tableType(table string) func() ([]string, *sqlmock.Rows)
 	switch table {
 	case "sellers":
 		return suite.buildSellers
-	case "locality":
+	case "localities":
 		return suite.buildLocalities
 	case "sel_by_loc":
 		return suite.buildSelByLoc
