@@ -8,7 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/tests"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/tests/mock"
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
@@ -52,7 +52,7 @@ func TestSectionHandler_GetAll(t *testing.T) {
 	}
 	for _, tc := range testsSlice {
 		t.Run(tc.name, func(t *testing.T) {
-			svc := &tests.MockSectionService{
+			svc := &mock.MockSectionService{
 				MockFindAll: tc.mockFindAll,
 			}
 			handler := NewSectionHandler(svc)
@@ -112,7 +112,7 @@ func TestSectionHandler_GetByID(t *testing.T) {
 	}
 	for _, tc := range testsSlice {
 		t.Run(tc.name, func(t *testing.T) {
-			svc := &tests.MockSectionService{
+			svc := &mock.MockSectionService{
 				MockFindByID: tc.mockFindByID,
 			}
 			handler := NewSectionHandler(svc)
@@ -173,7 +173,7 @@ func TestSectionHandler_Create(t *testing.T) {
 	}
 	for _, tc := range testsSlice {
 		t.Run(tc.name, func(t *testing.T) {
-			svc := &tests.MockSectionService{MockSave: tc.mockSave}
+			svc := &mock.MockSectionService{MockSave: tc.mockSave}
 			handler := NewSectionHandler(svc)
 			req := httptest.NewRequest("POST", "/", bytes.NewBufferString(tc.body))
 			rr := httptest.NewRecorder()
@@ -260,7 +260,7 @@ func TestSectionHandler_Update(t *testing.T) {
 	}
 	for _, tc := range testsSlice {
 		t.Run(tc.name, func(t *testing.T) {
-			svc := &tests.MockSectionService{MockUpdate: tc.mockUpdate}
+			svc := &mock.MockSectionService{MockUpdate: tc.mockUpdate}
 			handler := NewSectionHandler(svc)
 			req := httptest.NewRequest("PATCH", "/"+tc.id, bytes.NewBufferString(tc.body))
 			rctx := chi.NewRouteContext()
@@ -338,7 +338,7 @@ func TestSectionHandler_ReportProducts(t *testing.T) {
 	}
 	for _, tc := range testsSlice {
 		t.Run(tc.name, func(t *testing.T) {
-			svc := &tests.MockSectionService{MockReportProducts: tc.mockReport}
+			svc := &mock.MockSectionService{MockReportProducts: tc.mockReport}
 			handler := NewSectionHandler(svc)
 			req := httptest.NewRequest("GET", "/?ids="+tc.ids, nil)
 			rr := httptest.NewRecorder()
@@ -381,7 +381,7 @@ func TestSectionHandler_Delete(t *testing.T) {
 	}
 	for _, tc := range testsSlice {
 		t.Run(tc.name, func(t *testing.T) {
-			svc := &tests.MockSectionService{MockDelete: tc.mockDelete}
+			svc := &mock.MockSectionService{MockDelete: tc.mockDelete}
 			handler := NewSectionHandler(svc)
 			req := httptest.NewRequest("DELETE", "/"+tc.id, nil)
 			rctx := chi.NewRouteContext()

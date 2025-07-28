@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/tests"
+	"github.com/smartineztri_meli/W17-G2-Bootcamp/tests/mock"
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
@@ -66,7 +66,7 @@ func TestProductBatchHandler_GetAll(t *testing.T) {
 	}
 	for _, tc := range testsSlice {
 		t.Run(tc.name, func(t *testing.T) {
-			svc := &tests.MockProductBatchService{
+			svc := &mock.MockProductBatchService{
 				MockFindAll: tc.mockFindAll,
 			}
 			handler := NewProductBatchHandler(svc)
@@ -157,7 +157,7 @@ func TestProductBatchHandler_Create(t *testing.T) {
 	}
 	for _, tc := range testsSlice {
 		t.Run(tc.name, func(t *testing.T) {
-			svc := &tests.MockProductBatchService{
+			svc := &mock.MockProductBatchService{
 				MockSave: tc.mockSave,
 			}
 			handler := NewProductBatchHandler(svc)

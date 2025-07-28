@@ -1,6 +1,7 @@
 package repository
 
 import (
+	m "github.com/smartineztri_meli/W17-G2-Bootcamp/tests/mock"
 	"testing"
 	"time"
 
@@ -9,7 +10,6 @@ import (
 
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/tests"
 )
 
 // Helper
@@ -31,9 +31,9 @@ func TestProductBatchDB_FindAll(t *testing.T) {
 		{
 			name: "DB with data",
 			mockQuery: func(mock sqlmock.Sqlmock) {
-				rows := sqlmock.NewRows(tests.ProductBatchTableStruct).
-					AddRows(tests.ProductBatchDataValuesSelect...)
-				mock.ExpectQuery(tests.ProductBatchSelectExpectedQuery).WillReturnRows(rows)
+				rows := sqlmock.NewRows(m.ProductBatchTableStruct).
+					AddRows(m.ProductBatchDataValuesSelect...)
+				mock.ExpectQuery(m.ProductBatchSelectExpectedQuery).WillReturnRows(rows)
 			},
 			expected: []mod.ProductBatch{
 				{
@@ -69,7 +69,7 @@ func TestProductBatchDB_FindAll(t *testing.T) {
 			name: "Err empty DB",
 			mockQuery: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{`id`, `batch_number`})
-				mock.ExpectQuery(tests.ProductBatchSelectExpectedQuery).WillReturnRows(rows)
+				mock.ExpectQuery(m.ProductBatchSelectExpectedQuery).WillReturnRows(rows)
 			},
 			expected:    []mod.ProductBatch{},
 			expectedErr: e.ErrEmptyDB,
@@ -77,7 +77,7 @@ func TestProductBatchDB_FindAll(t *testing.T) {
 		{
 			name: "Query Error",
 			mockQuery: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery(tests.ProductBatchSelectExpectedQuery).WillReturnError(e.ErrQueryError)
+				mock.ExpectQuery(m.ProductBatchSelectExpectedQuery).WillReturnError(e.ErrQueryError)
 			},
 			expected:    []mod.ProductBatch{},
 			expectedErr: e.ErrQueryError,

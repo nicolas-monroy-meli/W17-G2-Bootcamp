@@ -4,13 +4,13 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/common"
+	m "github.com/smartineztri_meli/W17-G2-Bootcamp/tests/mock"
 	"strconv"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/tests"
 	"github.com/stretchr/testify/require"
 )
 
@@ -33,9 +33,9 @@ func TestSectionDB_FindAll(t *testing.T) {
 		{
 			name: "returns data",
 			setupMock: func(mock sqlmock.Sqlmock) {
-				rows := sqlmock.NewRows(tests.SectionTableStruct).
-					AddRows(tests.SectionDataValuesSelect...)
-				mock.ExpectQuery(tests.SectionSelectExpectedQuery).WillReturnRows(rows)
+				rows := sqlmock.NewRows(m.SectionTableStruct).
+					AddRows(m.SectionDataValuesSelect...)
+				mock.ExpectQuery(m.SectionSelectExpectedQuery).WillReturnRows(rows)
 			},
 			expected: []mod.Section{
 				{
@@ -67,7 +67,7 @@ func TestSectionDB_FindAll(t *testing.T) {
 			name: "returns empty db error",
 			setupMock: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"id", "section_number"})
-				mock.ExpectQuery(tests.SectionSelectExpectedQuery).WillReturnRows(rows)
+				mock.ExpectQuery(m.SectionSelectExpectedQuery).WillReturnRows(rows)
 			},
 			expected:    []mod.Section{},
 			expectedErr: e.ErrEmptyDB,
@@ -75,7 +75,7 @@ func TestSectionDB_FindAll(t *testing.T) {
 		{
 			name: "Query Error",
 			setupMock: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery(tests.SectionSelectExpectedQuery).
+				mock.ExpectQuery(m.SectionSelectExpectedQuery).
 					WillReturnError(e.ErrQueryError)
 			},
 			expected:    []mod.Section{},
@@ -114,9 +114,9 @@ func TestSectionDB_FindByID(t *testing.T) {
 			name: "existing section",
 			id:   2,
 			setupMock: func(mock sqlmock.Sqlmock, id int) {
-				rows := sqlmock.NewRows(tests.SectionTableStruct).
-					AddRow(tests.SectionDataValuesSelectByID...)
-				mock.ExpectQuery(tests.SectionSelectWhereExpectedQuery).
+				rows := sqlmock.NewRows(m.SectionTableStruct).
+					AddRow(m.SectionDataValuesSelectByID...)
+				mock.ExpectQuery(m.SectionSelectWhereExpectedQuery).
 					WithArgs(id).WillReturnRows(rows)
 			},
 			expected: mod.Section{
@@ -136,7 +136,7 @@ func TestSectionDB_FindByID(t *testing.T) {
 			name: "not found",
 			id:   2,
 			setupMock: func(mock sqlmock.Sqlmock, id int) {
-				mock.ExpectQuery(tests.SectionSelectExpectedQuery).
+				mock.ExpectQuery(m.SectionSelectExpectedQuery).
 					WithArgs(id).WillReturnError(sql.ErrNoRows)
 			},
 			expected:    mod.Section{},
@@ -329,7 +329,7 @@ func TestSectionDB_Update(t *testing.T) {
 						&mockSec.MinimumCapacity, &mockSec.MaximumCapacity,
 						&mockSec.WarehouseID, &mockSec.ProductTypeID)
 
-				mock.ExpectQuery(tests.SectionSelectWhereExpectedQuery).
+				mock.ExpectQuery(m.SectionSelectWhereExpectedQuery).
 					WithArgs(id).
 					WillReturnRows(findRows)
 			},
@@ -390,7 +390,7 @@ func TestSectionDB_Update(t *testing.T) {
 						&mockSec.MinimumCapacity, &mockSec.MaximumCapacity,
 						&mockSec.WarehouseID, &mockSec.ProductTypeID)
 
-				mock.ExpectQuery(tests.SectionSelectWhereExpectedQuery).
+				mock.ExpectQuery(m.SectionSelectWhereExpectedQuery).
 					WithArgs(id).
 					WillReturnRows(findRows)
 			},
@@ -406,7 +406,7 @@ func TestSectionDB_Update(t *testing.T) {
 					WithArgs(toDriverValueSlice(args)...).
 					WillReturnResult(sqlmock.NewResult(0, 0))
 
-				mock.ExpectQuery(tests.SectionSelectWhereExpectedQuery).
+				mock.ExpectQuery(m.SectionSelectWhereExpectedQuery).
 					WithArgs(id).
 					WillReturnError(sql.ErrNoRows)
 			},
