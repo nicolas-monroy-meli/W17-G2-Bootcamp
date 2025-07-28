@@ -1,4 +1,4 @@
-package handler
+package tests
 
 import (
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"

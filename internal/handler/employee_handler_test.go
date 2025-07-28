@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
+	tests2 "github.com/smartineztri_meli/W17-G2-Bootcamp/tests"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"net/http"
@@ -16,7 +17,7 @@ import (
 )
 
 func TestEmployeeHandler_GetAll(t *testing.T) {
-	mockService := new(MockEmployeeService)
+	mockService := new(tests2.MockEmployeeService)
 	handler := NewEmployeeHandler(mockService)
 
 	tests := []struct {
@@ -76,7 +77,7 @@ func TestEmployeeHandler_GetAll(t *testing.T) {
 }
 
 func TestEmployeeHandler_GetByID(t *testing.T) {
-	mockService := new(MockEmployeeService)
+	mockService := new(tests2.MockEmployeeService)
 	handler := NewEmployeeHandler(mockService)
 	tests := []struct {
 		name           string
@@ -189,7 +190,7 @@ func TestEmployeeHandler_Create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockService := new(MockEmployeeService)
+			mockService := new(tests2.MockEmployeeService)
 			handler := NewEmployeeHandler(mockService)
 
 			if tt.mockReturnErr != nil || (tt.mockReturnErr == nil && tt.expectedStatus == http.StatusCreated) {
@@ -294,7 +295,7 @@ func TestEmployeeHandler_Edit(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockService := new(MockEmployeeService)
+			mockService := new(tests2.MockEmployeeService)
 			handler := NewEmployeeHandler(mockService)
 
 			if tt.mockFindByIDReturnEmp != nil || tt.mockFindByIDReturnErr != nil {
@@ -373,7 +374,7 @@ func TestEmployeeHandler_Delete(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockService := new(MockEmployeeService)
+			mockService := new(tests2.MockEmployeeService)
 			handler := NewEmployeeHandler(mockService)
 
 			if tt.mockDeleteReturnErr != nil || tt.expectedStatus == http.StatusNoContent {
