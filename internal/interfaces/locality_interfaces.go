@@ -29,7 +29,7 @@ type LocalityService interface {
 // LocalityService is an interface that contains the methods that the seller service should support
 type LocalityHandler interface {
 	// FindAll returns all the sellers
-	GetLocalities() http.HandlerFunc
+	GetAll() http.HandlerFunc
 
 	GetSelByLocID(id int) http.HandlerFunc
 	// Save saves the given locality

@@ -1,4 +1,4 @@
-package repository
+package repository_test
 
 import (
 	"database/sql"
@@ -8,6 +8,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-sql-driver/mysql"
+	repo "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/repository"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 	dt "github.com/smartineztri_meli/W17-G2-Bootcamp/tests/data"
@@ -17,7 +18,7 @@ import (
 
 type SellerRepoTestSuite struct {
 	dt.TestSuite
-	repo *SellerDB
+	repo *repo.SellerDB
 }
 
 func (suite *SellerRepoTestSuite) TestSellers_FindAll() {
@@ -27,7 +28,7 @@ func (suite *SellerRepoTestSuite) TestSellers_FindAll() {
 		suite.SetupTest("sellers")
 		suite.MockDb.ExpectQuery("SELECT `id`, `cid`,`company_name`,`address`,`telephone`,`locality_id` FROM `sellers`").
 			WillReturnRows(suite.TestTable)
-		suite.repo = NewSellerRepo(suite.TestDb)
+		suite.repo = repo.NewSellerRepo(suite.TestDb)
 
 		// When
 		result, err := suite.repo.FindAll()
@@ -48,7 +49,7 @@ func (suite *SellerRepoTestSuite) TestSellers_FindAll() {
 		suite.SetupTest("sellers")
 		suite.MockDb.ExpectQuery("SELECT `id`, `cid`,`company_name`,`address`,`telephone`,`locality_id` FROM `sellers`").
 			WillReturnRows(suite.TestTable.AddRow(1, 1001, "Alpha Traders Inc.", "123 Alpha St, New York, NY", "+1-212-555-0101", nil))
-		suite.repo = NewSellerRepo(suite.TestDb)
+		suite.repo = repo.NewSellerRepo(suite.TestDb)
 
 		// When
 		_, err := suite.repo.FindAll()
@@ -63,7 +64,7 @@ func (suite *SellerRepoTestSuite) TestSellers_FindAll() {
 		suite.SetupTest("sellers")
 		suite.MockDb.ExpectQuery("SELECT `id`, `cid`,`company_name`,`address`,`telephone`,`locality_id` FROM `sellers`").
 			WillReturnError(e.ErrQueryError)
-		suite.repo = NewSellerRepo(suite.TestDb)
+		suite.repo = repo.NewSellerRepo(suite.TestDb)
 
 		// When
 		_, err := suite.repo.FindAll()
@@ -78,7 +79,7 @@ func (suite *SellerRepoTestSuite) TestSellers_FindAll() {
 		suite.SetupTest("sellers")
 		suite.MockDb.ExpectQuery("SELECT `id`, `cid`,`company_name`,`address`,`telephone`,`locality_id` FROM `sellers`").
 			WillReturnRows(sqlmock.NewRows(suite.TestColumns))
-		suite.repo = NewSellerRepo(suite.TestDb)
+		suite.repo = repo.NewSellerRepo(suite.TestDb)
 
 		// When
 		_, err := suite.repo.FindAll()
@@ -105,7 +106,7 @@ func (suite *SellerRepoTestSuite) TestSellers_FindById() {
 			WithArgs(1).
 			WillReturnRows(mockRow)
 
-		suite.repo = NewSellerRepo(suite.TestDb)
+		suite.repo = repo.NewSellerRepo(suite.TestDb)
 
 		// When
 		result, err := suite.repo.FindByID(1)
@@ -128,7 +129,7 @@ func (suite *SellerRepoTestSuite) TestSellers_FindById() {
 			WithArgs(1).
 			WillReturnRows(mockRowWithNil)
 
-		suite.repo = NewSellerRepo(suite.TestDb)
+		suite.repo = repo.NewSellerRepo(suite.TestDb)
 
 		// When
 		_, err := suite.repo.FindByID(1)
@@ -147,7 +148,7 @@ func (suite *SellerRepoTestSuite) TestSellers_FindById() {
 			WithArgs(99).
 			WillReturnError(sql.ErrNoRows)
 
-		suite.repo = NewSellerRepo(suite.TestDb)
+		suite.repo = repo.NewSellerRepo(suite.TestDb)
 
 		// When
 		_, err := suite.repo.FindByID(99)
@@ -179,7 +180,7 @@ func (suite *SellerRepoTestSuite) TestSellers_Save() {
 			WithArgs(newSeller.CID, newSeller.CompanyName, newSeller.Address, newSeller.Telephone, newSeller.Locality).
 			WillReturnResult(sqlmock.NewResult(4, 1))
 
-		suite.repo = NewSellerRepo(suite.TestDb)
+		suite.repo = repo.NewSellerRepo(suite.TestDb)
 
 		// when
 		insertedID, err := suite.repo.Save(newSeller)
@@ -199,7 +200,7 @@ func (suite *SellerRepoTestSuite) TestSellers_Save() {
 			WithArgs(newSeller.CID, newSeller.CompanyName, newSeller.Address, newSeller.Telephone, newSeller.Locality).
 			WillReturnError(&mysql.MySQLError{Number: 1062})
 
-		suite.repo = NewSellerRepo(suite.TestDb)
+		suite.repo = repo.NewSellerRepo(suite.TestDb)
 
 		// when
 		_, err := suite.repo.Save(newSeller)
@@ -218,7 +219,7 @@ func (suite *SellerRepoTestSuite) TestSellers_Save() {
 			WithArgs(newSeller.CID, newSeller.CompanyName, newSeller.Address, newSeller.Telephone, newSeller.Locality).
 			WillReturnError(&mysql.MySQLError{Number: 1452})
 
-		suite.repo = NewSellerRepo(suite.TestDb)
+		suite.repo = repo.NewSellerRepo(suite.TestDb)
 
 		// when
 		_, err := suite.repo.Save(newSeller)
@@ -237,7 +238,7 @@ func (suite *SellerRepoTestSuite) TestSellers_Save() {
 			WithArgs(newSeller.CID, newSeller.CompanyName, newSeller.Address, newSeller.Telephone, newSeller.Locality).
 			WillReturnError(e.ErrRepositoryDatabase)
 
-		suite.repo = NewSellerRepo(suite.TestDb)
+		suite.repo = repo.NewSellerRepo(suite.TestDb)
 
 		// when
 		_, err := suite.repo.Save(newSeller)
@@ -269,7 +270,7 @@ func (suite *SellerRepoTestSuite) TestSellers_Update() {
 		suite.MockDb.ExpectExec(regexp.QuoteMeta(expectedQuery)).
 			WithArgs(patchedSeller.CID, patchedSeller.CompanyName, patchedSeller.Address, patchedSeller.Telephone, patchedSeller.Locality, patchedSeller.ID).
 			WillReturnResult(sqlmock.NewResult(0, 1))
-		suite.repo = NewSellerRepo(suite.TestDb)
+		suite.repo = repo.NewSellerRepo(suite.TestDb)
 
 		// when
 		err := suite.repo.Update(patchedSeller)
@@ -287,7 +288,7 @@ func (suite *SellerRepoTestSuite) TestSellers_Update() {
 			WithArgs(patchedSeller.CID, patchedSeller.CompanyName, patchedSeller.Address, patchedSeller.Telephone, patchedSeller.Locality, patchedSeller.ID).
 			WillReturnError(&mysql.MySQLError{Number: 1062})
 
-		suite.repo = NewSellerRepo(suite.TestDb)
+		suite.repo = repo.NewSellerRepo(suite.TestDb)
 
 		// when
 		err := suite.repo.Update(patchedSeller)
@@ -306,7 +307,7 @@ func (suite *SellerRepoTestSuite) TestSellers_Update() {
 			WithArgs(patchedSeller.CID, patchedSeller.CompanyName, patchedSeller.Address, patchedSeller.Telephone, patchedSeller.Locality, patchedSeller.ID).
 			WillReturnError(&mysql.MySQLError{Number: 1452})
 
-		suite.repo = NewSellerRepo(suite.TestDb)
+		suite.repo = repo.NewSellerRepo(suite.TestDb)
 
 		// when
 		err := suite.repo.Update(patchedSeller)
@@ -325,7 +326,7 @@ func (suite *SellerRepoTestSuite) TestSellers_Update() {
 			WithArgs(patchedSeller.CID, patchedSeller.CompanyName, patchedSeller.Address, patchedSeller.Telephone, patchedSeller.Locality, patchedSeller.ID).
 			WillReturnError(errors.New("unexpected db error"))
 
-		suite.repo = NewSellerRepo(suite.TestDb)
+		suite.repo = repo.NewSellerRepo(suite.TestDb)
 
 		// when
 		err := suite.repo.Update(patchedSeller)
@@ -349,7 +350,7 @@ func (suite *SellerRepoTestSuite) TestSellers_Delete() {
 		suite.MockDb.ExpectExec(regexp.QuoteMeta(expectedQuery)).
 			WithArgs(1).
 			WillReturnResult(sqlmock.NewResult(0, 1))
-		suite.repo = NewSellerRepo(suite.TestDb)
+		suite.repo = repo.NewSellerRepo(suite.TestDb)
 
 		// when
 		err := suite.repo.Delete(1)
@@ -365,8 +366,8 @@ func (suite *SellerRepoTestSuite) TestSellers_Delete() {
 
 		suite.MockDb.ExpectExec(regexp.QuoteMeta(expectedQuery)).
 			WithArgs(1).
-			WillReturnError(e.ErrSellerRepositoryNotFound)
-		suite.repo = NewSellerRepo(suite.TestDb)
+			WillReturnResult(sqlmock.NewResult(0, 0))
+		suite.repo = repo.NewSellerRepo(suite.TestDb)
 
 		// when
 		err := suite.repo.Delete(1)
@@ -384,7 +385,7 @@ func (suite *SellerRepoTestSuite) TestSellers_Delete() {
 		suite.MockDb.ExpectExec(regexp.QuoteMeta(expectedQuery)).
 			WithArgs(1).
 			WillReturnError(errors.New("unexpected db error"))
-		suite.repo = NewSellerRepo(suite.TestDb)
+		suite.repo = repo.NewSellerRepo(suite.TestDb)
 
 		// when
 		err := suite.repo.Delete(1)

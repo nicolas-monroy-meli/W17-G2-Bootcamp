@@ -1,4 +1,4 @@
-package repository
+package repository_test
 
 import (
 	"errors"
@@ -7,6 +7,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-sql-driver/mysql"
+	repo "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/repository"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
 	dt "github.com/smartineztri_meli/W17-G2-Bootcamp/tests/data"
@@ -16,7 +17,7 @@ import (
 
 type LocalityRepoTestSuite struct {
 	dt.TestSuite
-	repo *LocalityDB
+	repo *repo.LocalityDB
 }
 
 func (suite *LocalityRepoTestSuite) TestLocalities_FindAll() {
@@ -26,7 +27,7 @@ func (suite *LocalityRepoTestSuite) TestLocalities_FindAll() {
 		suite.SetupTest("localities")
 		suite.MockDb.ExpectQuery("SELECT l.id, l.locality_name, l.province_name, l.country_name FROM localities AS l").
 			WillReturnRows(suite.TestTable)
-		suite.repo = NewLocalityRepo(suite.TestDb)
+		suite.repo = repo.NewLocalityRepo(suite.TestDb)
 
 		// When
 		result, err := suite.repo.FindAllLocalities()
@@ -47,7 +48,7 @@ func (suite *LocalityRepoTestSuite) TestLocalities_FindAll() {
 		suite.SetupTest("localities")
 		suite.MockDb.ExpectQuery("SELECT l.id, l.locality_name, l.province_name, l.country_name FROM localities AS l").
 			WillReturnRows(suite.TestTable.AddRow(4, "Medellin", "Antioquia", nil))
-		suite.repo = NewLocalityRepo(suite.TestDb)
+		suite.repo = repo.NewLocalityRepo(suite.TestDb)
 
 		// When
 		_, err := suite.repo.FindAllLocalities()
@@ -62,7 +63,7 @@ func (suite *LocalityRepoTestSuite) TestLocalities_FindAll() {
 		suite.SetupTest("localities")
 		suite.MockDb.ExpectQuery("SELECT l.id, l.locality_name, l.province_name, l.country_name FROM localities AS l").
 			WillReturnError(e.ErrQueryError)
-		suite.repo = NewLocalityRepo(suite.TestDb)
+		suite.repo = repo.NewLocalityRepo(suite.TestDb)
 
 		// When
 		_, err := suite.repo.FindAllLocalities()
@@ -77,7 +78,7 @@ func (suite *LocalityRepoTestSuite) TestLocalities_FindAll() {
 		suite.SetupTest("localities")
 		suite.MockDb.ExpectQuery("SELECT l.id, l.locality_name, l.province_name, l.country_name FROM localities AS l").
 			WillReturnRows(sqlmock.NewRows(suite.TestColumns))
-		suite.repo = NewLocalityRepo(suite.TestDb)
+		suite.repo = repo.NewLocalityRepo(suite.TestDb)
 
 		// When
 		_, err := suite.repo.FindAllLocalities()
@@ -106,7 +107,7 @@ func (suite *LocalityRepoTestSuite) TestLocalities_Save() {
 			WithArgs(newLocality.Name, newLocality.Province, newLocality.Country).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
-		suite.repo = NewLocalityRepo(suite.TestDb)
+		suite.repo = repo.NewLocalityRepo(suite.TestDb)
 
 		// when
 		insertedID, err := suite.repo.Save(newLocality)
@@ -126,7 +127,7 @@ func (suite *LocalityRepoTestSuite) TestLocalities_Save() {
 			WithArgs(newLocality.Name, newLocality.Province, newLocality.Country).
 			WillReturnError(&mysql.MySQLError{Number: 1062})
 
-		suite.repo = NewLocalityRepo(suite.TestDb)
+		suite.repo = repo.NewLocalityRepo(suite.TestDb)
 
 		// when
 		_, err := suite.repo.Save(newLocality)
@@ -145,7 +146,7 @@ func (suite *LocalityRepoTestSuite) TestLocalities_Save() {
 			WithArgs(newLocality.Name, newLocality.Province, newLocality.Country).
 			WillReturnError(errors.New("unexpected db error"))
 
-		suite.repo = NewLocalityRepo(suite.TestDb)
+		suite.repo = repo.NewLocalityRepo(suite.TestDb)
 
 		// when
 		_, err := suite.repo.Save(newLocality)
@@ -169,7 +170,7 @@ func (suite *LocalityRepoTestSuite) TestLocalities_FindSellerByLocalityID() {
 		suite.MockDb.ExpectQuery(regexp.QuoteMeta(expectedQuery)).
 			WillReturnRows(suite.TestTable)
 
-		suite.repo = NewLocalityRepo(suite.TestDb)
+		suite.repo = repo.NewLocalityRepo(suite.TestDb)
 
 		// When
 		result, err := suite.repo.FindSellersByLocID(-1)
@@ -196,7 +197,7 @@ func (suite *LocalityRepoTestSuite) TestLocalities_FindSellerByLocalityID() {
 			WithArgs(1).
 			WillReturnRows(mockRow)
 
-		suite.repo = NewLocalityRepo(suite.TestDb)
+		suite.repo = repo.NewLocalityRepo(suite.TestDb)
 
 		// When
 		result, err := suite.repo.FindSellersByLocID(1)
@@ -219,7 +220,7 @@ func (suite *LocalityRepoTestSuite) TestLocalities_FindSellerByLocalityID() {
 			WithArgs(1).
 			WillReturnRows(mockRowWithNil)
 
-		suite.repo = NewLocalityRepo(suite.TestDb)
+		suite.repo = repo.NewLocalityRepo(suite.TestDb)
 
 		// When
 		_, err := suite.repo.FindSellersByLocID(1)
@@ -237,7 +238,7 @@ func (suite *LocalityRepoTestSuite) TestLocalities_FindSellerByLocalityID() {
 		suite.MockDb.ExpectQuery(regexp.QuoteMeta(expectedQuery)).
 			WithArgs(1).WillReturnRows(sqlmock.NewRows(suite.TestColumns))
 
-		suite.repo = NewLocalityRepo(suite.TestDb)
+		suite.repo = repo.NewLocalityRepo(suite.TestDb)
 
 		// When
 		_, err := suite.repo.FindSellersByLocID(1)
@@ -256,7 +257,7 @@ func (suite *LocalityRepoTestSuite) TestLocalities_FindSellerByLocalityID() {
 			WithArgs(1).
 			WillReturnError(errors.New("unexpected db error"))
 
-		suite.repo = NewLocalityRepo(suite.TestDb)
+		suite.repo = repo.NewLocalityRepo(suite.TestDb)
 
 		// When
 		_, err := suite.repo.FindSellersByLocID(1)
