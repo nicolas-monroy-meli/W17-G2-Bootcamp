@@ -19,7 +19,7 @@ type ProductService struct {
 }
 
 // FindAll returns all products
-func (s *ProductService) FindAll() (products map[int]mod.Product, err error) {
+func (s *ProductService) FindAll() (products []mod.Product, err error) {
 	return s.rp.FindAll()
 }
 

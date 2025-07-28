@@ -20,9 +20,9 @@ type ProductDB struct {
 	db *sql.DB
 }
 
-// FindAll returns all products from the database
-func (r *ProductDB) FindAll() (products map[int]mod.Product, err error) {
-	rows, err := r.db.Query("SELECT `id`, `product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id` FROM frescos_db.products;")
+// FindAll returns all products from the database - TESTED
+func (r *ProductDB) FindAll() (products []mod.Product, err error) {
+	rows, err := r.db.Query("SELECT `id`, `product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id` FROM products;")
 	if err != nil {
 		return nil, e.ErrProductRepositoryNotFound
 	}
@@ -32,10 +32,7 @@ func (r *ProductDB) FindAll() (products map[int]mod.Product, err error) {
 		if err := rows.Scan(&product.ID, &product.ProductCode, &product.Description, &product.Height, &product.Length, &product.Width, &product.Weight, &product.ExpirationRate, &product.FreezingRate, &product.RecomFreezTemp, &product.ProductTypeID, &product.SellerID); err != nil {
 			return nil, e.ErrProductRepositoryNotFound
 		}
-		if products == nil {
-			products = make(map[int]mod.Product)
-		}
-		products[product.ID] = product
+		products = append(products, product)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, e.ErrProductRepositoryNotFound
@@ -46,12 +43,9 @@ func (r *ProductDB) FindAll() (products map[int]mod.Product, err error) {
 	return products, nil
 }
 
-// FindByID returns a product from the database by its id
+// FindByID returns a product from the database by its id - TESTED
 func (r *ProductDB) FindByID(id int) (product mod.Product, err error) {
 	row := r.db.QueryRow("SELECT `id`, `product_code`, `description`, `height`, `length`, `width`, `net_weight`, `expiration_rate`, `freezing_rate`, `recommended_freezing_temperature`, `product_type_id`, `seller_id` FROM frescos_db.products WHERE id = ?;", id)
-	if err != nil {
-		return mod.Product{}, e.ErrProductRepositoryNotFound
-	}
 	if err := row.Scan(&product.ID, &product.ProductCode, &product.Description, &product.Height, &product.Length, &product.Width, &product.Weight, &product.ExpirationRate, &product.FreezingRate, &product.RecomFreezTemp, &product.ProductTypeID, &product.SellerID); err != nil {
 		return mod.Product{}, e.ErrProductRepositoryNotFound
 	}
@@ -61,7 +55,7 @@ func (r *ProductDB) FindByID(id int) (product mod.Product, err error) {
 	return product, nil
 }
 
-// Save saves a product into the database
+// Save saves a product into the database - TESTED
 func (r *ProductDB) Save(product *mod.Product) (err error) {
 	if _, exists := r.FindByID(product.ID); exists == nil {
 		err = e.ErrProductRepositoryDuplicated
