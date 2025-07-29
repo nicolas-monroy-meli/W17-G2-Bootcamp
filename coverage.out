@@ -137,10 +137,6 @@ github.com/smartineztri_meli/W17-G2-Bootcamp/internal/service/warehouse_service.
 github.com/smartineztri_meli/W17-G2-Bootcamp/internal/service/warehouse_service.go:59.49,61.2 1 0
 github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/responses.go:10.67,15.2 4 0
 github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/responses.go:16.86,21.2 4 0
-github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models/purchase_order_model.go:20.45,23.2 2 0
-github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models/purchase_order_model.go:25.46,28.16 3 0
-github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models/purchase_order_model.go:28.16,30.3 1 0
-github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models/purchase_order_model.go:31.2,32.12 2 0
 github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors/errors.go:101.46,104.2 2 0
 github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors/errors.go:119.51,119.101 1 0
 github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors/errors.go:120.51,120.68 1 0
@@ -161,6 +157,10 @@ github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors/errors.go:156.17,1
 github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors/errors.go:158.11,159.75 1 0
 github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors/errors.go:162.3,162.32 1 0
 github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors/errors.go:164.2,164.19 1 0
+github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models/purchase_order_model.go:20.45,23.2 2 0
+github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models/purchase_order_model.go:25.46,28.16 3 0
+github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models/purchase_order_model.go:28.16,30.3 1 0
+github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models/purchase_order_model.go:31.2,32.12 2 0
 github.com/smartineztri_meli/W17-G2-Bootcamp/internal/handler/buyer_handler.go:19.62,23.2 1 0
 github.com/smartineztri_meli/W17-G2-Bootcamp/internal/handler/buyer_handler.go:32.50,33.54 1 0
 github.com/smartineztri_meli/W17-G2-Bootcamp/internal/handler/buyer_handler.go:33.54,37.17 3 0
@@ -231,7 +231,7 @@ github.com/smartineztri_meli/W17-G2-Bootcamp/internal/handler/buyer_handler.go:2
 github.com/smartineztri_meli/W17-G2-Bootcamp/internal/handler/carries_handler.go:21.62,28.2 2 1
 github.com/smartineztri_meli/W17-G2-Bootcamp/internal/handler/carries_handler.go:31.50,32.54 1 1
 github.com/smartineztri_meli/W17-G2-Bootcamp/internal/handler/carries_handler.go:32.54,35.64 2 1
-github.com/smartineztri_meli/W17-G2-Bootcamp/internal/handler/carries_handler.go:35.64,39.4 3 0
+github.com/smartineztri_meli/W17-G2-Bootcamp/internal/handler/carries_handler.go:35.64,39.4 3 1
 github.com/smartineztri_meli/W17-G2-Bootcamp/internal/handler/carries_handler.go:41.3,41.50 1 1
 github.com/smartineztri_meli/W17-G2-Bootcamp/internal/handler/carries_handler.go:41.50,44.4 2 1
 github.com/smartineztri_meli/W17-G2-Bootcamp/internal/handler/carries_handler.go:46.3,46.45 1 1

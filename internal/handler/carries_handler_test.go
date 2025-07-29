@@ -67,6 +67,34 @@ func TestCarryHandler_Create(t *testing.T) {
 		require.Equal(t, http.StatusCreated, w.Code)
 		require.JSONEq(t, expected, w.Body.String())
 	})
+	t.Run("create_missing_required_field", func(t *testing.T) {
+		body := strings.NewReader(`{
+        "company_name": "some name",
+        "address": "corrientes 800",
+        "telephone": "45674567",
+        "locality_id": 6700
+    }`)
+
+		req := httptest.NewRequest(http.MethodPost, "/carries", body)
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		handler.Create().ServeHTTP(w, req)
+
+		require.Equal(t, http.StatusUnprocessableEntity, w.Code)
+		require.Contains(t, w.Body.String(), "Campos inválidos")
+	})
+	t.Run("create_invalid_json", func(t *testing.T) {
+		body := strings.NewReader(`{invalid_json}`) // JSON malformado
+		req := httptest.NewRequest(http.MethodPost, "/carries", body)
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		handler.Create().ServeHTTP(w, req)
+
+		require.Equal(t, http.StatusBadRequest, w.Code)
+		require.Contains(t, w.Body.String(), e.ErrRequestWrongBody.Error())
+	})
 
 	t.Run("create_invalid_telephone", func(t *testing.T) {
 		body := strings.NewReader(`{
@@ -161,4 +189,19 @@ func TestCarryHandler_GetReportByLocality(t *testing.T) {
 		require.Equal(t, http.StatusNotFound, w.Code)
 		require.Contains(t, w.Body.String(), "locality not found")
 	})
+
+	t.Run("get_report_all_success", func(t *testing.T) {
+		// Mock del servicio: Retorna datos y ningún error
+		mock.On("GetReportByLocalityAll").Return(report, nil).Once()
+
+		req := httptest.NewRequest(http.MethodGet, "/localities/reportCarries", nil)
+		w := httptest.NewRecorder()
+
+		handler.GetReportByLocality().ServeHTTP(w, req)
+
+		require.Equal(t, http.StatusOK, w.Code)
+		require.Contains(t, w.Body.String(), "success")
+		require.Contains(t, w.Body.String(), "Test Locality") // Verifica datos del reporte
+	})
+
 }
