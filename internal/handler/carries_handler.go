@@ -75,7 +75,7 @@ func (h *carryHandler) GetReportByLocality() http.HandlerFunc {
 
 		report, err := h.sv.ReportByLocality(id)
 		if err != nil {
-			utils.BadResponse(w, http.StatusInternalServerError, "Error al generar el reporte: "+err.Error())
+			utils.BadResponse(w, http.StatusNotFound, "Error al generar el reporte: "+err.Error())
 			return
 		}
 

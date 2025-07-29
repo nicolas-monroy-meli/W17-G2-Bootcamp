@@ -2,13 +2,14 @@ package server
 
 import (
 	"database/sql"
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-sql-driver/mysql"
 	hand "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/handler"
 	repo "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/repository"
 	serv "github.com/smartineztri_meli/W17-G2-Bootcamp/internal/service"
-	"net/http"
 )
 
 type SQLConfig struct {
@@ -48,7 +49,7 @@ func (d *SQLConfig) Run() (err error) {
 
 	buyRepo := repo.NewBuyerRepo(db)
 	purRepo := repo.NewPurchaseOrderRepo(db)
-	empRepo := repo.NewEmployeeRepo(db)
+	// empRepo := repo.NewEmployeeRepo(db)
 	inbRepo := repo.NewInboundRepo(db)
 	secRepo := repo.NewSectionRepo(db)
 	pbRepo := repo.NewProductBatchRepo(db)
@@ -62,7 +63,7 @@ func (d *SQLConfig) Run() (err error) {
 	//instancing service layer
 	buyServ := serv.NewBuyerService(buyRepo)
 	purServ := serv.NewPurchaseOrderService(purRepo)
-	empServ := serv.NewEmployeeService(empRepo)
+	// empServ := serv.NewEmployeeService(empRepo)
 	inbServ := serv.NewInboundService(inbRepo)
 	secServ := serv.NewSectionService(secRepo)
 	pbServ := serv.NewProductBatchRepository(pbRepo)
@@ -76,7 +77,7 @@ func (d *SQLConfig) Run() (err error) {
 	//instancing handler layer
 	buyHand := hand.NewBuyerHandler(buyServ)
 	purHand := hand.NewPurchaseOrderHandler(purServ)
-	empHand := hand.NewEmployeeHandler(empServ)
+	// empHand := hand.NewEmployeeHandler(empServ)
 	inbHand := hand.NewInboundHandler(inbServ)
 	secHand := hand.NewSectionHandler(secServ)
 	pbHand := hand.NewProductBatchHandler(pbServ)
@@ -158,14 +159,14 @@ func (d *SQLConfig) Run() (err error) {
 	})
 
 	//// - employees
-	rt.Route("/v1/employees", func(rt chi.Router) {
-		rt.Get("/", empHand.GetAll())
-		rt.Get("/reportInboundOrders", inbHand.GetOrdersByEmployee())
-		rt.Get("/{id}", empHand.GetById())
-		rt.Post("/", empHand.Create())
-		rt.Patch("/{id}", empHand.Edit())
-		rt.Delete("/{id}", empHand.Delete())
-	})
+	// rt.Route("/v1/employees", func(rt chi.Router) {
+	// 	rt.Get("/", empHand.GetAll())
+	// 	rt.Get("/reportInboundOrders", inbHand.GetOrdersByEmployee())
+	// 	rt.Get("/{id}", empHand.GetById())
+	// 	rt.Post("/", empHand.Create())
+	// 	rt.Patch("/{id}", empHand.Edit())
+	// 	rt.Delete("/{id}", empHand.Delete())
+	// })
 
 	rt.Route("/v1/inboundOrders", func(rt chi.Router) {
 		rt.Post("/", inbHand.Create())
