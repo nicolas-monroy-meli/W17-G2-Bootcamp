@@ -13,12 +13,13 @@ var (
 	ErrNoRowsAffected = errors.New("repository: no rows were affected")
 	// DataRetrievedSuccess string that tells the data was retrieved
 	// Requests
-	ErrRequestIdMustBeInt  = errors.New("handler: id must be an integer")
-	ErrRequestIdMustBeGte0 = errors.New("handler: id must be greater than 0")
-	ErrRequestNoBody       = errors.New("handler: request must have a body")
-	ErrRequestWrongBody    = errors.New("handler: body does not meet requirements")
-	ErrRequestFailedBody   = errors.New("handler: failed to read body")
-	ErrNothingToUpdate     = errors.New("handler: nothing to update")
+	ErrRequestIdMustBeInt    = errors.New("handler: id must be an integer")
+	ErrRequestIdMustBeGte0   = errors.New("handler: id must be greater than 0")
+	ErrRequestNoBody         = errors.New("handler: request must have a body")
+	ErrRequestWrongBody      = errors.New("handler: body does not meet requirements")
+	ErrRequestFailedBody     = errors.New("handler: failed to read body")
+	ErrRequestInternalServer = errors.New("handler: internal server error")
+  ErrNothingToUpdate     = errors.New("handler: nothing to update")
 	//Query
 	ErrQueryError   = errors.New("repository: unable to execute query")
 	ErrParseError   = errors.New("repository: unable to parse row")

@@ -3,7 +3,6 @@ package repository
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"github.com/go-sql-driver/mysql"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
@@ -56,7 +55,6 @@ func (r *BuyerDB) FindByID(id int) (buyer mod.Buyer, err error) {
 		"WHERE buyers.id = ?", id)
 
 	if err = row.Err(); err != nil {
-		fmt.Println("error", err)
 		return
 	}
 
@@ -86,7 +84,6 @@ func (r *BuyerDB) Save(buyer *mod.Buyer) (err error) {
 			"VALUES (?, ?, ?)",
 		(*buyer).CardNumberID, (*buyer).FirstName, (*buyer).LastName,
 	)
-
 	if err != nil {
 		var mysqlErr *mysql.MySQLError
 		if errors.As(err, &mysqlErr) {
@@ -97,14 +94,16 @@ func (r *BuyerDB) Save(buyer *mod.Buyer) (err error) {
 				return err
 			}
 		}
+
+		return err
 	}
 
 	lastInsertId, err := result.LastInsertId()
+
 	if err != nil {
 		return err
 	}
 	(*buyer).ID = int(lastInsertId)
-
 	return
 }
 
@@ -126,6 +125,8 @@ func (r *BuyerDB) Update(buyer *mod.Buyer) (err error) {
 				return err
 			}
 		}
+
+		return err
 	}
 
 	return nil
