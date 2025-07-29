@@ -228,6 +228,20 @@ func (s *TestBuyeRepo) TestSaveBuyerRepo() {
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "fail id")
 	})
+
+	t.Run("Case 5: Fail Sql other error", func(t *testing.T) {
+		s.SetupTest()
+
+		mysqlErr := &mysql.MySQLError{Number: 2050, Message: "Unknown error"}
+		s.MockDb.ExpectExec(regexp.QuoteMeta(expectedQuery)).
+			WithArgs(newBuyer.CardNumberID, newBuyer.FirstName, newBuyer.LastName).
+			WillReturnError(mysqlErr)
+
+		err := s.Repo.Save(&newBuyer)
+
+		require.Error(t, err)
+		require.Equal(t, mysqlErr, err)
+	})
 }
 
 func (s *TestBuyeRepo) TestUpdateBuyerRepo() {
