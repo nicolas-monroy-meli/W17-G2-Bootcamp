@@ -36,9 +36,7 @@ func (h *warehouseHandler) GetAll() http.HandlerFunc {
 		}
 
 		var warehouses []models.Warehouse
-		for _, wh := range warehousesMap {
-			warehouses = append(warehouses, wh)
-		}
+		warehouses = append(warehouses, warehousesMap...)
 
 		sort.Slice(warehouses, func(i, j int) bool {
 			return warehouses[i].ID < warehouses[j].ID

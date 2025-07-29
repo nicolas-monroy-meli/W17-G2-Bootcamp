@@ -106,11 +106,7 @@ func (h *SellerHandler) Update() http.HandlerFunc {
 			return
 		}
 		req.ID = id
-		seller, err := common.PatchSeller(currentSeller, req)
-		if err != nil {
-			utils.BadResponse(w, 407, err.Error())
-			return
-		}
+		seller := common.PatchSeller(currentSeller, req)
 
 		errValidate := e.ValidateStruct(seller)
 		if len(errValidate) > 0 {

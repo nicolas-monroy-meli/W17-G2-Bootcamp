@@ -110,7 +110,7 @@ func (h *EmployeeHandler) Edit() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
-		employee := common.PatchEmployees(model, emplo)
+		employee := common.PatchEmployees(model, *emplo)
 		employee.ID = idNum
 		err = h.sv.Update(idNum, &employee)
 		if err != nil {
@@ -139,7 +139,6 @@ func (h *EmployeeHandler) Delete() http.HandlerFunc {
 			utils.BadResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
-		utils.GoodResponse(w, http.StatusNoContent, e.DataRetrievedSuccess, nil)
-
+		w.WriteHeader(http.StatusNoContent)
 	}
 }

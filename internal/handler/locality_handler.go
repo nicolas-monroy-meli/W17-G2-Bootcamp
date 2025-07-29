@@ -25,7 +25,7 @@ type LocalityHandler struct {
 }
 
 // GetByID returns a seller
-func (h *LocalityHandler) GetSelByLoc() http.HandlerFunc {
+func (h *LocalityHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		result, err := h.sv.FindAllLocalities()
 		if err != nil {
@@ -46,14 +46,14 @@ func (h *LocalityHandler) GetSelByLocID() http.HandlerFunc {
 			id = -1
 		default:
 			id, err = strconv.Atoi(req)
-			if id < 0 {
+			if err != nil {
 				utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
 				return
 			}
-		}
-		if err != nil {
-			utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeGte0.Error())
-			return
+			if id < 0 {
+				utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeGte0.Error())
+				return
+			}
 		}
 		result, err := h.sv.FindSellersByLocID(id)
 		if err != nil {

@@ -29,7 +29,7 @@ func (r *EmployeeDB) FindAll() ([]mod.Employee, error) {
 	for rows.Next() {
 
 		var emp mod.Employee
-		if err := rows.Scan(&emp.ID, &emp.FirstName, &emp.LastName, &emp.CardNumberID, &emp.WarehouseID); err != nil { // Adjust fields
+		if err := rows.Scan(&emp.ID, &emp.CardNumberID, &emp.FirstName, &emp.LastName, &emp.WarehouseID); err != nil {
 			return nil, errors.New("failed to scan employee row")
 		}
 		employees = append(employees, emp)

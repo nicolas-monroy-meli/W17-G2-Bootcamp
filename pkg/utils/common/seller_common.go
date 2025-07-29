@@ -4,7 +4,7 @@ import (
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 )
 
-func PatchSeller(seller mod.Seller, newSeller mod.SellerPatch) (*mod.Seller, error) {
+func PatchSeller(seller mod.Seller, newSeller mod.SellerPatch) *mod.Seller {
 	if newSeller.Telephone != nil {
 		seller.Telephone = *newSeller.Telephone
 	}
@@ -20,5 +20,5 @@ func PatchSeller(seller mod.Seller, newSeller mod.SellerPatch) (*mod.Seller, err
 	if newSeller.Locality != nil {
 		seller.Locality = *newSeller.Locality
 	}
-	return &seller, nil
+	return &seller
 }
