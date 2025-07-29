@@ -110,6 +110,20 @@ func TestWarehouseController_Create(t *testing.T) {
 		require.Equal(t, http.StatusConflict, w.Code)
 		require.JSONEq(t, expected, w.Body.String())
 	})
+
+	t.Run("create_conflictNill", func(t *testing.T) {
+
+		req := httptest.NewRequest(http.MethodPost, "/warehouses", nil)
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		expected := `{"data":null, "message":"handler: body does not meet requirements", "success":false}`
+
+		handler.Create().ServeHTTP(w, req)
+		require.Equal(t, http.StatusBadRequest, w.Code)
+		require.JSONEq(t, expected, w.Body.String())
+	})
+
 }
 
 func TestWarehouseController_Read(t *testing.T) {
@@ -344,6 +358,41 @@ func TestWarehouseController_Update(t *testing.T) {
 
 		handler.Update().ServeHTTP(w, req)
 		require.Equal(t, http.StatusBadRequest, w.Code)
+		require.JSONEq(t, expected, w.Body.String())
+	})
+
+	t.Run("update_invalidedIDNill", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPatch, "/warehouses/3", nil)
+		routeCtx := chi.NewRouteContext()
+		routeCtx.URLParams.Add("id", "3")
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, routeCtx))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		expected := `{"data":null, "message":"handler: body does not meet requirements", "success":false}`
+
+		handler.Update().ServeHTTP(w, req)
+		require.Equal(t, http.StatusBadRequest, w.Code)
+		require.JSONEq(t, expected, w.Body.String())
+	})
+
+	t.Run("update_invalidedIDNot", func(t *testing.T) {
+		body := strings.NewReader(`{"Address": "a",
+  "Telephone": "1234",
+  "Warehouse_Code": "a",
+  "Minimum_Capacity": -1,
+  "Minimum_Temperature": 1}`)
+		req := httptest.NewRequest(http.MethodPatch, "/warehouses/4", body)
+		routeCtx := chi.NewRouteContext()
+		routeCtx.URLParams.Add("id", "4")
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, routeCtx))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		expected := `{"data":null, "message":"Campos inválidos: Key: 'Warehouse.MinimumCapacity' Error:Field validation for 'MinimumCapacity' failed on the 'min' tag", "success":false}`
+
+		handler.Update().ServeHTTP(w, req)
+		require.Equal(t, http.StatusUnprocessableEntity, w.Code)
 		require.JSONEq(t, expected, w.Body.String())
 	})
 
