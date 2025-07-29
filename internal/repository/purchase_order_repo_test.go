@@ -83,7 +83,6 @@ func (s *TestPurchaseOrderRepo) TestSaveBuyerRepo() {
 			WithArgs(newPurchaseOrder.ProductsDetails[0].CleanLinessStatus, newPurchaseOrder.ProductsDetails[0].Quantity, newPurchaseOrder.ProductsDetails[0].Temperature, newPurchaseOrder.ProductsDetails[0].ProductRecordId, 21).
 			WillReturnResult(sqlmock.NewResult(31, 1))
 
-		// 5. Simula: Exec del segundo detalle
 		s.MockDb.ExpectExec(regexp.QuoteMeta(expectedQueryOrderDetail)).
 			WithArgs(newPurchaseOrder.ProductsDetails[1].CleanLinessStatus, newPurchaseOrder.ProductsDetails[1].Quantity, newPurchaseOrder.ProductsDetails[1].Temperature, newPurchaseOrder.ProductsDetails[1].ProductRecordId, 21).
 			WillReturnResult(sqlmock.NewResult(32, 1))
