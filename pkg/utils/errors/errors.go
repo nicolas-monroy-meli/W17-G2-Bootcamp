@@ -3,13 +3,14 @@ package errors
 import (
 	"errors"
 	"fmt"
+	"github.com/go-sql-driver/mysql"
 	"time"
 
 	"github.com/go-playground/validator/v10"
 )
 
 var (
-	NoRowsAffected = errors.New("repository: no rows were affected")
+	ErrNoRowsAffected = errors.New("repository: no rows were affected")
 	// DataRetrievedSuccess string that tells the data was retrieved
 	// Requests
 	ErrRequestIdMustBeInt    = errors.New("handler: id must be an integer")
@@ -18,8 +19,10 @@ var (
 	ErrRequestWrongBody      = errors.New("handler: body does not meet requirements")
 	ErrRequestFailedBody     = errors.New("handler: failed to read body")
 	ErrRequestInternalServer = errors.New("handler: internal server error")
+  ErrNothingToUpdate     = errors.New("handler: nothing to update")
 	//Query
 	ErrQueryError   = errors.New("repository: unable to execute query")
+	ErrParseError   = errors.New("repository: unable to parse row")
 	ErrInsertError  = errors.New("repository: insert is returning an error")
 	ErrQueryIsEmpty = errors.New("repository: query returned no info")
 
@@ -67,7 +70,7 @@ var (
 	ErrProductRecordRepositoryDuplicated = errors.New("repository: product record already exists")
 
 	// Errores de Section
-	ErrEmptySectionDB              = errors.New("repository: empty DB")
+	ErrEmptyDB                     = errors.New("repository: empty DB")
 	ErrSectionRepositoryNotFound   = errors.New("repository: section not found")
 	ErrSectionRepositoryDuplicated = errors.New("repository: section already exists")
 
@@ -83,7 +86,8 @@ var (
 
 	//Locality
 	// ErrLocalityNotFound is returned when the locality is not found
-	ErrLocalityRepositoryNotFound = errors.New("repository: locality not found")
+	ErrLocalityRepositoryNotFound   = errors.New("repository: locality not found")
+	ErrLocalityRepositoryDuplicated = errors.New("repository: locality already exists")
 
 	// Errores de Warehouse
 	ErrWarehouseRepositoryNotFound   = errors.New("repository: warehouse not found")
@@ -99,6 +103,22 @@ func validTime(fl validator.FieldLevel) bool {
 	_, err := time.Parse("15:04:05", fl.Field().String())
 	return err == nil
 }
+
+var DupErr = &mysql.MySQLError{
+	Number:  1062,
+	Message: "Duplicate Entry",
+}
+
+var FkErr = &mysql.MySQLError{
+	Number:  1452,
+	Message: "Foreign Key Constrain Error",
+}
+
+// FakeResult created in order to raise Fail on lastInsertId
+type FakeResult struct{}
+
+func (r FakeResult) LastInsertId() (int64, error) { return 0, errors.New("fail on last insert id") }
+func (r FakeResult) RowsAffected() (int64, error) { return 1, nil }
 
 // ValidateStruct returns a string map of formatted errors
 func ValidateStruct(s interface{}) map[string]string {
@@ -144,5 +164,3 @@ func ValidateStruct(s interface{}) map[string]string {
 	}
 	return errorsList
 }
-
-//tablas dependencias inexistentes

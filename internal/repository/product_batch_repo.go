@@ -3,7 +3,6 @@ package repository
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"github.com/go-sql-driver/mysql"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
@@ -22,8 +21,7 @@ func NewProductBatchRepo(db *sql.DB) *ProductBatchDB {
 func (r *ProductBatchDB) FindAll() (batches []mod.ProductBatch, err error) {
 	rows, err := r.db.Query("SELECT `id`,`batch_number`, `current_quantity`, `initial_quantity`, `current_temperature`, `minimum_temperature`, `due_date`, `manufacturing_date`, `manufacturing_hour`, `product_id`, `section_id` FROM `product_batches` ")
 	if err != nil {
-		fmt.Println(err.Error())
-		return nil, err
+		return nil, e.ErrQueryError
 	}
 
 	defer rows.Close()
@@ -38,7 +36,7 @@ func (r *ProductBatchDB) FindAll() (batches []mod.ProductBatch, err error) {
 	}
 
 	if len(batches) == 0 {
-		return nil, e.ErrEmptySectionDB
+		return nil, e.ErrEmptyDB
 	}
 	return batches, nil
 }
@@ -61,7 +59,7 @@ func (r *ProductBatchDB) Save(batch *mod.ProductBatch) (err error) {
 
 	id, err := result.LastInsertId()
 	if err != nil {
-		return
+		return e.ErrProductBatchNotFound
 	}
 	(*batch).ID = int(id)
 	return

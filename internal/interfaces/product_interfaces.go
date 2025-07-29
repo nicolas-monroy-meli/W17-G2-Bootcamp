@@ -9,7 +9,7 @@ import (
 // ProductRepository is an interface that contains the methods that the product repository should support
 type ProductRepository interface {
 	// FindAll returns all the products
-	FindAll() (map[int]mod.Product, error)
+	FindAll() ([]mod.Product, error)
 	// FindByID returns the product with the given ID
 	FindByID(id int) (mod.Product, error)
 	// Save saves the given product
@@ -23,7 +23,7 @@ type ProductRepository interface {
 // ProductService is an interface that contains the methods that the product service should support
 type ProductService interface {
 	// FindAll returns all the products
-	FindAll() (map[int]mod.Product, error)
+	FindAll() ([]mod.Product, error)
 	// FindByID returns the product with the given ID
 	FindByID(id int) (mod.Product, error)
 	// Save saves the given product
