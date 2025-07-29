@@ -119,15 +119,15 @@ func (r *carryRepository) Update(c *models.Carry) error {
 	}
 
 	query := `
-		UPDATE carries 
-		SET 
-			cid = ?, 
-			locality_id = ?, 
-			company_name = ?, 
-			address = ?, 
-			telephone = ? 
-		WHERE id = ?
-	`
+			UPDATE carries 
+			SET 
+				cid = ?, 
+				locality_id = ?, 
+				company_name = ?, 
+				address = ?, 
+				telephone = ? 
+			WHERE id = ?
+		`
 
 	result, err := r.db.Exec(query, // Exec
 		c.CID,

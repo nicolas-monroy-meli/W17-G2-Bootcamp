@@ -65,7 +65,7 @@ func GetQueryReport(ids []int) (string, []interface{}) {
         LEFT JOIN products p ON p.id = s.product_type_id
     `
 	whereClause := ""
-	args := []interface{}{}
+	var args []interface{}
 
 	// If ID list is provided, filter, else show all
 	if len(ids) > 0 {
@@ -104,10 +104,10 @@ func ParseIDs(param string) ([]int, error) {
 		}
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			return nil, fmt.Errorf("'%s' is not a valid integer", idStr)
+			return nil, e.ErrRequestIdMustBeInt
 		}
 		if id <= 0 {
-			return nil, fmt.Errorf("section ID must be positive, got %d", id)
+			return nil, e.ErrRequestIdMustBeGte0
 		}
 		ids = append(ids, id)
 	}

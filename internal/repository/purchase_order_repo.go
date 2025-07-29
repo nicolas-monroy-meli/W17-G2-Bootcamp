@@ -3,7 +3,6 @@ package repository
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"github.com/go-sql-driver/mysql"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
@@ -26,14 +25,12 @@ func (r *PurchaseOrderDB) Save(purchaseOrder *mod.PurchaseOrder) (err error) {
 	tx, _ := r.db.Begin()
 
 	defer func() {
-		fmt.Println("errorl", err)
 		if err != nil {
 			tx.Rollback()
 		} else {
 			err = tx.Commit()
 		}
 	}()
-	fmt.Println("Ejecutado")
 	result, err := tx.Exec(
 		"INSERT INTO purchase_orders (order_number, order_date, tracking_code, buyer_id) "+
 			"VALUES (?, ?, ?, ?)",
@@ -53,6 +50,8 @@ func (r *PurchaseOrderDB) Save(purchaseOrder *mod.PurchaseOrder) (err error) {
 				return err
 			}
 		}
+
+		return err
 	}
 
 	lastInsertId, err := result.LastInsertId()
@@ -82,7 +81,6 @@ func (r *PurchaseOrderDB) insertOrderDetail(tx *sql.Tx, orderDetails *mod.OrderD
 		(*orderDetails).CleanLinessStatus, (*orderDetails).Quantity, (*orderDetails).Temperature,
 		(*orderDetails).ProductRecordId, (*orderDetails).PurchaseOrderId,
 	)
-
 	if err != nil {
 		var mysqlErr *mysql.MySQLError
 		if errors.As(err, &mysqlErr) {
@@ -93,6 +91,8 @@ func (r *PurchaseOrderDB) insertOrderDetail(tx *sql.Tx, orderDetails *mod.OrderD
 				return err
 			}
 		}
+
+		return err
 	}
 
 	lastInsertId, err := result.LastInsertId()
@@ -102,21 +102,4 @@ func (r *PurchaseOrderDB) insertOrderDetail(tx *sql.Tx, orderDetails *mod.OrderD
 	(*orderDetails).ID = int(lastInsertId)
 
 	return nil
-}
-
-func (r *PurchaseOrderDB) GetByOrderNumber(orderNumber string) (purchaseOrder mod.PurchaseOrder, err error) {
-	rowBuyer := r.db.QueryRow(
-		"SELECT id, order_number FROM purchase_orders WHERE order_number = ? ", orderNumber,
-	)
-
-	err = rowBuyer.Scan(
-		&purchaseOrder.ID,
-		&purchaseOrder.OrderNumber,
-	)
-
-	if err != nil {
-		return
-	}
-
-	return purchaseOrder, nil
 }

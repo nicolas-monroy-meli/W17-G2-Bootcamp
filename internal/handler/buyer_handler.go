@@ -31,7 +31,6 @@ type BuyerHandler struct {
 // GetAll returns all buyers
 func (h *BuyerHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Print("Hola")
 		buyers, err := h.sv.FindAll()
 
 		if err != nil {
@@ -79,7 +78,8 @@ func (h *BuyerHandler) GetReport() http.HandlerFunc {
 		if idQuery != "" {
 			idParsed, err := strconv.Atoi(idQuery)
 			if err != nil {
-				utils.BadResponse(w, http.StatusNotFound, e.ErrRequestIdMustBeInt.Error())
+				utils.BadResponse(w, http.StatusBadRequest, e.ErrRequestIdMustBeInt.Error())
+				return
 			}
 			id = &idParsed
 		}
@@ -90,13 +90,10 @@ func (h *BuyerHandler) GetReport() http.HandlerFunc {
 			case errors.Is(err, e.ErrBuyerRepositoryNotFound):
 				utils.BadResponse(w, http.StatusNotFound, err.Error())
 			default:
-				utils.BadResponse(w, http.StatusInternalServerError, "internal server error")
+				utils.BadResponse(w, http.StatusInternalServerError, e.ErrRequestInternalServer.Error())
 			}
 			return
 		}
-
-		// response
-		// - serialize product to JSON
 
 		utils.GoodResponse(
 			w,
@@ -118,9 +115,6 @@ func (h *BuyerHandler) Create() http.HandlerFunc {
 		}
 
 		errValidation := e.ValidateStruct(newBuyer)
-
-		//validate := validator.New()
-		//err := validate.Struct(newBuyer)
 
 		if errValidation != nil {
 			//err = err.(validator.ValidationErrors)

@@ -31,14 +31,12 @@ func (h *warehouseHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		warehousesMap, err := h.sv.FindAll()
 		if err != nil {
-			utils.BadResponse(w, http.StatusInternalServerError, "Error al obtener los almacenes")
+			utils.BadResponse(w, http.StatusNotFound, "Error al obtener los almacenes")
 			return
 		}
 
 		var warehouses []models.Warehouse
-		for _, wh := range warehousesMap {
-			warehouses = append(warehouses, wh)
-		}
+		warehouses = append(warehouses, warehousesMap...)
 
 		sort.Slice(warehouses, func(i, j int) bool {
 			return warehouses[i].ID < warehouses[j].ID

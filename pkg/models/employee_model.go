@@ -5,7 +5,7 @@ type Employee struct {
 	// ID is the unique identifier of the employee
 	ID int `json:"id" validate:"numeric,min=1"`
 	// CardNumberID is the unique identifier of the card number
-	CardNumberID string `json:"card_number_id" validate:"numeric"`
+	CardNumberID string `json:"card_number_id"`
 	// FirstName is the first name of the employee
 	FirstName string `json:"first_name" `
 	// LastName is the last name of the employee
