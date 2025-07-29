@@ -74,7 +74,7 @@ func (h *PurchaseOrderHandler) Create() http.HandlerFunc {
 			return
 		}
 
-		utils.GoodResponse(w, http.StatusCreated, "Buyer creado exitosamente", newPurchaseOrder)
+		utils.GoodResponse(w, http.StatusCreated, "Purchase order creado exitosamente", newPurchaseOrder)
 		return
 	}
 }
