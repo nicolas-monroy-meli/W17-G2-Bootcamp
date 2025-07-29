@@ -25,7 +25,7 @@ func (s *EmployeeService) FindAll() (employees []mod.Employee, err error) {
 }
 
 // FindByID returns a employee
-func (s *EmployeeService) FindByID(id int) (employee mod.Employee, err error) {
+func (s *EmployeeService) FindByID(id int) (employee *mod.Employee, err error) {
 	employee, err = s.rp.FindByID(id)
 	return
 }

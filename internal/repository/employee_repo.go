@@ -44,16 +44,20 @@ func (r *EmployeeDB) FindAll() ([]mod.Employee, error) {
 }
 
 // FindById find 0ne employee by id
-func (r *EmployeeDB) FindByID(id int) (employee mod.Employee, err error) {
-	row := r.db.QueryRow("SELECT id,id_card_number,first_name,last_name, wareHouse_id  FROM employees WHERE id = ?", id) // Use appropriate placeholder for your DB
-	err = row.Scan(&employee.ID, &employee.CardNumberID, &employee.FirstName, &employee.LastName, &employee.WarehouseID) // Adjust fields
+func (r *EmployeeDB) FindByID(id int) (*mod.Employee, error) {
+	var employee mod.Employee
+
+	row := r.db.QueryRow("SELECT id,id_card_number,first_name,last_name, wareHouse_id FROM employees WHERE id = ?", id)
+
+	err := row.Scan(&employee.ID, &employee.CardNumberID, &employee.FirstName, &employee.LastName, &employee.WarehouseID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return employee, e.ErrEmployeeRepositoryNotFound // Your custom error
+			return nil, e.ErrEmployeeRepositoryNotFound
 		}
-		return employee, errors.New("failed to scan employee by ID")
+		return nil, errors.New("failed to scan employee by ID")
 	}
-	return employee, nil
+
+	return &employee, nil
 }
 
 // Save creates a new employee

@@ -95,13 +95,13 @@ func TestEmployeeDB_FindByID(t *testing.T) {
 	query := "SELECT id,id_card_number,first_name,last_name, wareHouse_id FROM employees WHERE id = ?"
 	mockedRow := sqlmock.NewRows(employeeCols).AddRow(1, "12345", "John", "Doe", 1)
 
-	expectedEmployee := mod.Employee{ID: 1, CardNumberID: "12345", FirstName: "John", LastName: "Doe", WarehouseID: 1}
+	expectedEmployee := &mod.Employee{ID: 1, CardNumberID: "12345", FirstName: "John", LastName: "Doe", WarehouseID: 1}
 
 	testCases := []struct {
 		name        string
 		inputID     int
 		mockQuery   func(mock sqlmock.Sqlmock)
-		expected    mod.Employee
+		expected    *mod.Employee
 		expectedErr error
 	}{
 		{
@@ -119,7 +119,7 @@ func TestEmployeeDB_FindByID(t *testing.T) {
 			mockQuery: func(mock sqlmock.Sqlmock) {
 				mock.ExpectQuery(regexp.QuoteMeta(query)).WithArgs(99).WillReturnError(errors.New("repository: employee not found"))
 			},
-			expected:    mod.Employee{},
+			expected:    nil,
 			expectedErr: errors.New("failed to scan employee by ID"),
 		},
 	}

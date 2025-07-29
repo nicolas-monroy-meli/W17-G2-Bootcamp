@@ -10,7 +10,7 @@ type EmployeeRepository interface {
 	// FindAll returns all the employees
 	FindAll() ([]mod.Employee, error)
 	// FindByID returns the employee with the given ID
-	FindByID(id int) (employee mod.Employee, err error)
+	FindByID(id int) (employee *mod.Employee, err error)
 	// Save saves the given employee
 	Save(employee *mod.Employee) error
 	// Update updates the given employee
