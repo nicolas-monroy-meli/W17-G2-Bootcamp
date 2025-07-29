@@ -324,6 +324,29 @@ func TestWarehouseController_Update(t *testing.T) {
 		require.Equal(t, http.StatusNotFound, w.Code)
 		require.JSONEq(t, expected, w.Body.String())
 	})
+
+	t.Run("update_invalidedID", func(t *testing.T) {
+		body := strings.NewReader(`{"Address": "a",
+  "Telephone": "1234",
+  "Warehouse_Code": "a",
+  "Minimum_Capacity": 1,
+  "Minimum_Temperature": 1}`)
+		req := httptest.NewRequest(http.MethodPatch, "/warehouses/a", body)
+		routeCtx := chi.NewRouteContext()
+		routeCtx.URLParams.Add("id", "a")
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, routeCtx))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		expected := `{
+		"data":null, "message":"handler: id must be an integer", "success":false
+		}`
+
+		handler.Update().ServeHTTP(w, req)
+		require.Equal(t, http.StatusBadRequest, w.Code)
+		require.JSONEq(t, expected, w.Body.String())
+	})
+
 }
 
 func TestWarehouseController_Delete(t *testing.T) {
@@ -359,6 +382,22 @@ func TestWarehouseController_Delete(t *testing.T) {
 
 		handler.Delete().ServeHTTP(w, req)
 		require.Equal(t, http.StatusNotFound, w.Code)
+		require.JSONEq(t, expected, w.Body.String())
+	})
+
+	t.Run("delete_invalidedID", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodDelete, "/warehouses/a", nil)
+		routeCtx := chi.NewRouteContext()
+		routeCtx.URLParams.Add("id", "a")
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, routeCtx))
+		w := httptest.NewRecorder()
+
+		expected := `{
+			"data":null, "message":"handler: id must be an integer", "success":false
+		}`
+
+		handler.Delete().ServeHTTP(w, req)
+		require.Equal(t, http.StatusBadRequest, w.Code)
 		require.JSONEq(t, expected, w.Body.String())
 	})
 }
