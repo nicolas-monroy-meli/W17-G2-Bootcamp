@@ -167,10 +167,6 @@ func (r *BuyerDB) GetPurchaseOrderReport(id *int) (reports []mod.BuyerReportPO, 
 		return nil, err
 	}
 
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
 	found := false
 	for rows.Next() {
 		found = true

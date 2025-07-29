@@ -5,7 +5,7 @@ import (
 	"errors"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/tests/buyers/mocks"
+	mock2 "github.com/smartineztri_meli/W17-G2-Bootcamp/tests/mock"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -16,12 +16,12 @@ import (
 
 type THandlerPurchaseOrderSuite struct {
 	suite.Suite
-	mockService *mocks.MockPurchaseOrderService
+	mockService *mock2.MockPurchaseOrderService
 	handler     *PurchaseOrderHandler
 }
 
 func (s *THandlerPurchaseOrderSuite) SetupTest() {
-	s.mockService = new(mocks.MockPurchaseOrderService)
+	s.mockService = new(mock2.MockPurchaseOrderService)
 	s.handler = NewPurchaseOrderHandler(s.mockService)
 }
 

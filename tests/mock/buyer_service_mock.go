@@ -1,4 +1,4 @@
-package mocks
+package mock
 
 import (
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"

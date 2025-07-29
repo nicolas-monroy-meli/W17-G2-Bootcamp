@@ -7,7 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	mod "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/models"
 	e "github.com/smartineztri_meli/W17-G2-Bootcamp/pkg/utils/errors"
-	"github.com/smartineztri_meli/W17-G2-Bootcamp/tests/buyers/mocks"
+	mock2 "github.com/smartineztri_meli/W17-G2-Bootcamp/tests/mock"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -18,12 +18,12 @@ import (
 
 type THandlerBuyerSuite struct {
 	suite.Suite
-	mockService *mocks.MockBuyerService
+	mockService *mock2.MockBuyerService
 	handler     *BuyerHandler
 }
 
 func (s *THandlerBuyerSuite) SetupTest() {
-	s.mockService = new(mocks.MockBuyerService)
+	s.mockService = new(mock2.MockBuyerService)
 	s.handler = NewBuyerHandler(s.mockService)
 }
 
